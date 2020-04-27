@@ -1,0 +1,10 @@
+
+**/build/
+**/build-int/
+
+# Visual studio
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
