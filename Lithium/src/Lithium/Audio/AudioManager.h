@@ -2,8 +2,6 @@
 
 #include "Lithium/Core/Core.h"
 
-
-
 namespace li
 {
 	class AudioManager

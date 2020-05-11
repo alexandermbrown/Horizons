@@ -6,6 +6,7 @@
 #include "ShaderSegment.h"
 #include "TextureAtlasSegment.h"
 #include "FontSegment.h"
+#include "AudioSegment.h"
 
 #include <fstream>
 #include <vector>
@@ -44,6 +45,7 @@ namespace AssetBase
 		ASSETBASE_PUSH_SEGMENT(ShaderSegment,		root->first_node("shaders"),			path);
 		ASSETBASE_PUSH_SEGMENT(TextureAtlasSegment, root->first_node("texture_atlases"),	path);
 		ASSETBASE_PUSH_SEGMENT(FontSegment,			root->first_node("fonts"),				path);
+		ASSETBASE_PUSH_SEGMENT(AudioSegment,		root->first_node("audio"),				path);
 
 		FontSegment::Shutdown();
 
@@ -62,7 +64,10 @@ namespace AssetBase
 		os.write((char*)&as.GetHeaderSerial().signature, sizeof(uint32_t));
 		os.write((char*)&as.GetHeaderSerial().fileSize, sizeof(size_t));
 		os.write((char*)&as.GetHeaderSerial().infoTableOffset, sizeof(size_t));
+		std::cout << "-";
 
+		float i = 0.0f;
+		int percentage = 0;
 		for (const std::shared_ptr<Segment>& segment : as.GetSegments())
 		{
 			if (segment->type == SegmentType::Shader)
@@ -81,8 +86,19 @@ namespace AssetBase
 			{
 				os << *std::dynamic_pointer_cast<FontSegment>(segment).get();
 			}
+			else if (segment->type == SegmentType::Audio)
+			{
+				os << *std::dynamic_pointer_cast<AudioSegment>(segment).get();
+			}
+
+			while (i / as.GetSegments().size() * 100 > percentage) {
+				std::cout << "|";
+				percentage++;
+			}
+			i++;
 		}
 		os << *as.GetSegmentInfoTable().get();
+		std::cout << "-\n";
 		return os;
 	}
 }

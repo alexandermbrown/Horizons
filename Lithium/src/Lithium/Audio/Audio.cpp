@@ -6,13 +6,59 @@
 #define AL_LIBTYPE_STATIC
 #include "AL/al.h"
 
-#include "vorbis/codec.h"
 #include "vorbis/vorbisfile.h"
+#include <stdlib.h>
 
 #define LI_AUDIO_BUFFER_SIZE 32768
 
 namespace li
 {
+	typedef struct
+	{
+		void* buffer;
+		size_t size;
+		off_t read_pos;
+	} ogg_handle;
+
+	static size_t audio_read(void* buffer, size_t size, size_t nmemb, void* f)
+	{
+		size_t actual_size = size * nmemb;
+		if (((ogg_handle*)f)->size - ((ogg_handle*)f)->read_pos < actual_size)
+			actual_size = ((ogg_handle*)f)->size - ((ogg_handle*)f)->read_pos;
+		if (actual_size != size * nmemb) {
+			nmemb = actual_size / size;
+		}
+		memcpy(buffer,
+			(uint8_t*)((ogg_handle*)f)->buffer + ((ogg_handle*)f)->read_pos,
+			size * nmemb);
+		((ogg_handle*)f)->read_pos += size * nmemb;
+		return nmemb;
+	}
+	static int audio_seek(void* f, ogg_int64_t off, int whence)
+	{
+		switch (whence) {
+		case SEEK_SET:
+			((ogg_handle*)f)->read_pos = off;
+			break;
+		case SEEK_CUR:
+			((ogg_handle*)f)->read_pos += off;
+			break;
+		case SEEK_END:
+			((ogg_handle*)f)->read_pos = (off_t)(((ogg_handle*)f)->size) + off;
+			break;
+		}
+		return ((ogg_handle*)f)->read_pos;
+	}
+
+	static int audio_close(void* f)
+	{
+		return 0;
+	}
+	static long audio_tell(void* f)
+	{
+		return ((ogg_handle*)f)->read_pos;
+	}
+
 	Audio::Audio(const std::string& filename)
 	{
 		OggVorbis_File file;
@@ -63,44 +109,56 @@ namespace li
 		ALCall( alBufferData(m_BufferID, format, &pcmData[0], (int)pcmData.size(), freq) );
 	}
 
+
 	Audio::Audio(void* source, uint32_t length)
 	{
-		//OggVorbis_File file;
-		//int eof = 0;
-		//int current_section = 0;
+		OggVorbis_File file;
+		int eof = 0;
+		int current_section = 0;
 
-		//if (ov_open_callbacks(source, &file, NULL, 0, OV_CALLBACKS_NOCLOSE) < 0)
-		//{
-		//	LI_CORE_ERROR("Failed to load audio. Not a valid Ogg bitstream.\n");
-		//	return;
-		//}
+		ogg_handle oh;
+		oh.buffer = source;
+		oh.size = length;
+		oh.read_pos = 0;
 
-		//vorbis_info* info = ov_info(&file, -1);
+		ov_callbacks callbacks = {
+			(size_t(*)(void*, size_t, size_t, void*))		audio_read,
+			(int (*)(void*, ogg_int64_t, int))				audio_seek,
+			(int (*)(void*))								audio_close,
+			(long (*)(void*))								audio_tell,
+		};
 
-		//uint32_t format;
-		//if (info->channels == 1)
-		//	format = AL_FORMAT_MONO16;
-		//else
-		//	format = AL_FORMAT_STEREO16;
+		if (ov_open_callbacks(&oh, &file, NULL, 0, callbacks) < 0)
+		{
+			LI_CORE_ERROR("Failed to load audio. Not a valid Ogg bitstream.\n");
+			return;
+		}
 
-		//long freq = info->rate;
+		vorbis_info* info = ov_info(&file, -1);
 
-		//std::vector<char> pcmData = std::vector<char>();
-		//int bitStream;
-		//long bytes;
-		//char buffer[LI_AUDIO_BUFFER_SIZE];
-		//do
-		//{
-		//	bytes = ov_read(&file, buffer, LI_AUDIO_BUFFER_SIZE, 0, 2, 1, &bitStream);
-		//	pcmData.insert(pcmData.end(), buffer, buffer + bytes);
+		uint32_t format;
+		if (info->channels == 1)
+			format = AL_FORMAT_MONO16;
+		else
+			format = AL_FORMAT_STEREO16;
 
-		//} while (bytes > 0);
+		long freq = info->rate;
 
-		//ov_clear(&file);
+		std::vector<char> pcmData = std::vector<char>();
+		int bitStream;
+		long bytes;
+		char buffer[LI_AUDIO_BUFFER_SIZE];
+		do
+		{
+			bytes = ov_read(&file, buffer, LI_AUDIO_BUFFER_SIZE, 0, 2, 1, &bitStream);
+			pcmData.insert(pcmData.end(), buffer, buffer + bytes);
 
-		//ALCall(alGenBuffers(1, &m_BufferID));
-		//ALCall(alBufferData(m_BufferID, format, &pcmData[0], (int)pcmData.size(), freq));
+		} while (bytes > 0);
 
+		ov_clear(&file);
+
+		ALCall( alGenBuffers(1, &m_BufferID) );
+		ALCall( alBufferData(m_BufferID, format, &pcmData[0], (int)pcmData.size(), freq) );
 	}
 
 	Audio::~Audio()

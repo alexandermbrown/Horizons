@@ -21,6 +21,8 @@ namespace AssetBase
 		if (strlen(name) == 0)
 			throw "Attribute 'name' not found in shader.\n";
 
+		std::cout << "Loading shader '" << name << "' ... ";
+
 		std::filesystem::path shaderPath;
 		for (rapidxml::xml_node<>* node = shaderNode->first_node(); node; node = node->next_sibling())
 		{
@@ -45,6 +47,8 @@ namespace AssetBase
 
 		shaderFile.read((char*)&shaderData[0], shaderSize);
 		shaderFile.close();
+
+		std::cout << "done.\n";
 	}
 
 	ShaderSegment::~ShaderSegment()

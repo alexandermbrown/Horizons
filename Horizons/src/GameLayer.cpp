@@ -18,6 +18,9 @@ GameLayer::GameLayer()
 
 void GameLayer::OnAttach()
 {
+	m_AudioSource = li::CreateRef<li::AudioSource>();
+	m_AudioSource->SetAudio(li::ResourceManager::Get<li::Audio>("audio_wind"));
+	m_AudioSource->Play();
 }
 
 void GameLayer::OnDetach()
@@ -32,7 +35,7 @@ void GameLayer::OnUpdate(float dt)
 	li::Renderer::BeginScene(&m_Camera.GetCamera());
 
 	li::Renderer::SubmitColored(m_QuadColor, glm::translate(m_Transform, glm::vec3(2.0f, 1.0f, 0.0f)));
-	//li::Renderer::SubmitColoredTexture("test_small", m_QuadColor, m_Transform);
+	li::Renderer::SubmitColoredTexture("test_small", m_QuadColor, m_Transform);
 	li::Renderer::SubmitLabel(m_Label, glm::scale(glm::mat4(1.0f), {0.01f, 0.01f, 1.0f}), glm::vec4(1.0f));
 
 

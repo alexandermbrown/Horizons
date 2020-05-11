@@ -12,7 +12,8 @@ namespace AssetBase
 		Texture2D,
 		Shader,
 		TextureAtlas,
-		Font
+		Font,
+		Audio
 	};
 
 	class Segment

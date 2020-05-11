@@ -26,8 +26,6 @@ namespace li
 		if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_Context))) {
 			LI_CORE_ERROR("Failed to make audio context current!");
 		}
-
-
 	}
 
 	void AudioManager::ShutdownImpl()

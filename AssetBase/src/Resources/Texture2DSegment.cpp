@@ -50,6 +50,8 @@ namespace AssetBase
 		if (strlen(name) == 0)
 			throw "Attribute 'name' not found in texture.";
 
+		std::cout << "Loading texture '" << name << "' ... ";
+
 		std::filesystem::path imagePath;
 		for (rapidxml::xml_node<>* node = textureNode->first_node(); node; node = node->next_sibling())
 		{
@@ -93,6 +95,8 @@ namespace AssetBase
 
 		imageFile.read((char *)&imageData[0], imageSize);
 		imageFile.close();
+
+		std::cout << "done.\n";
 	}
 
 	Texture2DSegment::~Texture2DSegment()

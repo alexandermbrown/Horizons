@@ -26,6 +26,8 @@ namespace AssetBase
 		if (name == "")
 			throw "Attribute 'name' not found in shader.";
 
+		std::cout << "Loading texture atlas '" << name << "' ... ";
+
 		for (rapidxml::xml_node<>* innerNode = atlasNode->first_node(); innerNode; innerNode = innerNode->next_sibling())
 		{
 			if (!strcmp(innerNode->name(), "texture"))
@@ -55,6 +57,8 @@ namespace AssetBase
 				}
 			}
 		}
+
+		std::cout << "done.\n";
 	}
 
 	size_t TextureAtlasSegment::GetSize()

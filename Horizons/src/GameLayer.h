@@ -23,4 +23,6 @@ private:
 	glm::vec4 m_QuadColor;
 
 	li::Ref<li::Label> m_Label;
+
+	li::Ref<li::AudioSource> m_AudioSource;
 };

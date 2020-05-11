@@ -66,6 +66,13 @@ namespace li
 			return m_Fonts.at(name);
 		}
 
+		template<>
+		Ref<Audio> GetImpl<Audio>(const std::string& name) const
+		{
+			LI_CORE_ASSERT(m_Audio.find(name) != m_Audio.end(), "Audio not found.");
+			return m_Audio.at(name);
+		}
+
 		std::unordered_map<std::string, Ref<Texture2D>> m_Textures;
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 		std::unordered_map<std::string, Ref<TextureAtlas>> m_TextureAtlases;
