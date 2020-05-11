@@ -5,10 +5,11 @@
 #include "Lithium/Core/Log.h"
 #include "Lithium/Core/SDLEvent.h"
 #include "Lithium/Resources/ResourceManager.h"
+#include "Lithium/Audio/AudioManager.h"
 #include <SDL.h>
 #include <chrono>
 
-#include <imgui.h>
+#include "imgui.h"
 
 #define LI_MIN_TICKS 2
 
@@ -52,13 +53,18 @@ namespace li
 		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
 
 		Renderer::Init();
+		AudioManager::Init();
 
 		ResourceManager::Init("resources.lab");
 	}
 
 	Application::~Application()
 	{
-		
+		m_LayerStack.Clear();
+		ResourceManager::Shutdown();
+		AudioManager::Shutdown();
+		Renderer::Shutdown();
+		m_Window->Shutdown();
 	}
 
 	void Application::Run()

@@ -4,27 +4,29 @@
 #include "ConvertOpenGL.h"
 #include "glad/glad.h"
 
+#include "OpenGLCore.h"
+
 namespace li
 {
 	OpenGLFramebuffer::OpenGLFramebuffer(FramebufferTarget target)
 		: m_Target(target), m_GLTarget(ConvertOpenGL::FramebufferTarget(m_Target))
 	{
-		glCreateFramebuffers(1, &m_RendererID);
+		GLCall( glCreateFramebuffers(1, &m_RendererID) );
 	}
 
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
-		glDeleteFramebuffers(1, &m_RendererID);
+		GLCall( glDeleteFramebuffers(1, &m_RendererID) );
 	}
 
 	void OpenGLFramebuffer::Bind() const
 	{
-		glBindFramebuffer(m_GLTarget, m_RendererID);
+		GLCall( glBindFramebuffer(m_GLTarget, m_RendererID) );
 	}
 
 	void OpenGLFramebuffer::Unbind() const
 	{
-		glBindFramebuffer(m_GLTarget, 0);
+		GLCall( glBindFramebuffer(m_GLTarget, 0) );
 	}
 
 	void OpenGLFramebuffer::AttachTexture(Ref<Texture2D> texture, FramebufferAttachment attachment)
@@ -45,9 +47,9 @@ namespace li
 
 	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
-		glDeleteFramebuffers(1, &m_RendererID);
-		glCreateFramebuffers(1, &m_RendererID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		GLCall( glDeleteFramebuffers(1, &m_RendererID) );
+		GLCall( glCreateFramebuffers(1, &m_RendererID) );
+		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
 
 		if (m_Texture) 
 		{

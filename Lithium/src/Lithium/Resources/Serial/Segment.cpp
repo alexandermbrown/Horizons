@@ -6,7 +6,7 @@ namespace li
 	SegmentInfoTable::SegmentInfoTable(const std::vector<std::shared_ptr<Segment>>& segments)
 	{
 		size_t offset = HeaderSerial::GetSize();
-		numEntries = segments.size();
+		numEntries = (uint32_t)segments.size();
 		table = new SegmentInfoTableEntry[numEntries];
 		for (uint32_t i = 0; i < segments.size(); i++) 
 		{

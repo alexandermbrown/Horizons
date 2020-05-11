@@ -64,7 +64,7 @@ namespace li
 	{
 	public:
 
-		Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color = glm::vec4(1.0f), int maxChars = -1);
+		Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color = glm::vec4(1.0f), uint32_t maxChars = 0);
 		virtual ~Label() = default;
 
 		void Set(const std::wstring& text, float pointSize, const glm::vec3& position, Ref<Font> font);
@@ -87,7 +87,7 @@ namespace li
 		float m_PointSize;
 		Ref<Font> m_Font;
 
-		int m_MaxChars;
+		uint32_t m_MaxChars;
 		std::vector<GlyphVertex> m_GlyphVertices;
 		std::vector<uint32_t> m_GlyphIndices;
 

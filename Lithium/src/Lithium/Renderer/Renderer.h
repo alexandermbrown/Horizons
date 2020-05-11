@@ -17,29 +17,18 @@ namespace li
 	class Renderer
 	{
 	public:
-		Renderer();
 
+		Renderer();
 		virtual ~Renderer();
 
-		inline static void Init() 
-		{ 
-			s_Instance->InitImpl();
-		}
+		inline static void Init() { s_Instance->InitImpl(); }
+		inline static void Shutdown() { s_Instance.reset(); }
 
-		inline static void AddTextureAtlas(Ref<TextureAtlas> atlas)
-		{
-			s_Instance->AddTextureAtlasImpl(atlas);
-		}
+		inline static void AddTextureAtlas(Ref<TextureAtlas> atlas) { s_Instance->AddTextureAtlasImpl(atlas); }
 
-		inline static void BeginScene(OrthographicCamera* camera) 
-		{
-			s_Instance->BeginSceneImpl(camera);
-		}
+		inline static void BeginScene(OrthographicCamera* camera) { s_Instance->BeginSceneImpl(camera); }
 
-		inline static void EndScene() 
-		{ 
-			s_Instance->EndSceneImpl(); 
-		}
+		inline static void EndScene() { s_Instance->EndSceneImpl(); }
 
 		inline static void SubmitTextured(const std::string& textureAlias, const glm::mat4& transform = glm::mat4(1.0f))
 		{

@@ -1,8 +1,10 @@
 #include "lipch.h"
-#include "Lithium/Platform/OpenGL/OpenGLVertexArray.h"
+#include "OpenGLVertexArray.h"
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
+#include "glad/glad.h"
+#include "glm/glm.hpp"
+
+#include "OpenGLCore.h"
 
 namespace li 
 {
@@ -29,29 +31,29 @@ namespace li
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		glCreateVertexArrays(1, &m_RendererID);
+		GLCall( glCreateVertexArrays(1, &m_RendererID) );
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_RendererID);
+		GLCall( glDeleteVertexArrays(1, &m_RendererID) );
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		glBindVertexArray(m_RendererID);
+		GLCall( glBindVertexArray(m_RendererID) );
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
-		glBindVertexArray(0);
+		GLCall( glBindVertexArray(0) );
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
 		LI_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
-		glBindVertexArray(m_RendererID);
+		GLCall( glBindVertexArray(m_RendererID) );
 		vertexBuffer->Bind();
 
 		const auto& layout = vertexBuffer->GetLayout();
@@ -61,30 +63,32 @@ namespace li
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					glEnableVertexAttribArray(element.Location + i);
-					glVertexAttribPointer(element.Location + i,
+					GLCall( glEnableVertexAttribArray(element.Location + i) );
+					GLCall( glVertexAttribPointer(element.Location + i,
 						element.GetComponentCount() / 4,
 						ShaderDataTypeToOpenGLBaseType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.GetStride(),
-						(const void*)(element.Offset + i * sizeof(glm::vec4)));
+						(const void*)(element.Offset + i * sizeof(glm::vec4))) );
 					
-					if (element.Divisor > 0)
-						glVertexAttribDivisor(element.Location + i, element.Divisor);
+					if (element.Divisor > 0) {
+						GLCall( glVertexAttribDivisor(element.Location + i, element.Divisor) );
+					}
 				}
 			}
 			else
 			{
-				glEnableVertexAttribArray(element.Location);
-				glVertexAttribPointer(element.Location,
+				GLCall( glEnableVertexAttribArray(element.Location) );
+				GLCall( glVertexAttribPointer(element.Location,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
 					layout.GetStride(),
-					(const void*)(element.Offset));
+					(const void*)(element.Offset)) );
 
-				if (element.Divisor > 0)
-					glVertexAttribDivisor(element.Location, element.Divisor);
+				if (element.Divisor > 0) {
+					GLCall( glVertexAttribDivisor(element.Location, element.Divisor) );
+				}
 			}
 		}
 		m_VertexBuffers.push_back(vertexBuffer);
@@ -92,7 +96,7 @@ namespace li
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
-		glBindVertexArray(m_RendererID);
+		GLCall( glBindVertexArray(m_RendererID) );
 		indexBuffer->Bind();
 
 		m_IndexBuffer = indexBuffer;

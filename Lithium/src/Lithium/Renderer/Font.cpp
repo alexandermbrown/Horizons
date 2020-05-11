@@ -14,7 +14,7 @@ namespace li
 		}
 	}
 
-	Label::Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color, int maxChars)
+	Label::Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color, uint32_t maxChars)
 		: m_Text(text), m_PointSize(pointSize), m_Font(font), m_MaxChars(maxChars)
 	{
 		Init();
@@ -23,15 +23,15 @@ namespace li
 
 	void Label::Init()
 	{
-		if (m_MaxChars >= 0)
+		if (m_MaxChars > 0)
 		{
-			m_GlyphVertices.reserve((size_t)m_MaxChars * 4);
-			m_GlyphIndices.reserve((size_t)m_MaxChars * 6);
+			m_GlyphVertices.reserve((size_t)m_MaxChars * 4ULL);
+			m_GlyphIndices.reserve((size_t)m_MaxChars * 6ULL);
 		}
 		else
 		{
-			m_GlyphVertices.reserve(m_Text.length() * 4);
-			m_GlyphIndices.reserve(m_Text.length() * 6);
+			m_GlyphVertices.reserve(m_Text.length() * 4ULL);
+			m_GlyphIndices.reserve(m_Text.length() * 6ULL);
 		}
 
 		m_VertexArray = VertexArray::Create();
@@ -41,11 +41,13 @@ namespace li
 			{ ShaderDataType::Float2, "a_TexCoord", 1 }
 		});
 
-		m_VertexBuffer = VertexBuffer::Create((m_MaxChars ? m_MaxChars : m_Text.length()) * charLayout.GetStride() * 4,
+		m_VertexBuffer = VertexBuffer::Create(
+			static_cast<uint32_t>(m_MaxChars ? m_MaxChars : m_Text.length()) * charLayout.GetStride() * 4U,
 			m_MaxChars >= 0 ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
 		m_VertexBuffer->SetLayout(charLayout);
 
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create((m_MaxChars ? m_MaxChars : m_Text.length()) * 6 * sizeof(uint32_t),
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(
+			static_cast<uint32_t>((m_MaxChars ? m_MaxChars : m_Text.length()) * 6ULL * sizeof(uint32_t)),
 			m_MaxChars >= 0 ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
 
 		m_VertexArray->SetIndexBuffer(indexBuffer);
@@ -55,7 +57,7 @@ namespace li
 	void Label::Calculate()
 	{
 		const FontProperties& fontInfo = m_Font->GetProperties();
-		float xOffset = 0;
+		float xOffset = 0.0f;
 		m_GlyphVertices.clear();
 		m_GlyphIndices.clear();
 
@@ -74,28 +76,12 @@ namespace li
 			float bottom = -8.0f;
 			float top = bottom + m_PointSize * 1.25f;
 
-			//float textureLeft = 0.0f;
-			//float textureBottom = 0.0f;
-			//float textureRight = 1.0f;
-			//float textureTop = 1.0f;
-
-			//float textureOffset = 4 * (fontInfo.GlyphWidth / fontInfo.EmSize) / fontInfo.TextureWidth;
-			//float textureLeft = glyphInfo.TextureOffset.x + textureOffset + (glyphInfo.BearingX * scale / fontInfo.TextureWidth);
-			//float textureBottom = glyphInfo.TextureOffset.y + textureOffset + (glyphInfo.BearingY * scale / fontInfo.TextureWidth) - (glyphInfo.Height * scale / fontInfo.TextureWidth);
-			//float textureRight = glyphInfo.TextureOffset.x + (glyphInfo.BearingX * scale / fontInfo.TextureWidth) + (glyphInfo.Width * scale / fontInfo.TextureWidth);
-			//float textureTop = glyphInfo.TextureOffset.y + (glyphInfo.BearingY * scale / fontInfo.TextureWidth);
-
 			float textureLeft = glyphInfo.TextureOffset.x + 0.002f;
 			float textureBottom = glyphInfo.TextureOffset.y + 0.002f;
 			float textureRight = glyphInfo.TextureOffset.x + fontInfo.GlyphWidth / (float)fontInfo.TextureWidth - 0.002f;
 			float textureTop = glyphInfo.TextureOffset.y + fontInfo.GlyphWidth / (float)fontInfo.TextureWidth - 0.002f;
 
-			//float textureLeft = ((fontInfo.GlyphWidth * character) % fontInfo.TextureWidth) / (float)fontInfo.TextureWidth;
-			//float textureBottom = std::floor((float)(fontInfo.GlyphWidth * character) / (float)fontInfo.TextureWidth) * fontInfo.GlyphWidth / (float)fontInfo.TextureWidth;
-			//float textureRight = textureLeft + fontInfo.GlyphWidth / fontInfo.TextureWidth;
-			//float textureTop = textureBottom + fontInfo.GlyphWidth / fontInfo.TextureWidth;
-
-			int count = m_GlyphVertices.size();
+			uint32_t count = (uint32_t)m_GlyphVertices.size();
 			m_GlyphIndices.push_back(count);
 			m_GlyphIndices.push_back(count + 1);
 			m_GlyphIndices.push_back(count + 2);
@@ -123,8 +109,16 @@ namespace li
 			xOffset += glyphInfo.HorizontalAdvance * scale;
 		}
 
-		m_VertexArray->GetIndexBuffer()->SetSubData((uint32_t*)&m_GlyphIndices[0], m_GlyphIndices.size() * sizeof(uint32_t), 0);
-		m_VertexBuffer->SetSubData((float*)&m_GlyphVertices[0], sizeof(GlyphVertex) * m_GlyphVertices.size(), 0);
+		m_VertexArray->GetIndexBuffer()->SetSubData(
+			(uint32_t*)&m_GlyphIndices[0], 
+			static_cast<uint32_t>(m_GlyphIndices.size() * sizeof(uint32_t)), 
+			0
+		);
+		m_VertexBuffer->SetSubData(
+			(float*)&m_GlyphVertices[0], 
+			static_cast<uint32_t>(sizeof(GlyphVertex) * m_GlyphVertices.size()),
+			0
+		);
 	}
 
 	void Label::Set(const std::wstring& text, float pointSize, const glm::vec3& position, Ref<Font> font)

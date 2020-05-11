@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/GraphicsContext.h"
 #include <SDL.h>
 
@@ -11,6 +12,8 @@ namespace li
 		OpenGLContext(SDL_Window* windowHandle);
 
 		virtual void Init();
+		virtual void Shutdown();
+
 		virtual void SwapBuffers();
 		virtual inline SDL_GLContext* GetGLContext() { return &m_Context; }
 

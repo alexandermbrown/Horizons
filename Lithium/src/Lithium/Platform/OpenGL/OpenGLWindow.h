@@ -11,6 +11,8 @@ namespace li
 		OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown);
 		virtual ~OpenGLWindow();
 
+		virtual void Shutdown() override;
+
 		virtual void SwapBuffers() override;
 		virtual inline unsigned int GetWidth() const override { return m_Width; }
 		virtual inline unsigned int GetHeight() const override { return m_Height; }

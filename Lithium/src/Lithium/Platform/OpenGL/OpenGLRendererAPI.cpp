@@ -2,7 +2,9 @@
 #include "OpenGLRendererAPI.h"
 
 #include "ConvertOpenGL.h"
-#include <glad/glad.h>
+#include "glad/glad.h"
+
+#include "OpenGLCore.h"
 
 namespace li
 {
@@ -29,51 +31,55 @@ namespace li
 	void OpenGLRendererAPI::InitImpl()
 	{
 #ifdef LI_DEBUG
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+		GLCall( glEnable(GL_DEBUG_OUTPUT) );
+		GLCall( glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS) );
+		GLCall( glDebugMessageCallback(OpenGLMessageCallback, nullptr) );
 
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+		GLCall( glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE) );
 #endif
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		GLCall( glEnable(GL_BLEND) );
+		GLCall( glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) );
 
-		glEnable(GL_DEPTH_TEST);
+		GLCall( glEnable(GL_DEPTH_TEST) );
 	}
 
 	void OpenGLRendererAPI::SetViewportImpl(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
-		glViewport(x, y, width, height);
+		GLCall( glViewport(x, y, width, height) );
 	}
 
 	void OpenGLRendererAPI::SetClearColorImpl(const glm::vec4& color)
 	{
-		glClearColor(color.r, color.g, color.b, color.a);
+		GLCall( glClearColor(color.r, color.g, color.b, color.a) );
 	}
 
 	void OpenGLRendererAPI::ClearImpl()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		GLCall( glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) );
 	}
 
 	void OpenGLRendererAPI::SetDepthTestImpl(bool enabled)
 	{
-		if (enabled)
-			glEnable(GL_DEPTH_TEST);
-		else
-			glDisable(GL_DEPTH_TEST);
+		if (enabled) {
+			GLCall( glEnable(GL_DEPTH_TEST) );
+		}
+		else {
+			GLCall( glDisable(GL_DEPTH_TEST) );
+		}
 	}
 
 	void OpenGLRendererAPI::DrawIndexedImpl(const Ref<VertexArray>& vertexArray)
 	{
-		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		GLCall( glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr) );
 	}
 
 	void OpenGLRendererAPI::DrawIndexedInstancedImpl(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, DrawMode mode)
 	{
-		glDrawElementsInstanced(ConvertOpenGL::DrawMode(mode),
+		GLCall( glDrawElementsInstanced(
+			ConvertOpenGL::DrawMode(mode),
 			vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT,
-			nullptr, instanceCount);
+			nullptr, instanceCount
+		) );
 	}
 }

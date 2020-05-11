@@ -17,4 +17,8 @@
 #include "Lithium/Renderer/OrthographicCamera.h"
 #include "Lithium/Renderer/OrthographicCameraController.h"
 
+#include "Lithium/Audio/AudioManager.h"
+#include "Lithium/Audio/Audio.h"
+#include "Lithium/Audio/AudioSource.h"
+
 #include "Lithium/Resources/ResourceManager.h"

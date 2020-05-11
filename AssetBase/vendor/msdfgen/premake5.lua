@@ -19,6 +19,8 @@ project "msdfgen"
     links {
         "freetype/win64/freetype.lib"
     }
+
+    warnings "Off"
     
 	filter "system:windows"
         systemversion "latest"

@@ -11,7 +11,13 @@ project "zlib"
         "**.h",
         "**.c"
     }
+
+    warnings "Off"
     
     filter "system:windows"
         systemversion "latest"
         staticruntime "On"
+
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
+        }

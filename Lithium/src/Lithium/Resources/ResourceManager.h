@@ -5,6 +5,7 @@
 #include "Lithium/Renderer/Shader.h"
 #include "Lithium/Renderer/TextureAtlas.h"
 #include "Lithium/Renderer/Font.h"
+#include "Lithium/Audio/Audio.h"
 
 #include <unordered_map>
 
@@ -13,12 +14,14 @@ namespace li
 	class ResourceManager
 	{
 	public:
-		static void Init(const std::string& labFilePath) {
+		inline static void Init(const std::string& labFilePath) {
 			s_Instance->InitImpl(labFilePath);
 		}
 
+		inline static void Shutdown() { s_Instance->ShutdownImpl(); }
+
 		template<typename T>
-		static Ref<T> Get(const std::string& name)
+		inline static Ref<T> Get(const std::string& name)
 		{
 			return s_Instance->GetImpl<T>(name);
 		}
@@ -27,6 +30,7 @@ namespace li
 
 	private:
 		void InitImpl(const std::string& labFilePath);
+		void ShutdownImpl();
 
 		template<typename T>
 		Ref<T> GetImpl(const std::string& name) const
@@ -66,6 +70,7 @@ namespace li
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 		std::unordered_map<std::string, Ref<TextureAtlas>> m_TextureAtlases;
 		std::unordered_map<std::string, Ref<Font>> m_Fonts;
+		std::unordered_map<std::string, Ref<Audio>> m_Audio;
 
 		static Scope<ResourceManager> s_Instance;
 	};

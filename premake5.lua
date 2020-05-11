@@ -22,6 +22,10 @@ IncludeDir["glm"] = "Lithium/vendor/glm"
 IncludeDir["imgui"] = "Lithium/vendor/imgui"
 IncludeDir["stb_image"] = "Lithium/vendor/stb_image"
 IncludeDir["zlib"] = "Lithium/vendor/zlib"
+IncludeDir["zstr"] = "Lithium/vendor/zstr"
+IncludeDir["openal"] = "Lithium/vendor/openal-soft/include"
+IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
+IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -31,6 +35,8 @@ IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
 include "Lithium/vendor/glad"
 include "Lithium/vendor/imgui"
 include "Lithium/vendor/zlib"
+include "Lithium/vendor/libvorbis"
+include "Lithium/vendor/openal-soft"
 include "AssetBase/vendor/msdfgen"
 include "GameServer/vendor/yojimbo"
 
@@ -69,18 +75,26 @@ project "Lithium"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.zlib}",
-        "Lithium/vendor/zstr",
+        "%{IncludeDir.zstr}",
+        "%{IncludeDir.openal}",
+        "%{IncludeDir.libogg}",
+        "%{IncludeDir.libvorbis}"
     }
 
     links {
         "glad",
-        "opengl32.lib",
         "imgui",
-        "zlib"
+        "zlib",
+        "libvorbis",
+        "openal-soft"
     }
 
     filter "system:windows"
         systemversion "latest"
+
+        links {
+            "Lithium/vendor/SDL2/lib/x64/SDL2.lib"
+        }
 
     filter "configurations:Debug"
         defines "LI_DEBUG"
@@ -123,12 +137,12 @@ project "Horizons"
     }
 
     links {
-        "Lithium",
-        "Lithium/vendor/SDL2/lib/x64/SDL2.lib"
+        "Lithium"
     }
 
     filter "system:windows"
         systemversion "latest"
+        
         
     filter "configurations:Debug"
         defines "LI_DEBUG"
@@ -169,15 +183,16 @@ project "AssetBase"
     includedirs {
         "Lithium/src",
         "AssetBase/vendor/rapidxml",
-        "AssetBase/vendor/zstr",
-        "AssetBase/vendor/zlib",
+        "%{IncludeDir.zlib}",
+        "%{IncludeDir.zstr}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.freetype}",
         "%{IncludeDir.msdfgen}"
     }
 
     links {
-        "msdfgen"
+        "msdfgen",
+        "zlib"
     }
     
     debugargs { "./resources.xml", "./resources.lab" }

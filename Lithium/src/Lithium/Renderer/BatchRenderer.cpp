@@ -53,7 +53,7 @@ namespace li
 
 	void BatchRenderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
 	{
-		uint32_t index = m_Batches.size();
+		uint32_t index = (uint32_t)m_Batches.size();
 		for (auto& [alias, bounds]: atlas->GetEntries()) {
 			m_TextureLUT[alias] = index;
 		}

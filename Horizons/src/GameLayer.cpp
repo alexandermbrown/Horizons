@@ -8,10 +8,12 @@ GameLayer::GameLayer()
 	m_Camera((float)li::Application::Get().GetWindow()->GetWidth() / (float)li::Application::Get().GetWindow()->GetHeight(), 10.0f, true),
 	m_QuadColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
 {
-	m_Label = li::CreateRef<li::Label>(L"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lacinia eget sem in elementum.", 20, li::ResourceManager::Get<li::Font>("Lato-Regular"));
+	m_Label = li::CreateRef<li::Label>(L"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lacinia eget sem in elementum.", 20.0f, li::ResourceManager::Get<li::Font>("Lato-Regular"));
 	m_Transform = glm::mat4(1.0f);
 
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
+
+	
 }
 
 void GameLayer::OnAttach()
@@ -20,6 +22,7 @@ void GameLayer::OnAttach()
 
 void GameLayer::OnDetach()
 {
+
 }
 
 void GameLayer::OnUpdate(float dt)

@@ -23,6 +23,11 @@ namespace li
 
 	OpenGLWindow::~OpenGLWindow()
 	{
+	}
+
+	void OpenGLWindow::Shutdown()
+	{
+		m_Context->Shutdown();
 		SDL_DestroyWindow(m_Window);
 	}
 

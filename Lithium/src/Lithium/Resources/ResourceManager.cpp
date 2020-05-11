@@ -150,7 +150,7 @@ namespace li
 				LI_READ_FILE(inFile, (char*)&underlineThickness, sizeof(underlineThickness)	, pos);
 
 				LI_READ_FILE(inFile, (char*)&numGlyphs, sizeof(numGlyphs), pos);
-				for (int i = 0; i < numGlyphs; i++)
+				for (uint32_t i = 0; i < numGlyphs; i++)
 				{
 					Glyph glyph;
 					LI_READ_FILE(inFile, (char*)&glyph.Character, sizeof(glyph.Character), pos);
@@ -198,5 +198,14 @@ namespace li
 		LI_CORE_INFO("    # Shaders         | {}", m_Shaders.size());
 		LI_CORE_INFO("    # TextureAtlases  | {}", m_TextureAtlases.size());
 		LI_CORE_INFO("    # Fonts           | {}", m_Fonts.size());
+	}
+
+	void ResourceManager::ShutdownImpl()
+	{
+		m_Textures.clear();
+		m_Shaders.clear();
+		m_TextureAtlases.clear();
+		m_Fonts.clear();
+		m_Audio.clear();
 	}
 }

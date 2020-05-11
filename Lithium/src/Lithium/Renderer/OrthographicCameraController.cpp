@@ -20,27 +20,27 @@ namespace li
 		bool doPosition = false;
 		if (Input::IsKeyPressed(SDLK_a))
 		{
-			m_CameraPosition.x -= SDL_cos(m_CameraRotation) * m_CameraTranslationSpeed * dt;
-			m_CameraPosition.y -= SDL_sin(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.x -= SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.y -= SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 			doPosition = true;
 		}
 		else if (Input::IsKeyPressed(SDLK_d))
 		{
-			m_CameraPosition.x += SDL_cos(m_CameraRotation) * m_CameraTranslationSpeed * dt;
-			m_CameraPosition.y += SDL_sin(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.x += SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.y += SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 			doPosition = true;
 		}
 
 		if (Input::IsKeyPressed(SDLK_w))
 		{
-			m_CameraPosition.x += -SDL_sin(m_CameraRotation) * m_CameraTranslationSpeed * dt;
-			m_CameraPosition.y += SDL_cos(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.x += -SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.y += SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 			doPosition = true;
 		}
 		else if (Input::IsKeyPressed(SDLK_s))
 		{
-			m_CameraPosition.x -= -SDL_sin(m_CameraRotation) * m_CameraTranslationSpeed * dt;
-			m_CameraPosition.y -= SDL_cos(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.x -= -SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
+			m_CameraPosition.y -= SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 			doPosition = true;
 		}
 

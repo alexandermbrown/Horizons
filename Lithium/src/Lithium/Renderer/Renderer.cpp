@@ -44,7 +44,7 @@ namespace li
 
 		Ref<Window>& window = Application::Get().GetWindow();
 
-		m_UICamera = CreateScope<OrthographicCamera>(0, window->GetWidth(), 0, window->GetHeight());
+		m_UICamera = CreateScope<OrthographicCamera>(0, (float)window->GetWidth(), 0, (float)window->GetHeight());
 	}
 
 	void Renderer::BeginSceneImpl(OrthographicCamera* camera)
@@ -95,7 +95,7 @@ namespace li
 
 	void Renderer::ResizeImpl(uint32_t width, uint32_t height)
 	{
-		m_UICamera->SetProjection(0, width, 0, height);
+		m_UICamera->SetProjection(0, (float)width, 0, (float)height);
 	}
 
 	void Renderer::RenderLabel(const Ref<Label> label, const glm::mat4& transform, const glm::vec4& color, const glm::mat4& viewProjection)
