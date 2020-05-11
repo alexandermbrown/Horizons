@@ -7,8 +7,6 @@
 #include <inttypes.h>
 #include <time.h>
 
-using namespace yojimbo;
-
 const uint64_t ProtocolId = 0x11223344556677ULL;
 
 const int ClientPort = 30000;
@@ -22,7 +20,7 @@ inline int GetNumBitsForMessage(uint16_t sequence)
     return messageBitsArray[index];
 }
 
-struct TestMessage : public Message
+struct TestMessage : public yojimbo::Message
 {
     uint16_t sequence;
 
@@ -50,7 +48,7 @@ struct TestMessage : public Message
     YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 };
 
-struct TestBlockMessage : public BlockMessage
+struct TestBlockMessage : public yojimbo::BlockMessage
 {
     uint16_t sequence;
 
@@ -68,7 +66,7 @@ struct TestBlockMessage : public BlockMessage
     YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 };
 
-struct TestSerializeFailOnReadMessage : public Message
+struct TestSerializeFailOnReadMessage : public yojimbo::Message
 {
     template <typename Stream> bool Serialize(Stream& /*stream*/)
     {
@@ -78,7 +76,7 @@ struct TestSerializeFailOnReadMessage : public Message
     YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 };
 
-struct TestExhaustStreamAllocatorOnReadMessage : public Message
+struct TestExhaustStreamAllocatorOnReadMessage : public yojimbo::Message
 {
     template <typename Stream> bool Serialize(Stream& stream)
     {
@@ -143,11 +141,11 @@ YOJIMBO_MESSAGE_FACTORY_START(SingleBlockTestMessageFactory, NUM_SINGLE_BLOCK_TE
 YOJIMBO_DECLARE_MESSAGE_TYPE(SINGLE_BLOCK_TEST_MESSAGE, TestBlockMessage);
 YOJIMBO_MESSAGE_FACTORY_FINISH();
 
-class TestAdapter : public Adapter
+class TestAdapter : public yojimbo::Adapter
 {
 public:
 
-    MessageFactory* CreateMessageFactory(Allocator& allocator)
+    yojimbo::MessageFactory* CreateMessageFactory(yojimbo::Allocator& allocator)
     {
         return YOJIMBO_NEW(allocator, TestMessageFactory, allocator);
     }
