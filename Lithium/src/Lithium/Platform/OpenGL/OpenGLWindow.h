@@ -21,6 +21,8 @@ namespace li
 
 		virtual void SetVSync(bool enabled) override;
 		virtual inline bool IsVSync() const override { return m_VSync; }
+		virtual void SetFullscreen(FullscreenType type) override;
+		virtual inline FullscreenType GetFullscreen() const override { return m_Fullscreen; };
 
 		virtual void OnWindowResize(const WindowResizeEvent& event) override;
 
@@ -33,5 +35,7 @@ namespace li
 		int m_Width;
 		int m_Height;
 		bool m_VSync;
+
+		FullscreenType m_Fullscreen;
 	};
 }

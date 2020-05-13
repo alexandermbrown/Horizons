@@ -67,14 +67,14 @@ namespace li
 			float scale = m_PointSize / fontInfo.EmSize;
 
 			if (character == L' ') {
-				xOffset += glyphInfo.HorizontalAdvance * scale * 1.6f;
+				xOffset += glyphInfo.HorizontalAdvance * scale;// *1.6f;
 				continue;
 			}
 
 			float left = xOffset + (glyphInfo.BearingX - 4.0f) * scale;
-			float right = left + m_PointSize * 1.25f;
+			float right = left + m_PointSize;// * 1.25f;
 			float bottom = -8.0f;
-			float top = bottom + m_PointSize * 1.25f;
+			float top = bottom + m_PointSize;// * 1.25f;
 
 			float textureLeft = glyphInfo.TextureOffset.x + 0.002f;
 			float textureBottom = glyphInfo.TextureOffset.y + 0.002f;

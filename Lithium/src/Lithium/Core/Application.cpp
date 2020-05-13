@@ -48,6 +48,8 @@ namespace li
 		);
 #endif
 
+		m_EventCallbackFn = LI_BIND_EVENT_FN(Application::OnEvent);
+
 		m_Window = Window::Create("Lithium Engine", 1280, 720, true, true, Renderer::GetAPI());
 
 		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
@@ -81,7 +83,7 @@ namespace li
 				if (m_ImGuiRenderer->WantCapture(sdlEvent))
 					continue;
 				
-				SDLEvent::Broadcast(sdlEvent, LI_BIND_EVENT_FN(Application::OnEvent));
+				SDLEvent::Broadcast(sdlEvent, m_EventCallbackFn);
 			}
 			
 			unsigned int ticks = SDL_GetTicks();
@@ -109,8 +111,6 @@ namespace li
 
 	void Application::OnEvent(Event& e)
 	{
-		//LI_CORE_TRACE(e.ToString());
-
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(LI_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(LI_BIND_EVENT_FN(Application::OnWindowResize));
@@ -143,9 +143,12 @@ namespace li
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		LI_CORE_TRACE("Resizing window to: {0}, {1}", e.GetWidth(), e.GetHeight());
-		RendererAPI::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
-		Renderer::Resize(e.GetWidth(), e.GetHeight());
+		int w, h;
+		SDL_GL_GetDrawableSize(m_Window->GetWindow(), &w, &h);
+		LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
+
+		RendererAPI::SetViewport(0, 0, w, h);
+		Renderer::Resize(w, h);
 
 		return false;
 	}

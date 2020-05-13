@@ -119,6 +119,7 @@ project "Horizons"
     language "C++"
     cppdialect "C++17"
     staticruntime "on"
+    dpiawareness "HighPerMonitor"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")

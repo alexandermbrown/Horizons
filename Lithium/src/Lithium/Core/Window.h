@@ -10,6 +10,13 @@
 
 namespace li
 {
+	enum class FullscreenType
+	{
+		Windowed,
+		Fullscreen,
+		FullscreenWindowed
+	};
+
 	class Window
 	{
 	public:
@@ -19,12 +26,16 @@ namespace li
 		virtual void Shutdown() = 0;
 
 		virtual void SwapBuffers() = 0;
+
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;
 		virtual Ref<GraphicsContext> GetContext() const = 0;
 		virtual SDL_Window* GetWindow() const = 0;
+
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+		virtual void SetFullscreen(FullscreenType type) = 0;
+		virtual FullscreenType GetFullscreen() const = 0;
 
 		virtual void OnWindowResize(const WindowResizeEvent& event) = 0;
 

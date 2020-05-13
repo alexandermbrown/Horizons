@@ -10,7 +10,6 @@ namespace li
 {
 	namespace SDLEvent
 	{
-		using EventCallbackFn = std::function<void(Event&)>;
-		void Broadcast(SDL_Event& sdlEvent, const EventCallbackFn& callback);
+		void Broadcast(SDL_Event& sdlEvent, const std::function<void(Event&)>& callback);
 	}
 }

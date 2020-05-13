@@ -9,13 +9,13 @@ namespace li
 {
 	namespace SDLEvent
 	{
-		void Broadcast(SDL_Event& sdlEvent, const EventCallbackFn& callback)
+		void Broadcast(SDL_Event& sdlEvent, const std::function<void(Event&)>& callback)
 		{
 			if (sdlEvent.type == SDL_WINDOWEVENT)
 			{
 				switch (sdlEvent.window.event)
 				{
-				case SDL_WINDOWEVENT_RESIZED:
+				case SDL_WINDOWEVENT_SIZE_CHANGED:
 				{
 					WindowResizeEvent ev(sdlEvent.window.windowID, sdlEvent.window.data1, sdlEvent.window.data2);
 					callback(ev);
@@ -60,6 +60,12 @@ namespace li
 				case SDL_WINDOWEVENT_CLOSE:
 				{
 					WindowCloseEvent ev(sdlEvent.window.windowID);
+					callback(ev);
+					break;
+				}
+				case SDL_WINDOWEVENT_EXPOSED:
+				{
+					WindowExposedEvent ev(sdlEvent.window.windowID);
 					callback(ev);
 					break;
 				}

@@ -9,7 +9,7 @@ namespace li
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocusGained, WindowFocusLost, WindowMoved, WindowMinimized, WindowMaximized, WindowRestored,
+		WindowClose, WindowResize, WindowFocusGained, WindowFocusLost, WindowMoved, WindowMinimized, WindowMaximized, WindowRestored, WindowExposed,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, TextInput,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled

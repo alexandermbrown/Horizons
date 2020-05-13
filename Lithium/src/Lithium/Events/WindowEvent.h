@@ -146,4 +146,19 @@ namespace li
 		EVENT_CLASS_TYPE(WindowRestored)
 		EVENT_CLASS_CATEGORY(EventCategoryWindow)
 	};
+
+	class WindowExposedEvent : public WindowEvent
+	{
+	public:
+		WindowExposedEvent(unsigned int id)
+			: WindowEvent(id) {}
+
+		std::string ToString() const override
+		{
+			return "WindowExposedEvent";
+		}
+
+		EVENT_CLASS_TYPE(WindowExposed)
+		EVENT_CLASS_CATEGORY(EventCategoryWindow)
+	};
 }

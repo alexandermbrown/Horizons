@@ -66,6 +66,7 @@ namespace li
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
 	}
+
 	bool ImGuiRenderer::WantCapture(const SDL_Event& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();

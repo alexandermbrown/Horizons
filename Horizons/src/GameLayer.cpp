@@ -57,4 +57,19 @@ void GameLayer::OnImGuiRender()
 void GameLayer::OnEvent(li::Event& event)
 {
 	m_Camera.OnEvent(event);
+
+	li::EventDispatcher dispatcher(event);
+	dispatcher.Dispatch<li::KeyReleasedEvent>([&](const li::KeyReleasedEvent e) -> bool {
+		if (e.GetKeyCode() == SDLK_F11) {
+			if (li::Application::Get().GetWindow()->GetFullscreen() == li::FullscreenType::Windowed) {
+				li::Application::Get().GetWindow()->SetFullscreen(li::FullscreenType::FullscreenWindowed);
+			}
+			else {
+				li::Application::Get().GetWindow()->SetFullscreen(li::FullscreenType::Windowed);
+			}
+
+			return true;
+		}
+		return false;
+	});
 }
