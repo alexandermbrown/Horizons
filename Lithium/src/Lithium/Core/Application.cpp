@@ -3,7 +3,7 @@
 
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"
-#include "Lithium/Core/SDLEvent.h"
+#include "Lithium/Events/EventDispatcher.h"
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
 #include <SDL.h>
@@ -56,8 +56,6 @@ namespace li
 
 		Renderer::Init();
 		AudioManager::Init();
-
-		ResourceManager::Init("resources.lab");
 	}
 
 	Application::~Application()
@@ -67,6 +65,7 @@ namespace li
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
 		m_Window->Shutdown();
+		SDL_Quit();
 	}
 
 	void Application::Run()
@@ -78,12 +77,12 @@ namespace li
 			SDL_Event sdlEvent;
 			while (SDL_PollEvent(&sdlEvent))
 			{
-				m_ImGuiRenderer->OnSDLEvent(&sdlEvent);
+				m_ImGuiRenderer->OnEvent(&sdlEvent);
 				// Capture ImGui keyboard and mouse input.
 				if (m_ImGuiRenderer->WantCapture(sdlEvent))
 					continue;
-				
-				SDLEvent::Broadcast(sdlEvent, m_EventCallbackFn);
+
+				OnEvent(&sdlEvent);
 			}
 			
 			unsigned int ticks = SDL_GetTicks();
@@ -109,17 +108,14 @@ namespace li
 		}
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnEvent(SDL_Event* e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(LI_BIND_EVENT_FN(Application::OnWindowClose));
-		dispatcher.Dispatch<WindowResizeEvent>(LI_BIND_EVENT_FN(Application::OnWindowResize));
+		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_EVENT_FN(Application::OnWindowEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			(*it)->OnEvent(e);
-			if (e.Handled)
-				break;
 		}
 	}
 
@@ -135,21 +131,21 @@ namespace li
 		layer->OnAttach();
 	}
 
-	bool Application::OnWindowClose(WindowCloseEvent& e)
+	void Application::OnWindowEvent(SDL_Event* event)
 	{
-		m_Running = false;
-		return true;
-	}
+		switch(event->window.event)
+		{
+		case SDL_WINDOWEVENT_CLOSE:
+			m_Running = false;
+			break;
+		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			int w, h;
+			SDL_GL_GetDrawableSize(m_Window->GetWindow(), &w, &h);
+			LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
 
-	bool Application::OnWindowResize(WindowResizeEvent& e)
-	{
-		int w, h;
-		SDL_GL_GetDrawableSize(m_Window->GetWindow(), &w, &h);
-		LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
-
-		RendererAPI::SetViewport(0, 0, w, h);
-		Renderer::Resize(w, h);
-
-		return false;
+			RendererAPI::SetViewport(0, 0, w, h);
+			Renderer::Resize(w, h);
+			break;
+		}
 	}
 }

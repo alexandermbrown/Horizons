@@ -62,7 +62,7 @@ namespace li
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void ImGuiRenderer::OnSDLEvent(SDL_Event* event)
+	void ImGuiRenderer::OnEvent(SDL_Event* event)
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
 	}

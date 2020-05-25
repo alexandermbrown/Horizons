@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Lithium/Core/Core.h"
-#include "Lithium/Events/Event.h"
+#include "SDL.h"
 
 namespace li
 {
@@ -15,7 +15,7 @@ namespace li
 		virtual void OnDetach() {}
 		virtual void OnUpdate(float dt) {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event& event) {}
+		virtual void OnEvent(SDL_Event* event) {}
 
 		inline const std::string GetName() const { return m_DebugName; }
 

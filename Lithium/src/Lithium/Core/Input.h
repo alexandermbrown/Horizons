@@ -9,8 +9,6 @@ namespace li
 	class Input
 	{
 	public:
-		Input();
-		virtual ~Input();
 
 		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 
@@ -23,12 +21,12 @@ namespace li
 
 	protected:
 
-		virtual bool IsKeyPressedImpl(int keycode);
+		bool IsKeyPressedImpl(int keycode);
 
-		virtual bool IsMouseButtonPressedImpl(int button);
-		virtual glm::ivec2 GetMousePositionImpl();
-		virtual int GetMouseXImpl();
-		virtual int GetMouseYImpl();
+		bool IsMouseButtonPressedImpl(int button);
+		glm::ivec2 GetMousePositionImpl();
+		int GetMouseXImpl();
+		int GetMouseYImpl();
 
 	private:
 		static Scope<Input> s_Instance;

@@ -66,14 +66,14 @@ namespace li
 			const Glyph& glyphInfo = m_Font->GetGlyph(character);
 			float scale = m_PointSize / fontInfo.EmSize;
 
-			if (character == L' ') {
+			if (character == L' ' || character == L'\t') {
 				xOffset += glyphInfo.HorizontalAdvance * scale;// *1.6f;
 				continue;
 			}
 
 			float left = xOffset + (glyphInfo.BearingX - 4.0f) * scale;
 			float right = left + m_PointSize;// * 1.25f;
-			float bottom = -8.0f;
+			float bottom = -10.0f;
 			float top = bottom + m_PointSize;// * 1.25f;
 
 			float textureLeft = glyphInfo.TextureOffset.x + 0.002f;

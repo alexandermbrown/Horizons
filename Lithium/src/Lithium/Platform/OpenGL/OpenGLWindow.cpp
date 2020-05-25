@@ -1,9 +1,6 @@
 #include "lipch.h"
 #include "OpenGLWindow.h"
 
-#include "Lithium/Events/WindowEvent.h"
-#include "Lithium/Events/MouseEvent.h"
-#include "Lithium/Events/KeyEvent.h"
 #include "Lithium/Core/Application.h"
 
 namespace li
@@ -70,9 +67,12 @@ namespace li
 		}
 	}
 
-	void OpenGLWindow::OnWindowResize(const WindowResizeEvent& event)
+	void OpenGLWindow::OnWindowEvent(SDL_Event* event)
 	{
-		m_Width = event.GetWidth();
-		m_Height = event.GetHeight();
+		if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+		{
+			m_Width = event->window.data1;
+			m_Height = event->window.data2;
+		}
 	}
 }

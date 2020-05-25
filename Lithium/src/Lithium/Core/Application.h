@@ -2,8 +2,6 @@
 
 #include "Lithium/Core/Window.h"
 #include "Lithium/Core/LayerStack.h"
-#include "Lithium/Events/Event.h"
-#include "Lithium/Events/WindowEvent.h"
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
 #include <functional>
@@ -17,7 +15,7 @@ namespace li
 		virtual ~Application();
 		void Run();
 
-		void OnEvent(Event& e);
+		void OnEvent(SDL_Event* event);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -26,18 +24,17 @@ namespace li
 		inline static Application& Get() { return *s_Instance; }
 		inline Ref<Window>& GetWindow() { return m_Window;  }
 
-		inline const std::function<void(Event&)>& GetEventCallbackFn() { return m_EventCallbackFn; }
+		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
 
 	private:
-		bool OnWindowClose(WindowCloseEvent& e);
-		bool OnWindowResize(WindowResizeEvent& e);
+		void OnWindowEvent(SDL_Event* event);
 
 		bool m_Running;
 		unsigned int m_LastTicks;
 		Ref<Window> m_Window;
 		Scope<ImGuiRenderer> m_ImGuiRenderer;
 		LayerStack m_LayerStack;
-		std::function<void(Event&)> m_EventCallbackFn;
+		std::function<void(SDL_Event* event)> m_EventCallbackFn;
 		
 		static Application* s_Instance;
 	};

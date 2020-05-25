@@ -26,12 +26,18 @@ IncludeDir["zstr"] = "Lithium/vendor/zstr"
 IncludeDir["openal"] = "Lithium/vendor/openal-soft/include"
 IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
 IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
+IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
 
 IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
 
+IncludeDir["entt"] = "Horizons/vendor/entt/include"
+IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
+IncludeDir["readerwriterqueue"] = "Horizons/vendor/readerwriterqueue/include"
+
+group "vendor"
 include "Lithium/vendor/glad"
 include "Lithium/vendor/imgui"
 include "Lithium/vendor/zlib"
@@ -39,6 +45,8 @@ include "Lithium/vendor/libvorbis"
 include "Lithium/vendor/openal-soft"
 include "AssetBase/vendor/msdfgen"
 include "GameServer/vendor/yojimbo"
+include "Horizons/vendor/box2d"
+group  ""
 
 ------------------------------ Lithium ----------------------------------
 
@@ -123,6 +131,9 @@ project "Horizons"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+
+    pchheader "pch.h"
+    pchsource "Horizons/src/pch.cpp"
     
     files {
         "%{prj.name}/src/**.h",
@@ -131,14 +142,19 @@ project "Horizons"
 
     includedirs {
         "Lithium/src",
-        "Lithium/vendor",
+        "Horizons/src",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.SDL2}"
+        "%{IncludeDir.SDL2}",
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.box2d}",
+        "%{IncludeDir.readerwriterqueue}"
     }
 
     links {
-        "Lithium"
+        "Lithium",
+        "box2d"
     }
 
     filter "system:windows"
@@ -172,6 +188,9 @@ project "AssetBase"
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
+    pchheader "pch.h"
+    pchsource "AssetBase/src/pch.cpp"
+
     files {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
@@ -182,13 +201,15 @@ project "AssetBase"
     }
 
     includedirs {
+        "AssetBase/src",
         "Lithium/src",
         "AssetBase/vendor/rapidxml",
         "%{IncludeDir.zlib}",
         "%{IncludeDir.zstr}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.freetype}",
-        "%{IncludeDir.msdfgen}"
+        "%{IncludeDir.msdfgen}",
+        "%{IncludeDir.simpleini}"
     }
 
     links {

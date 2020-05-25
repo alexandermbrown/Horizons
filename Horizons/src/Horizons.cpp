@@ -1,8 +1,10 @@
+#include "pch.h"
 #include "Horizons.h"
 
-#include "GameLayer.h"
+#include "Horizons/Layers/GameLayer.h"
 
 Horizons::Horizons()
+	: li::Application()
 {
 	PushLayer(new GameLayer());
 }

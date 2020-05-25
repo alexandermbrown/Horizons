@@ -51,8 +51,8 @@
 #define LI_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 #define LI_CORE_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 #else
-#define LI_ASSERT(x, ...)
-#define LI_CORE_ASSERT(x, ...)
+#define LI_ASSERT(x, ...) x
+#define LI_CORE_ASSERT(x, ...) x
 #endif
 
 #define BIT(x) (1 << x)

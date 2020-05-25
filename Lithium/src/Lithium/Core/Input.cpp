@@ -7,14 +7,6 @@ namespace li
 {
 	Scope<Input> Input::s_Instance = CreateScope<Input>();
 
-	Input::Input()
-	{
-	}
-
-	Input::~Input()
-	{
-	}
-
 	bool Input::IsKeyPressedImpl(int keycode)
 	{
 		SDL_Scancode scancode = SDL_GetScancodeFromKey(keycode);

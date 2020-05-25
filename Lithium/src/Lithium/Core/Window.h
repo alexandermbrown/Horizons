@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Lithium/Core/Core.h"
-#include "Lithium/Events/Event.h"
-#include "Lithium/Events/WindowEvent.h"
 #include "Lithium/Renderer/GraphicsContext.h"
 #include "Lithium/Renderer/Renderer.h"
 
@@ -37,7 +35,7 @@ namespace li
 		virtual void SetFullscreen(FullscreenType type) = 0;
 		virtual FullscreenType GetFullscreen() const = 0;
 
-		virtual void OnWindowResize(const WindowResizeEvent& event) = 0;
+		virtual void OnWindowEvent(SDL_Event* event) = 0;
 
 		static Ref<Window> Create(
 			const char* title = "Lithium Engine",

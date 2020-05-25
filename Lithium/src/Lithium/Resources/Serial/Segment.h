@@ -13,7 +13,8 @@ namespace li
 		Shader,
 		TextureAtlas,
 		Font,
-		Audio
+		Audio,
+		Locale
 	};
 
 	class Segment

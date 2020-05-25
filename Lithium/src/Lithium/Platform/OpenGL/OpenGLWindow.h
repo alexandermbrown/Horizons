@@ -24,8 +24,7 @@ namespace li
 		virtual void SetFullscreen(FullscreenType type) override;
 		virtual inline FullscreenType GetFullscreen() const override { return m_Fullscreen; };
 
-		virtual void OnWindowResize(const WindowResizeEvent& event) override;
-
+		virtual void OnWindowEvent(SDL_Event* event) override;
 
 	private:
 		SDL_Window* m_Window;

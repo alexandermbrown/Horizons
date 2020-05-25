@@ -9,6 +9,7 @@
 #include "Loaders/TextureAtlasLoader.h"
 #include "Loaders/FontLoader.h"
 #include "Loaders/AudioLoader.h"
+#include "Loaders/LocaleLoader.h"
 
 #define LI_READ_FILE(file, ptr, size, pos) file.read(ptr, size); pos += file.gcount()
 
@@ -90,6 +91,13 @@ namespace li
 				m_Audio[name] = audio;
 				break;
 			}
+			case SegmentType::Locale:
+			{
+				std::string name;
+				Ref<Locale> locale = LoadLocale(&name, &inFile, &pos);
+				Localization::AddLocale(locale);
+				break;
+			}
 			default:
 				LI_CORE_ERROR("Unknown asset type!");
 				break;
@@ -102,6 +110,7 @@ namespace li
 		LI_CORE_INFO("    # TextureAtlases  | {}", m_TextureAtlases.size());
 		LI_CORE_INFO("    # Fonts           | {}", m_Fonts.size());
 		LI_CORE_INFO("    # Audio           | {}", m_Audio.size());
+		LI_CORE_INFO("    # Locales         | {}", Localization::GetLocaleCount());
 	}
 
 	void ResourceManager::ShutdownImpl()

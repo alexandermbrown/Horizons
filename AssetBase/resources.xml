@@ -38,23 +38,37 @@
 	</textures>
 	
 	<fonts>
-	<!--
-		<font name="NotoSans-Regular">
-			<source>./res/fonts/NotoSans/NotoSans-Regular.ttf</source>
-			<glyph_width>32</glyph_width>
-			<texture_width>2048</texture_width>
-		</font>
-		<font name="Rubik-Regular">
-			<source>./res/fonts/Rubik/Rubik-Regular.ttf</source>
+		<font name="RobotoMono-Regular">
+			<source>./res/fonts/RobotoMono/RobotoMono-Regular.ttf</source>
 			<glyph_width>64</glyph_width>
 			<texture_width>2048</texture_width>
 		</font>
-	-->
-		<font name="Lato-Regular">
-			<source>./res/fonts/Lato/Lato-Regular.ttf</source>
-			<glyph_width>32</glyph_width>
-			<texture_width>1024</texture_width>
+
+
+		<font name="RobotoMono-Light">
+			<source>./res/fonts/RobotoMono/RobotoMono-Light.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
 		</font>
+
+		<font name="RobotoMono-Italic">
+			<source>./res/fonts/RobotoMono/RobotoMono-Italic.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+
+		<font name="RobotoMono-Bold">
+			<source>./res/fonts/RobotoMono/RobotoMono-Bold.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+
+		<font name="RobotoMono-BoldItalic">
+			<source>./res/fonts/RobotoMono/RobotoMono-BoldItalic.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+		
 	</fonts>
 
 	<texture_atlases>
@@ -80,5 +94,13 @@
 			<source>./res/audio/ship_startup_spin.ogg</source>
 		</audio_file>
 	</audio>
+
+	<locales>
+
+		<locale name="en-us"><source>./res/locales/en-us/en-us.ini</source></locale>
+		<locale name="test"><source>./res/locales/test/test.ini</source></locale>
+
+
+	</locales>
 
 </resources>
