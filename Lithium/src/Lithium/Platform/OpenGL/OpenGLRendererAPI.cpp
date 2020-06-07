@@ -69,9 +69,19 @@ namespace li
 		}
 	}
 
+	void OpenGLRendererAPI::DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+	{
+		GLCall( glDrawArrays(ConvertOpenGL::DrawMode(mode), 0, (int)count) );
+	}
+
 	void OpenGLRendererAPI::DrawIndexedImpl(const Ref<VertexArray>& vertexArray)
 	{
 		GLCall( glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr) );
+	}
+
+	void OpenGLRendererAPI::DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+	{
+		GLCall( glDrawElements(ConvertOpenGL::DrawMode(mode), count, GL_UNSIGNED_INT, nullptr) );
 	}
 
 	void OpenGLRendererAPI::DrawIndexedInstancedImpl(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, DrawMode mode)

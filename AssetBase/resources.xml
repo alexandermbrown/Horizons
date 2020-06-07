@@ -7,6 +7,9 @@
 		<shader name="shader_label">
 			<source>./res/shaders/Label.glsl</source>
 		</shader>
+		<shader name="shader_debug_physics">
+			<source>./res/shaders/DebugPhysics.glsl</source>
+		</shader>
 	</shaders>
 
 	<textures>

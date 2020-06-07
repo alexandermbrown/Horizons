@@ -35,15 +35,23 @@ namespace li
 			s_RendererAPI->ClearImpl();
 		}
 
+		inline static void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+		{
+			s_RendererAPI->DrawArraysImpl(vertexArray, count, mode);
+		}
+
 		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray)
 		{
 			s_RendererAPI->DrawIndexedImpl(vertexArray);
 		}
 
-		inline static void DrawIndexedInstanced(
-			const Ref<VertexArray>& vertexArray,
-			uint32_t instanceCount,
-			DrawMode mode = DrawMode::Triangles)
+		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+		{
+			s_RendererAPI->DrawIndexedImpl(vertexArray, count, mode);
+		}
+
+		inline static void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray,
+			uint32_t instanceCount, DrawMode mode = DrawMode::Triangles)
 		{
 			s_RendererAPI->DrawIndexedInstancedImpl(vertexArray, instanceCount, mode);
 		}
@@ -64,11 +72,12 @@ namespace li
 
 		virtual void SetDepthTestImpl(bool enabled) = 0;
 
+		virtual void DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) = 0;
+
 		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray) = 0;
-		virtual void DrawIndexedInstancedImpl(
-			const Ref<VertexArray>& vertexArray, 
-			uint32_t instanceCount, 
-			DrawMode mode) = 0;
+		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) = 0;
+		virtual void DrawIndexedInstancedImpl(const Ref<VertexArray>& vertexArray, 
+			uint32_t instanceCount, DrawMode mode) = 0;
 
 	private:
 		static API s_API;

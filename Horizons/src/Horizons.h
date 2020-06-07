@@ -7,5 +7,5 @@ class Horizons : public li::Application
 {
 public:
 	Horizons();
-	~Horizons() = default;
+	virtual ~Horizons() = default;
 };

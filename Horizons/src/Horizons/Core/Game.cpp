@@ -2,9 +2,12 @@
 #include "Game.h"
 
 #include "Horizons/Core/Core.h"
-#include "Horizons/Physics/PhysicsSystem.h"
+#include "Horizons/Gameplay/Physics/PhysicsSystem.h"
+#include "Horizons/Gameplay/Player/PlayerSystem.h"
 
-#include "readerwriterqueue/readerwriterqueue.h"
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+#include "Horizons/Gameplay/Physics/DebugDrawSystem.h"
+#endif
 
 #include <chrono>
 
@@ -13,11 +16,25 @@ Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue)
 {
 }
 
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, DebugDrawCommandQueue* debugDrawQueue)
+	: m_Running(false), m_EventQueue(eventQueue), m_DebugDrawQueue(debugDrawQueue)
+{
+}
+#endif
+
 void Game::Run()
 {
 	m_Running = true;
 
+	// Initialize systems.
 	PhysicsSystem::Init(m_Registry);
+	PlayerSystem::Init(m_Registry);
+
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawSystem::Init(m_Registry, m_DebugDrawQueue);
+#endif
+
 
 	using namespace std::chrono_literals;
 	constexpr float dt = 1.0f / HZ_TICKS_PER_SECOND;
@@ -25,7 +42,6 @@ void Game::Run()
 	constexpr std::chrono::nanoseconds sleepMargin(5ms);
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
-
 	
 
 	while (m_Running)
@@ -33,7 +49,7 @@ void Game::Run()
 		std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
 		std::chrono::nanoseconds diff = currentTime - m_LastUpdateTime;
 
-#if HZ_SLEEP_BETWEEN_TICKS
+#ifdef HZ_SLEEP_BETWEEN_TICKS
 		std::chrono::nanoseconds waitNano = dtNano - diff - sleepMargin;
 		if (waitNano.count() > 0LL) {
 			
@@ -58,9 +74,15 @@ void Game::Run()
 		}
 		
 		PhysicsSystem::Step(m_Registry, dt);
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+		DebugDrawSystem::Draw(m_Registry);
+#endif
 	}
 
 	PhysicsSystem::Shutdown(m_Registry);
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawSystem::Shutdown(m_Registry);
+#endif
 
 	LI_TRACE("Tick thread closing...");
 }

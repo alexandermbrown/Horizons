@@ -162,7 +162,10 @@ project "Horizons"
         
         
     filter "configurations:Debug"
-        defines "LI_DEBUG"
+        defines {
+            "LI_DEBUG",
+            "HZ_DEBUG"
+        }
         runtime "Debug"
         symbols "on"
 

@@ -53,9 +53,6 @@ namespace li
 
 	void ImGuiRenderer::End()
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		Application& app = Application::Get();
-		io.DisplaySize = ImVec2((float)app.GetWindow()->GetWidth(), (float)app.GetWindow()->GetHeight());
 
 		// Rendering
 		ImGui::EndScene();
@@ -65,6 +62,12 @@ namespace li
 	void ImGuiRenderer::OnEvent(SDL_Event* event)
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
+	}
+
+	void ImGuiRenderer::Resize(int width, int height)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2(width, height);
 	}
 
 	bool ImGuiRenderer::WantCapture(const SDL_Event& event)

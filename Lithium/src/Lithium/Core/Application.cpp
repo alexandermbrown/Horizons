@@ -11,7 +11,7 @@
 
 #include "imgui.h"
 
-#define LI_MIN_TICKS 2
+#define LI_MIN_MS_PER_FRAME 2
 
 namespace li 
 {
@@ -87,7 +87,7 @@ namespace li
 			
 			unsigned int ticks = SDL_GetTicks();
 			unsigned int deltaTicks = ticks - m_LastTicks;
-			if (deltaTicks < LI_MIN_TICKS)
+			if (deltaTicks < LI_MIN_MS_PER_FRAME)
 				continue;
 
 			m_LastTicks = ticks;
@@ -133,6 +133,7 @@ namespace li
 
 	void Application::OnWindowEvent(SDL_Event* event)
 	{
+		m_Window->OnWindowEvent(event);
 		switch(event->window.event)
 		{
 		case SDL_WINDOWEVENT_CLOSE:
@@ -145,6 +146,8 @@ namespace li
 
 			RendererAPI::SetViewport(0, 0, w, h);
 			Renderer::Resize(w, h);
+			m_ImGuiRenderer->Resize(w, h);
+
 			break;
 		}
 	}

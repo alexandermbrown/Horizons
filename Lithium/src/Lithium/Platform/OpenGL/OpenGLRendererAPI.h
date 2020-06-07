@@ -16,7 +16,10 @@ namespace li
 
 		virtual void SetDepthTestImpl(bool enabled) override;
 
+		virtual void DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) override;
+
 		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray) override;
+		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) override;
 		virtual void DrawIndexedInstancedImpl(
 			const Ref<VertexArray>& vertexArray,
 			uint32_t instanceCount,

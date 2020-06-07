@@ -6,6 +6,8 @@
 Horizons::Horizons()
 	: li::Application()
 {
+	li::ResourceManager::Init("data/resources.lab");
+	li::Localization::SetLocale("en-us");
 	PushLayer(new GameLayer());
 }
 

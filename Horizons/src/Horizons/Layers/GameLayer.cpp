@@ -10,11 +10,11 @@
 GameLayer::GameLayer()
 	: Layer("GameLayer"),
 	m_Camera((float)li::Application::Get().GetWindow()->GetWidth() / (float)li::Application::Get().GetWindow()->GetHeight(), 10.0f, true),
-	m_QuadColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), m_EventQueue(256)
+	m_QuadColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), m_EventQueue(256ULL)
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	, m_DebugDrawQueue(256ULL), m_DebugPhysicsRenderer(&m_DebugDrawQueue)
+#endif
 {
-	li::ResourceManager::Init("data/resources.lab");
-
-	li::Localization::SetLocale("en-us");
 	m_Label = li::CreateRef<li::Label>(li::Localization::Get("BUTTON_PLAY"), 30.0f,
 		li::ResourceManager::Get<li::Font>("RobotoMono-Italic"), glm::vec4(1.0f), 11);
 
@@ -22,7 +22,11 @@ GameLayer::GameLayer()
 
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
 
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	m_TickThread = std::thread(TickThreadEntryPointDebugDraw, &m_EventQueue, &m_DebugDrawQueue);
+#else
 	m_TickThread = std::thread(TickThreadEntryPoint, &m_EventQueue);
+#endif
 }
 
 void GameLayer::OnAttach()
@@ -54,6 +58,10 @@ void GameLayer::OnUpdate(float dt)
 	li::Renderer::UISubmitLabel(m_Label, glm::translate(glm::mat4(1.0f), { 100.0f, 100.0f, 1.0f }), glm::vec4(1.0f));
 
 	li::Renderer::EndScene();
+
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	m_DebugPhysicsRenderer.Render(&m_Camera.GetCamera(), 0.9f);
+#endif
 }
 
 void GameLayer::OnImGuiRender()

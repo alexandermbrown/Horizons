@@ -1,6 +1,13 @@
 #pragma once
 
-#include "Horizons/OrthographicCameraController.h"
+#include "Horizons/Core/Core.h"
+
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+#include "Horizons/Rendering/DebugPhysicsDrawShared.h"
+#include "Horizons/Rendering/DebugPhysicsRenderer.h"
+#endif
+
+#include "Horizons/Gameplay/Player/OrthographicCameraController.h"
 
 #include "Lithium.h"
 #include "glm/glm.hpp"
@@ -32,4 +39,9 @@ private:
 	std::thread m_TickThread;
 
 	moodycamel::ReaderWriterQueue<SDL_Event> m_EventQueue;
+
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawCommandQueue m_DebugDrawQueue;
+	DebugPhysicsRenderer m_DebugPhysicsRenderer;
+#endif
 };
