@@ -9,7 +9,7 @@
 
 GameLayer::GameLayer()
 	: Layer("GameLayer"),
-	m_Camera((float)li::Application::Get().GetWindow()->GetWidth() / (float)li::Application::Get().GetWindow()->GetHeight(), 10.0f, true),
+	m_Camera((float)li::Application::Get()->GetWindow()->GetWidth() / (float)li::Application::Get()->GetWindow()->GetHeight(), 10.0f, true),
 	m_QuadColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), m_EventQueue(256ULL)
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	, m_DebugDrawQueue(256ULL), m_DebugPhysicsRenderer(&m_DebugDrawQueue)
@@ -81,11 +81,11 @@ void GameLayer::OnEvent(SDL_Event* event)
 	dispatcher.Dispatch(SDL_KEYUP, [&](SDL_Event* e) {
 
 		if (e->key.keysym.scancode == SDL_SCANCODE_F11) {
-			if (li::Application::Get().GetWindow()->GetFullscreen() == li::FullscreenType::Windowed) {
-				li::Application::Get().GetWindow()->SetFullscreen(li::FullscreenType::FullscreenWindowed);
+			if (li::Application::Get()->GetWindow()->GetFullscreen() == li::FullscreenType::Windowed) {
+				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::FullscreenWindowed);
 			}
 			else {
-				li::Application::Get().GetWindow()->SetFullscreen(li::FullscreenType::Windowed);
+				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::Windowed);
 			}
 		}
 		else if (e->key.keysym.scancode == SDL_SCANCODE_L) {

@@ -16,26 +16,26 @@ OrthographicCameraController::OrthographicCameraController(float aspectRatio, fl
 void OrthographicCameraController::OnUpdate(float dt)
 {
 	bool doPosition = false;
-	if (li::Input::IsKeyPressed(SDLK_a))
+	if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_A))
 	{
 		m_CameraPosition.x -= SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		m_CameraPosition.y -= SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		doPosition = true;
 	}
-	else if (li::Input::IsKeyPressed(SDLK_d))
+	else if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_D))
 	{
 		m_CameraPosition.x += SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		m_CameraPosition.y += SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		doPosition = true;
 	}
 
-	if (li::Input::IsKeyPressed(SDLK_w))
+	if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_W))
 	{
 		m_CameraPosition.x += -SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		m_CameraPosition.y += SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		doPosition = true;
 	}
-	else if (li::Input::IsKeyPressed(SDLK_s))
+	else if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_S))
 	{
 		m_CameraPosition.x -= -SDL_sinf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
 		m_CameraPosition.y -= SDL_cosf(m_CameraRotation) * m_CameraTranslationSpeed * dt;
@@ -45,12 +45,12 @@ void OrthographicCameraController::OnUpdate(float dt)
 	if (m_Rotation)
 	{
 		bool doRotation = false;
-		if (li::Input::IsKeyPressed(SDLK_q))
+		if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_Q))
 		{
 			m_CameraRotation += m_CameraRotationSpeed * dt;
 			doRotation = true;
 		}
-		if (li::Input::IsKeyPressed(SDLK_e))
+		if (li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_E))
 		{
 			m_CameraRotation -= m_CameraRotationSpeed * dt;
 			doRotation = true;
@@ -84,7 +84,7 @@ void OrthographicCameraController::OnWindowEvent(SDL_Event* event)
 {
 	if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 		int w, h;
-		SDL_GL_GetDrawableSize(li::Application::Get().GetWindow()->GetWindow(), &w, &h);
+		SDL_GL_GetDrawableSize(li::Application::Get()->GetWindow()->GetWindow(), &w, &h);
 		m_AspectRatio = (float)w / (float)h;
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 	}

@@ -18,7 +18,7 @@ namespace li
 	void OpenGLContext::Init()
 	{
 		SDL_GL_MakeCurrent(m_WindowHandle, m_Context);
-		LI_CORE_ASSERT(gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to load OpenGL loader!");
+		LI_CORE_RUN_ASSERT(gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to load OpenGL loader!");
 
 		LI_CORE_INFO("OpenGL Info:");
 		GLCall( LI_CORE_INFO("    Vendor: {0}", glGetString(GL_VENDOR)) );

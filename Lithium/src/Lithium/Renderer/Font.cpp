@@ -52,6 +52,7 @@ namespace li
 
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArray->Unbind();
 	}
 
 	void Label::Calculate()

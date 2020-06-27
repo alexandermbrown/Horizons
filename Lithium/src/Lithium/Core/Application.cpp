@@ -6,6 +6,7 @@
 #include "Lithium/Events/EventDispatcher.h"
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
+#include "Lithium/Localization/Localization.h"
 #include <SDL.h>
 #include <chrono>
 
@@ -19,7 +20,7 @@ namespace li
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
-		: m_Running(false), m_LayerStack(), m_LastTicks(0)
+		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), m_Input(), m_FocusedLayer(nullptr)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
 		s_Instance = this;
@@ -54,6 +55,7 @@ namespace li
 
 		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
 
+		Localization::Init();
 		Renderer::Init();
 		AudioManager::Init();
 	}
@@ -77,11 +79,6 @@ namespace li
 			SDL_Event sdlEvent;
 			while (SDL_PollEvent(&sdlEvent))
 			{
-				m_ImGuiRenderer->OnEvent(&sdlEvent);
-				// Capture ImGui keyboard and mouse input.
-				if (m_ImGuiRenderer->WantCapture(sdlEvent))
-					continue;
-
 				OnEvent(&sdlEvent);
 			}
 			
@@ -92,14 +89,33 @@ namespace li
 
 			m_LastTicks = ticks;
 
+			bool reachedFocused = false;
+			if (m_FocusedLayer)
+				m_Input.Disable();
+
 			for (Layer* layer : m_LayerStack)
 			{
+				if (m_FocusedLayer == layer && !reachedFocused)
+				{
+					m_Input.Enable();
+					reachedFocused = true;
+				}
+
 				layer->OnUpdate((float)deltaTicks * 0.001f);
 			}
+
+			reachedFocused = false;
+			if (m_FocusedLayer)
+				m_Input.Disable();
 
 			m_ImGuiRenderer->Begin();
 			for (Layer* layer : m_LayerStack)
 			{
+				if (m_FocusedLayer == layer && !reachedFocused)
+				{
+					m_Input.Enable();
+					reachedFocused = true;
+				}
 				layer->OnImGuiRender();
 			}
 			m_ImGuiRenderer->End();
@@ -108,14 +124,22 @@ namespace li
 		}
 	}
 
-	void Application::OnEvent(SDL_Event* e)
+	void Application::OnEvent(SDL_Event* event)
 	{
-		EventDispatcher dispatcher(e);
+		m_Input.OnEvent(event);
+
+		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_EVENT_FN(Application::OnWindowEvent));
+
+		m_ImGuiRenderer->OnEvent(event);
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
+			if (m_EventHandled) {
+				m_EventHandled = false;
+				break;
+			}
+			(*it)->OnEvent(event);
 		}
 	}
 

@@ -30,10 +30,10 @@ namespace li
 		ImGui::StyleColorsDark();
 		//ImGui::StyleColorsClassic();
 
-		Application& app = Application::Get();
+		Application* app = Application::Get();
 
 		// Setup Platform/Renderer bindings
-		ImGui_ImplSDL2_InitForOpenGL((SDL_Window*)app.GetWindow()->GetWindow(), std::dynamic_pointer_cast<OpenGLContext>(app.GetWindow()->GetContext())->GetGLContext());
+		ImGui_ImplSDL2_InitForOpenGL((SDL_Window*)app->GetWindow()->GetWindow(), std::dynamic_pointer_cast<OpenGLContext>(app->GetWindow()->GetContext())->GetGLContext());
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
@@ -47,13 +47,12 @@ namespace li
 	void ImGuiRenderer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame((SDL_Window*)Application::Get().GetWindow()->GetWindow());
+		ImGui_ImplSDL2_NewFrame((SDL_Window*)Application::Get()->GetWindow()->GetWindow());
 		ImGui::NewFrame();
 	}
 
 	void ImGuiRenderer::End()
 	{
-
 		// Rendering
 		ImGui::EndScene();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -62,6 +61,27 @@ namespace li
 	void ImGuiRenderer::OnEvent(SDL_Event* event)
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (io.WantCaptureKeyboard) {
+			if (event->type == SDL_KEYDOWN ||
+				event->type == SDL_KEYUP ||
+				event->type == SDL_TEXTEDITING ||
+				event->type == SDL_TEXTINPUT)
+			{
+				Application::Get()->EventHandled();
+			}
+		}
+		
+		if (io.WantCaptureMouse) {
+			if (event->type == SDL_MOUSEBUTTONDOWN ||
+				event->type == SDL_MOUSEBUTTONUP ||
+				event->type == SDL_MOUSEMOTION ||
+				event->type == SDL_MOUSEWHEEL)
+			{
+				Application::Get()->EventHandled();
+			}
+		}
 	}
 
 	void ImGuiRenderer::Resize(int width, int height)

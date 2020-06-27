@@ -137,20 +137,18 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 		m_IndexBuffer->SetSubData(m_Indices.data(), m_IndexCount * sizeof(uint32_t), 0);
 	}
 
-	RenderExisting(camera, z);
-}
+	// Render the lines.
+	if (m_IndexCount > 0)
+	{
+		m_VertexArray->Bind();
+		li::Ref<li::Shader> shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
+		shader->Bind();
+		shader->SetFloat("u_ZPosition", z);
+		shader->SetMat4("u_ViewProjection", camera->GetViewProjectionMatrix());
 
-void DebugPhysicsRenderer::RenderExisting(li::OrthographicCamera* camera, float z)
-{
-	if (m_IndexCount == 0) return;
-
-	m_VertexArray->Bind();
-	li::Ref<li::Shader> shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
-	shader->Bind();
-	shader->SetFloat("u_ZPosition", z);
-	shader->SetMat4("u_ViewProjection", camera->GetViewProjectionMatrix());
-
-	li::RendererAPI::DrawIndexed(m_VertexArray, m_IndexCount, li::DrawMode::Lines);
+		li::RendererAPI::DrawIndexed(m_VertexArray, m_IndexCount, li::DrawMode::Lines);
+		m_VertexArray->Unbind();
+	}
 }
 
 #endif

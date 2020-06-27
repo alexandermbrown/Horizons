@@ -15,6 +15,8 @@ namespace li
 			OpenGL
 		};
 
+		virtual ~RendererAPI() = default;
+
 		inline static void Init()
 		{
 			s_RendererAPI->InitImpl();
