@@ -15,15 +15,12 @@
 
 namespace li
 {
-	Scope<ResourceManager> ResourceManager::s_Instance = CreateScope<ResourceManager>();
+	Scope<ResourceManager::ResourceData> ResourceManager::s_Data;
 
-	ResourceManager::ResourceManager()
-		: m_Textures(), m_Shaders()
+	void ResourceManager::Init(const std::string& labFilePath)
 	{
-	}
-
-	void ResourceManager::InitImpl(const std::string& labFilePath)
-	{
+		s_Data = CreateScope<ResourceData>();
+		
 		LI_CORE_INFO("Loading asset base {}...", labFilePath);
 		zstr::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
 
@@ -58,22 +55,22 @@ namespace li
 			{
 				std::string name;
 				Ref<Texture2D> texture = LoadTexture2D(&name, &inFile, &pos);
-				m_Textures[name] = texture;
+				s_Data->Textures[name] = texture;
 				break;
 			}
 			case SegmentType::Shader:
 			{
 				std::string name;
 				Ref<Shader> shader = LoadShader(&name, &inFile, &pos);
-				m_Shaders[name] = shader;
+				s_Data->Shaders[name] = shader;
 				break;
 			}
 			case SegmentType::TextureAtlas:
 			{
 				std::string name;
-				Ref<TextureAtlas> atlas = LoadTextureAtlas(m_Textures, &name, &inFile, &pos);
+				Ref<TextureAtlas> atlas = LoadTextureAtlas(s_Data->Textures, &name, &inFile, &pos);
 				if (atlas) {
-					m_TextureAtlases[name] = atlas;
+					s_Data->TextureAtlases[name] = atlas;
 				}
 				break;
 			}
@@ -81,14 +78,14 @@ namespace li
 			{
 				std::string name;
 				Ref<Font> font = LoadFont(&name, &inFile, &pos);
-				m_Fonts[name] = font;
+				s_Data->Fonts[name] = font;
 				break;
 			}
 			case SegmentType::Audio:
 			{
 				std::string name;
 				Ref<Audio> audio = LoadAudio(&name, &inFile, &pos);
-				m_Audio[name] = audio;
+				s_Data->Audio[name] = audio;
 				break;
 			}
 			case SegmentType::Locale:
@@ -105,20 +102,16 @@ namespace li
 		}
 
 		LI_CORE_INFO("Successfully loaded lithium asset base {}", labFilePath);
-		LI_CORE_INFO("    # Textures        | {}", m_Textures.size());
-		LI_CORE_INFO("    # Shaders         | {}", m_Shaders.size());
-		LI_CORE_INFO("    # TextureAtlases  | {}", m_TextureAtlases.size());
-		LI_CORE_INFO("    # Fonts           | {}", m_Fonts.size());
-		LI_CORE_INFO("    # Audio           | {}", m_Audio.size());
+		LI_CORE_INFO("    # Textures        | {}", s_Data->Textures.size());
+		LI_CORE_INFO("    # Shaders         | {}", s_Data->Shaders.size());
+		LI_CORE_INFO("    # TextureAtlases  | {}", s_Data->TextureAtlases.size());
+		LI_CORE_INFO("    # Fonts           | {}", s_Data->Fonts.size());
+		LI_CORE_INFO("    # Audio           | {}", s_Data->Audio.size());
 		LI_CORE_INFO("    # Locales         | {}", Localization::GetLocaleCount());
 	}
 
-	void ResourceManager::ShutdownImpl()
+	void ResourceManager::Shutdown()
 	{
-		m_Textures.clear();
-		m_Shaders.clear();
-		m_TextureAtlases.clear();
-		m_Fonts.clear();
-		m_Audio.clear();
+		s_Data.reset();
 	}
 }

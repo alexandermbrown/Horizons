@@ -14,71 +14,61 @@ namespace li
 	class ResourceManager
 	{
 	public:
-		inline static void Init(const std::string& labFilePath) {
-			s_Instance->InitImpl(labFilePath);
-		}
 
-		inline static void Shutdown() { s_Instance->ShutdownImpl(); }
+		static void Init(const std::string& labFilePath);
+		static void Shutdown();
 
 		template<typename T>
-		inline static Ref<T> Get(const std::string& name)
-		{
-			return s_Instance->GetImpl<T>(name);
-		}
-
-		ResourceManager();
-
-	private:
-		void InitImpl(const std::string& labFilePath);
-		void ShutdownImpl();
-
-		template<typename T>
-		Ref<T> GetImpl(const std::string& name) const
+		static Ref<T> Get(const std::string& name)
 		{
 			return nullptr;
 		}
 
 		template<>
-		Ref<Texture2D> GetImpl<Texture2D>(const std::string& name) const
+		static Ref<Texture2D> Get<Texture2D>(const std::string& name)
 		{
-			LI_CORE_ASSERT(m_Textures.find(name) != m_Textures.end(), "Texture not found.");
-			return m_Textures.at(name);
+			LI_CORE_ASSERT(s_Data->Textures.find(name) != s_Data->Textures.end(), "Texture not found.");
+			return s_Data->Textures.at(name);
 		}
 
 		template<>
-		Ref<Shader> GetImpl<Shader>(const std::string& name) const
+		static Ref<Shader> Get<Shader>(const std::string& name)
 		{
-			LI_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end(), "Shader not found.");
-			return m_Shaders.at(name);
+			LI_CORE_ASSERT(s_Data->Shaders.find(name) != s_Data->Shaders.end(), "Shader not found.");
+			return s_Data->Shaders.at(name);
 		}
 
 		template<>
-		Ref<TextureAtlas> GetImpl<TextureAtlas>(const std::string& name) const
+		static Ref<TextureAtlas> Get<TextureAtlas>(const std::string& name)
 		{
-			LI_CORE_ASSERT(m_TextureAtlases.find(name) != m_TextureAtlases.end(), "Texture atlas not found.");
-			return m_TextureAtlases.at(name);
+			LI_CORE_ASSERT(s_Data->TextureAtlases.find(name) != s_Data->TextureAtlases.end(), "Texture atlas not found.");
+			return s_Data->TextureAtlases.at(name);
 		}
 
 		template<>
-		Ref<Font> GetImpl<Font>(const std::string& name) const
+		static Ref<Font> Get<Font>(const std::string& name)
 		{
-			LI_CORE_ASSERT(m_Fonts.find(name) != m_Fonts.end(), "Font not found.");
-			return m_Fonts.at(name);
+			LI_CORE_ASSERT(s_Data->Fonts.find(name) != s_Data->Fonts.end(), "Font not found.");
+			return s_Data->Fonts.at(name);
 		}
 
 		template<>
-		Ref<Audio> GetImpl<Audio>(const std::string& name) const
+		static Ref<Audio> Get<Audio>(const std::string& name)
 		{
-			LI_CORE_ASSERT(m_Audio.find(name) != m_Audio.end(), "Audio not found.");
-			return m_Audio.at(name);
+			LI_CORE_ASSERT(s_Data->Audio.find(name) != s_Data->Audio.end(), "Audio not found.");
+			return s_Data->Audio.at(name);
 		}
 
-		std::unordered_map<std::string, Ref<Texture2D>> m_Textures;
-		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
-		std::unordered_map<std::string, Ref<TextureAtlas>> m_TextureAtlases;
-		std::unordered_map<std::string, Ref<Font>> m_Fonts;
-		std::unordered_map<std::string, Ref<Audio>> m_Audio;
-
-		static Scope<ResourceManager> s_Instance;
+	private:
+		struct ResourceData
+		{
+			std::unordered_map<std::string, Ref<Texture2D>> Textures;
+			std::unordered_map<std::string, Ref<Shader>> Shaders;
+			std::unordered_map<std::string, Ref<TextureAtlas>> TextureAtlases;
+			std::unordered_map<std::string, Ref<Font>> Fonts;
+			std::unordered_map<std::string, Ref<Audio>> Audio;
+		};
+		
+		static Scope<ResourceData> s_Data;
 	};
 }
