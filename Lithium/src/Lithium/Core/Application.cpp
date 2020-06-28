@@ -19,8 +19,8 @@ namespace li
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
-		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), m_Input(), m_FocusedLayer(nullptr)
+	Application::Application(const WindowProps& props)
+		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
 		s_Instance = this;
@@ -51,7 +51,7 @@ namespace li
 
 		m_EventCallbackFn = LI_BIND_EVENT_FN(Application::OnEvent);
 
-		m_Window = Window::Create("Lithium Engine", 1280, 720, true, true, Renderer::GetAPI());
+		m_Window = Window::Create(props.Title, props.Width, props.Height, props.Resizable, props.Shown, props.Borderless, Renderer::GetAPI());
 
 		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
 
@@ -93,6 +93,8 @@ namespace li
 			if (m_FocusedLayer)
 				m_Input.Disable();
 
+			m_LayersDirty = false;
+
 			for (Layer* layer : m_LayerStack)
 			{
 				if (m_FocusedLayer == layer && !reachedFocused)
@@ -102,6 +104,9 @@ namespace li
 				}
 
 				layer->OnUpdate((float)deltaTicks * 0.001f);
+
+				if (m_LayersDirty)
+					break;
 			}
 
 			reachedFocused = false;
@@ -117,6 +122,9 @@ namespace li
 					reachedFocused = true;
 				}
 				layer->OnImGuiRender();
+
+				if (m_LayersDirty)
+					break;
 			}
 			m_ImGuiRenderer->End();
 
@@ -153,6 +161,18 @@ namespace li
 	{
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
+	}
+
+	void Application::PopLayer(Layer* layer)
+	{
+		m_LayersDirty = true;
+		m_LayerStack.PopLayer(layer);
+	}
+
+	void Application::PopOverlay(Layer* overlay)
+	{
+		m_LayersDirty = true;
+		m_LayerStack.PopOverlay(overlay);
 	}
 
 	void Application::OnWindowEvent(SDL_Event* event)

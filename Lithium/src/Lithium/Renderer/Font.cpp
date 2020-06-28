@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Font::Font(const std::string& name, const FontProperties& props, const std::vector<Glyph> glyphs, Ref<Texture2D> texture)
+	Font::Font(const std::string& name, const FontProperties& props, const std::vector<Glyph>& glyphs, Ref<Texture2D> texture)
 		: m_Name(name), m_Properties(props), m_Glyphs(), m_Texture(texture)
 	{
 		for (const Glyph& glyph : glyphs)

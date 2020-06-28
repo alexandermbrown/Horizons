@@ -27,6 +27,7 @@ IncludeDir["openal"] = "Lithium/vendor/openal-soft/include"
 IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
 IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
 IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
+IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -35,7 +36,6 @@ IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
 
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
-IncludeDir["readerwriterqueue"] = "Horizons/vendor/readerwriterqueue/include"
 
 group "vendor"
 include "Lithium/vendor/glad"
@@ -86,7 +86,8 @@ project "Lithium"
         "%{IncludeDir.zstr}",
         "%{IncludeDir.openal}",
         "%{IncludeDir.libogg}",
-        "%{IncludeDir.libvorbis}"
+        "%{IncludeDir.libvorbis}",
+        "%{IncludeDir.readerwriterqueue}"
     }
 
     links {

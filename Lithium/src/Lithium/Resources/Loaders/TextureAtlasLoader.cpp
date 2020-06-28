@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Ref<TextureAtlas> LoadTextureAtlas(std::unordered_map<std::string, Ref<Texture2D>>& textures, std::string* outname, zstr::ifstream* inFile, size_t* pos)
+	TextureAtlasArgs* TextureAtlasArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
 	{
 		char name[64];
 		char texture[64];
@@ -26,12 +26,6 @@ namespace li
 			entries[alias] = bounds;
 		}
 
-		*outname = std::string(name);
-
-		if (textures.count(texture) < 1) {
-			LI_CORE_ERROR("Texture {} not found for atlas {}", texture, name);
-			return nullptr;
-		}
-		else return CreateRef<TextureAtlas>(textures[texture], entries);
+		return new TextureAtlasArgs(name, texture, std::move(entries));
 	}
 }

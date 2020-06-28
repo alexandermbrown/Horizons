@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Ref<Font> LoadFont(std::string* outname, zstr::ifstream* inFile, size_t* pos)
+	FontArgs* FontArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
 	{
 		char name[64];
 		uint16_t glyphWidth = 0;
@@ -64,12 +64,11 @@ namespace li
 		props.UnderlineY = underlineY;
 		props.UnderlineThickness = underlineThickness;
 
-		Ref<Texture2D> texture = Texture2D::Create(imageSize, imageData, WrapType::ClampToEdge, WrapType::ClampToEdge,
-			FilterType::Linear, FilterType::Linear);
-		delete[] imageData;
+		return new FontArgs(name, imageSize, imageData, props, std::move(glyphs));
+	}
 
-		*outname = std::string(name);
-
-		return CreateRef<Font>(name, props, glyphs, texture);
+	FontArgs::~FontArgs()
+	{
+		delete[] m_ImageData;
 	}
 }

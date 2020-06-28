@@ -9,6 +9,16 @@
 
 namespace li
 {
+	struct WindowProps
+	{
+		char* Title;
+		int Width;
+		int Height;
+		bool Resizable;
+		bool Shown;
+		bool Borderless;
+	};
+
 	class Application
 	{
 	public:
@@ -17,7 +27,7 @@ namespace li
 		template<typename T>
 		inline static T* Get() { return static_cast<T*>(s_Instance); }
 
-		Application();
+		Application(const WindowProps& props);
 		virtual ~Application();
 		void Run();
 
@@ -27,6 +37,8 @@ namespace li
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+		void PopLayer(Layer* layer);
+		void PopOverlay(Layer* overlay);
 
 		inline Ref<Window>& GetWindow() { return m_Window;  }
 		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
@@ -48,6 +60,7 @@ namespace li
 		static Application* s_Instance;
 
 		bool m_EventHandled;
+		bool m_LayersDirty;
 
 		Layer* m_FocusedLayer;
 	};

@@ -2,6 +2,7 @@
 #include "Horizons.h"
 
 #include "Horizons/Layers/GameLayer.h"
+#include "Horizons/Layers/SplashScreenLayer.h"
 
 #ifdef HZ_CONSOLE_ENABLED
 #include "Horizons/Commands/CVarCommands.h"
@@ -10,11 +11,8 @@
 #include "Lithium/Core/EntryPoint.h"
 
 Horizons::Horizons()
-	: li::Application()
+	: li::Application({ "Horizons", 768, 384, false, true, true })
 {
-	li::ResourceManager::Init("data/resources.lab");
-	li::Localization::SetLocale("en-us");
-	PushLayer(new GameLayer());
 
 #ifdef HZ_CONSOLE_ENABLED
 	m_Console = new ConsoleLayer();
@@ -24,6 +22,8 @@ Horizons::Horizons()
 	m_Console->AddCommand(CreateCVarSetCommand());
 	m_Console->AddCommand(CreateCVarGetCommand());
 #endif
+
+	PushLayer(new SplashScreenLayer());
 }
 
 li::Application* li::CreateApplication()

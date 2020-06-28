@@ -1,8 +1,10 @@
 #include "pch.h"
-#include "CVarCommands.h"
 
 #include "Horizons.h"
 #include "Lithium.h"
+
+#ifdef HZ_CONSOLE_ENABLED
+#include "CVarCommands.h"
 
 li::Ref<Command> CreateCVarSetCommand()
 {
@@ -68,3 +70,4 @@ li::Ref<Command> CreateCVarGetCommand()
 
 	return get;
 }
+#endif

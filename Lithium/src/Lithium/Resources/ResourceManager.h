@@ -8,6 +8,10 @@
 #include "Lithium/Audio/Audio.h"
 
 #include <unordered_map>
+#include <atomic>
+
+#include "Loaders/ResourceArgs.h"
+#include "readerwriterqueue/readerwriterqueue.h"
 
 namespace li
 {
@@ -15,8 +19,13 @@ namespace li
 	{
 	public:
 
-		static void Init(const std::string& labFilePath);
+		static void LoadAsync(const std::string& labFilePath);
 		static void Shutdown();
+
+		static bool DequeueAsset();
+		static inline bool IsLoaded() { return s_Loaded.load(); }
+
+		static void PrintInfo();
 
 		template<typename T>
 		static Ref<T> Get(const std::string& name)
@@ -60,15 +69,24 @@ namespace li
 		}
 
 	private:
+
+		static void LoadFile(std::string labFilePath);
+
 		struct ResourceData
 		{
+			moodycamel::ReaderWriterQueue<ResourceArgs*> ArgsQueue;
+
 			std::unordered_map<std::string, Ref<Texture2D>> Textures;
 			std::unordered_map<std::string, Ref<Shader>> Shaders;
 			std::unordered_map<std::string, Ref<TextureAtlas>> TextureAtlases;
 			std::unordered_map<std::string, Ref<Font>> Fonts;
 			std::unordered_map<std::string, Ref<Audio>> Audio;
+
+			std::thread LoadThread;
 		};
 		
 		static Scope<ResourceData> s_Data;
+		static std::atomic<bool> s_Loaded;
+
 	};
 }

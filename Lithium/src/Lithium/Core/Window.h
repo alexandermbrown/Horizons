@@ -34,13 +34,19 @@ namespace li
 		virtual bool IsVSync() const = 0;
 		virtual void SetFullscreen(FullscreenType type) = 0;
 		virtual FullscreenType GetFullscreen() const = 0;
+		virtual void SetBordered(bool bordered) = 0;
+		virtual void SetResizable(bool resizable) = 0;
+		virtual void Show() = 0;
+		virtual void Hide() = 0;
+		virtual void SetSize(int width, int height) = 0;
+		virtual void SetPosition(int x, int y) = 0;
 
 		virtual void OnWindowEvent(SDL_Event* event) = 0;
 
 		static Ref<Window> Create(
-			const char* title = "Lithium Engine",
-			int width = 1280, int height = 720,
-			bool resizable = false, bool shown = true,
+			const char* title,
+			int width, int height,
+			bool resizable, bool shown, bool borderless,
 			RendererAPI::API api = RendererAPI::API::OpenGL
 		);
 	};

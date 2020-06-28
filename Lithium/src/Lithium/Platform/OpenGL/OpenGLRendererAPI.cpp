@@ -61,6 +61,11 @@ namespace li
 
 	void OpenGLRendererAPI::SetDepthTestImpl(bool enabled)
 	{
+		if (m_DepthTest == enabled)
+			return;
+
+		m_DepthTest = enabled;
+
 		if (enabled) {
 			GLCall( glEnable(GL_DEPTH_TEST) );
 		}

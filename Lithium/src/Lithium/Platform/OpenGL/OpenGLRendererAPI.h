@@ -24,5 +24,9 @@ namespace li
 			const Ref<VertexArray>& vertexArray,
 			uint32_t instanceCount,
 			DrawMode mode) override;
+
+	private:
+
+		bool m_DepthTest = false;
 	};
 }

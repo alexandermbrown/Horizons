@@ -141,11 +141,11 @@ namespace li
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-		virtual void SetData(float* data, uint32_t size, uint32_t offset, BufferUsage usage = BufferUsage::StaticDraw, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
+		virtual void SetData(float* data, uint32_t size, uint32_t offset, BufferUsage usage, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
 		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
 
-		static Ref<VertexBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::DynamicDraw);
-		static Ref<VertexBuffer> Create(float* vertices, uint32_t size, BufferUsage usage = BufferUsage::StaticDraw);
+		static Ref<VertexBuffer> Create(uint32_t size, BufferUsage usage);
+		static Ref<VertexBuffer> Create(float* vertices, uint32_t size, BufferUsage usage);
 	};
 
 	class IndexBuffer

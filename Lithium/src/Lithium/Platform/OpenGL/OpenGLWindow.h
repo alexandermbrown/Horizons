@@ -8,7 +8,7 @@ namespace li
 	class OpenGLWindow : public Window
 	{
 	public:
-		OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown);
+		OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown, bool borderless);
 		virtual ~OpenGLWindow();
 
 		virtual void Shutdown() override;
@@ -23,6 +23,12 @@ namespace li
 		virtual inline bool IsVSync() const override { return m_VSync; }
 		virtual void SetFullscreen(FullscreenType type) override;
 		virtual inline FullscreenType GetFullscreen() const override { return m_Fullscreen; };
+		virtual void SetBordered(bool bordered) override;
+		virtual void SetResizable(bool resizable) override;
+		virtual void Show() override;
+		virtual void Hide() override;
+		virtual void SetSize(int width, int height) override;
+		virtual void SetPosition(int x, int y) override;
 
 		virtual void OnWindowEvent(SDL_Event* event) override;
 

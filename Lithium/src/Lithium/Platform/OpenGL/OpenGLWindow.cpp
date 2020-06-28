@@ -5,12 +5,18 @@
 
 namespace li
 {
-	OpenGLWindow::OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown)
+	OpenGLWindow::OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown, bool borderless)
 		: m_Title(title), m_Width(width), m_Height(height), m_VSync(false), m_Fullscreen(FullscreenType::Windowed)
 	{
 		int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 		if (resizable) flags |= SDL_WINDOW_RESIZABLE;
-		if (shown) flags |= SDL_WINDOW_SHOWN;
+		if (shown)
+			flags |= SDL_WINDOW_SHOWN;
+		else
+			flags |= SDL_WINDOW_HIDDEN;
+
+		if (borderless)
+			flags |= SDL_WINDOW_BORDERLESS;
 
 		m_Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 		LI_CORE_ASSERT(m_Window, "Error creating window.");
@@ -65,6 +71,36 @@ namespace li
 			LI_CORE_ERROR("Unknown fullscreen type {}.", type);
 			break;
 		}
+	}
+
+	void OpenGLWindow::SetBordered(bool bordered)
+	{
+		SDL_SetWindowBordered(m_Window, bordered ? SDL_TRUE : SDL_FALSE);
+	}
+
+	void OpenGLWindow::SetResizable(bool resizable)
+	{
+		SDL_SetWindowResizable(m_Window, resizable ? SDL_TRUE : SDL_FALSE);
+	}
+
+	void OpenGLWindow::Show()
+	{
+		SDL_ShowWindow(m_Window);
+	}
+
+	void OpenGLWindow::Hide()
+	{
+		SDL_HideWindow(m_Window);
+	}
+
+	void OpenGLWindow::SetSize(int width, int height)
+	{
+		SDL_SetWindowSize(m_Window, width, height);
+	}
+
+	void OpenGLWindow::SetPosition(int x, int y)
+	{
+		SDL_SetWindowPosition(m_Window, x, y);
 	}
 
 	void OpenGLWindow::OnWindowEvent(SDL_Event* event)

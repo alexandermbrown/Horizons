@@ -38,7 +38,7 @@ namespace li
 	{
 	public:
 
-		Font(const std::string& name, const FontProperties& props, const std::vector<Glyph> glyphs, Ref<Texture2D> texture);
+		Font(const std::string& name, const FontProperties& props, const std::vector<Glyph>& glyphs, Ref<Texture2D> texture);
 		virtual ~Font() = default;
 
 		inline Ref<Texture2D> GetTexture() const { return m_Texture; }

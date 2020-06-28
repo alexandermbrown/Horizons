@@ -33,7 +33,7 @@ namespace li
 
 		static void SubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform = glm::mat4(1.0f));
 
-		static void SubmitLabel(const Ref<Label> label, const glm::mat4& transform, const glm::vec4& color);
+		static void SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 
 		static void UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform = glm::mat4(1.0f));
 
@@ -41,9 +41,9 @@ namespace li
 
 		static void UISubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform = glm::mat4(1.0f));
 
-		static void UISubmitLabel(const Ref<Label> label, const glm::mat4& transform, const glm::vec4& color);
+		static void UISubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 
-		static void UISubmit(const Ref<Texture> texture, const glm::vec4& color = glm::vec4(1.0f), const glm::mat4& transform = glm::mat4(1.0f));
+		static void UISubmit(const Ref<Texture>& texture, const glm::vec4& color = glm::vec4(1.0f), const glm::mat4& transform = glm::mat4(1.0f));
 
 		static void Resize(uint32_t width, uint32_t height);
 
@@ -53,18 +53,21 @@ namespace li
 
 		struct RendererData
 		{
-			BatchRenderer m_SceneRenderer;
-			BatchRenderer m_UIRenderer;
+			BatchRenderer SceneRenderer;
+			BatchRenderer UIRenderer;
 
-			Ref<Shader> m_FontShader;
+			Ref<Shader> FontShader;
 
-			OrthographicCamera* m_Camera;
-			Scope<OrthographicCamera> m_UICamera;
+			Ref<Shader> TextureShader;
+			Ref<VertexArray> QuadVA;
+
+			OrthographicCamera* Camera;
+			Scope<OrthographicCamera> UICamera;
 		};
 
 		static Scope<RendererData> s_Data;
 
 
-		static void RenderLabel(const Ref<Label> label, const glm::mat4& transform, const glm::vec4& color, const glm::mat4& viewProjection);
+		static void RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color, const glm::mat4& viewProjection);
 	};
 }
