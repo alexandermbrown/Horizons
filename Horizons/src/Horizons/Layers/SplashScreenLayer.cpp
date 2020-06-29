@@ -2,17 +2,15 @@
 #include "SplashScreenLayer.h"
 
 #include "glm/gtc/matrix_transform.hpp"
-#include "Horizons/Layers/GameLayer.h"
+
 
 SplashScreenLayer::SplashScreenLayer()
 {
-	m_Texture = li::Texture2D::Create("data/textures/horizons_splash.png", 
+	m_Texture = li::Texture2D::Create("data/images/horizons_splash.png", 
 		li::WrapType::ClampToEdge, li::WrapType::ClampToEdge,
 		li::FilterType::Linear, li::FilterType::Linear);
 
 	CalculateTransform();
-
-	li::ResourceManager::LoadAsync("data/resources.lab");
 }
 
 void SplashScreenLayer::OnAttach()
@@ -21,27 +19,10 @@ void SplashScreenLayer::OnAttach()
 
 void SplashScreenLayer::OnDetach()
 {
-	li::Ref<li::Window>& window = li::Application::Get()->GetWindow();
-	window->SetBordered(true);
-	window->SetResizable(true);
-	window->SetSize(1280, 720);
-	window->SetPosition(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
 void SplashScreenLayer::OnUpdate(float dt)
 {
-	if (!li::ResourceManager::DequeueAsset() && li::ResourceManager::IsLoaded())
-	{
-		li::ResourceManager::PrintInfo();
-
-		// TODO: make config.
-		li::Localization::SetLocale("en-us");
-
-		li::Application* app = li::Application::Get();
-		app->PushLayer(new GameLayer());
-		app->PopLayer(this);
-	}
-
 	li::RendererAPI::Clear();
 	li::Renderer::UISubmit(m_Texture, glm::vec4(1.0f), m_Transform);
 }

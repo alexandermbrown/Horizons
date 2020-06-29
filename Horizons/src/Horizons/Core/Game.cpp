@@ -84,7 +84,7 @@ void Game::Run()
 	DebugDrawSystem::Shutdown(m_Registry);
 #endif
 
-	LI_TRACE("Tick thread closing...");
+	
 }
 
 void Game::OnEvent(SDL_Event* event)

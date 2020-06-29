@@ -2,8 +2,10 @@
 
 #include "Lithium/Core/Window.h"
 #include "Lithium/Core/LayerStack.h"
-#include "Lithium/ImGui/ImGuiRenderer.h"
 #include "Lithium/Core/Input.h"
+#include "Lithium/Core/Scene.h"
+
+#include "Lithium/ImGui/ImGuiRenderer.h"
 
 #include <functional>
 
@@ -44,6 +46,8 @@ namespace li
 		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
 		inline const Input& GetInput() { return m_Input; }
 
+		void Transition(Scene* scene);
+
 	private:
 		void OnWindowEvent(SDL_Event* event);
 
@@ -56,13 +60,16 @@ namespace li
 		Input m_Input;
 
 		std::function<void(SDL_Event* event)> m_EventCallbackFn;
-		
-		static Application* s_Instance;
 
 		bool m_EventHandled;
 		bool m_LayersDirty;
 
 		Layer* m_FocusedLayer;
+		
+		Scene* m_CurrentScene;
+		Scene* m_NextScene;
+
+		static Application* s_Instance;
 	};
 
 	// To be defined in CLIENT

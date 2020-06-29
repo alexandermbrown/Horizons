@@ -20,7 +20,8 @@ namespace li
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
-		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false)
+		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), 
+		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
 		s_Instance = this;
@@ -62,6 +63,7 @@ namespace li
 
 	Application::~Application()
 	{
+		delete m_CurrentScene;
 		m_LayerStack.Clear();
 		ResourceManager::Shutdown();
 		AudioManager::Shutdown();
@@ -76,11 +78,18 @@ namespace li
 
 		while (m_Running)
 		{
+			//////////////////////
+			// Propagate Events //
+			//////////////////////
 			SDL_Event sdlEvent;
 			while (SDL_PollEvent(&sdlEvent))
 			{
 				OnEvent(&sdlEvent);
 			}
+
+			//////////////////////////
+			// Calculate Delta Time //
+			//////////////////////////
 			
 			unsigned int ticks = SDL_GetTicks();
 			unsigned int deltaTicks = ticks - m_LastTicks;
@@ -88,6 +97,30 @@ namespace li
 				continue;
 
 			m_LastTicks = ticks;
+
+			float dt = (float)deltaTicks * 0.001f;
+
+			//////////////////
+			// Update Scene //
+			//////////////////
+
+			if (m_CurrentScene)
+			{
+				m_CurrentScene->OnUpdate(dt);
+
+				if (m_NextScene && m_CurrentScene->Finished())
+				{
+					delete m_CurrentScene;
+					m_CurrentScene = m_NextScene;
+					m_CurrentScene->TransitionIn();
+					m_NextScene = nullptr;
+				}
+			}
+
+
+			///////////////////
+			// Update Layers //
+			///////////////////
 
 			bool reachedFocused = false;
 			if (m_FocusedLayer)
@@ -103,11 +136,16 @@ namespace li
 					reachedFocused = true;
 				}
 
-				layer->OnUpdate((float)deltaTicks * 0.001f);
+				layer->OnUpdate(dt);
 
 				if (m_LayersDirty)
 					break;
 			}
+
+
+			//////////////////
+			// Render ImGui //
+			//////////////////
 
 			reachedFocused = false;
 			if (m_FocusedLayer)
@@ -173,6 +211,30 @@ namespace li
 	{
 		m_LayersDirty = true;
 		m_LayerStack.PopOverlay(overlay);
+	}
+
+	void Application::Transition(Scene* nextScene)
+	{
+		m_NextScene = nullptr;
+		if (m_CurrentScene)
+		{
+			m_CurrentScene->TransitionOut();
+			if (m_CurrentScene->Finished())
+			{
+				delete m_CurrentScene;
+				m_CurrentScene = nextScene;
+				m_CurrentScene->TransitionIn();
+			}
+			else
+			{
+				m_NextScene = nextScene;
+			}
+		}
+		else
+		{
+			m_CurrentScene = nextScene;
+			nextScene->TransitionIn();
+		}
 	}
 
 	void Application::OnWindowEvent(SDL_Event* event)

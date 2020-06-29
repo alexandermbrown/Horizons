@@ -34,12 +34,17 @@ namespace li
 		virtual bool IsVSync() const = 0;
 		virtual void SetFullscreen(FullscreenType type) = 0;
 		virtual FullscreenType GetFullscreen() const = 0;
+
 		virtual void SetBordered(bool bordered) = 0;
 		virtual void SetResizable(bool resizable) = 0;
+
 		virtual void Show() = 0;
 		virtual void Hide() = 0;
+
 		virtual void SetSize(int width, int height) = 0;
 		virtual void SetPosition(int x, int y) = 0;
+
+		virtual void SetIcon(const std::string& path) = 0;
 
 		virtual void OnWindowEvent(SDL_Event* event) = 0;
 

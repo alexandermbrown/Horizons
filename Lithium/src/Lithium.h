@@ -8,6 +8,7 @@
 #include "Lithium/Core/Input.h"
 #include "Lithium/Core/Layer.h"
 #include "Lithium/Core/LayerStack.h"
+#include "Lithium/Core/Scene.h"
 
 #include "Lithium/Renderer/Buffer.h"
 #include "Lithium/Renderer/VertexArray.h"

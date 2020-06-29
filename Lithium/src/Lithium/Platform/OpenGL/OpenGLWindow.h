@@ -30,11 +30,16 @@ namespace li
 		virtual void SetSize(int width, int height) override;
 		virtual void SetPosition(int x, int y) override;
 
+		virtual void SetIcon(const std::string& path) override;
+
 		virtual void OnWindowEvent(SDL_Event* event) override;
 
 	private:
 		SDL_Window* m_Window;
 		Ref<OpenGLContext> m_Context;
+
+		SDL_Surface* m_Icon;
+		unsigned char* m_IconData;
 
 		const char* m_Title;
 		int m_Width;
