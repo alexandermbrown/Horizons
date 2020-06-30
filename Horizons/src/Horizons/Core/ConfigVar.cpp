@@ -62,6 +62,10 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		try
 		{
+			// Try to stop the user from entering negative values.
+			if (value[0] == '-')
+				return false;
+
 			m_UnsignedValue = std::stoul(value);
 		}
 		catch (const std::invalid_argument&)

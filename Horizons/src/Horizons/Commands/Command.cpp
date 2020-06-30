@@ -12,7 +12,11 @@ void Command::Execute(const std::string& args, std::string* errorOut)
 		{
 			size_t next_space = args.find(' ', position + 1);
 			std::string current_arg = args.substr(position, next_space - position);
-			position = next_space;
+
+			if (next_space != std::string::npos)
+				position = next_space + 1;
+			else
+				position = std::string::npos;
 
 			// Check that there aren't too many parameters.
 			if (arguments.size() >= m_Layout.GetCount())
