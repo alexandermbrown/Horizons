@@ -33,7 +33,15 @@ namespace AssetBase
 	std::ostream& operator<<(std::ostream& os, const SegmentInfoTable& sit)
 	{
 		os.write((char*)&sit.numEntries, sizeof(sit.numEntries));
-		os.write((char*)sit.table, sit.numEntries * SegmentInfoTableEntry::GetSize());
+
+		// TODO: test.
+		for (int i = 0; i < sit.numEntries; i++)
+		{
+			os.write((char*)&sit.table[i].id, sizeof(sit.table[i].id));
+			os.write((char*)&sit.table[i].type, sizeof(sit.table[i].type));
+			os.write((char*)&sit.table[i].offset, sizeof(sit.table[i].offset));
+		}
+
 		return os;
 	}
 }

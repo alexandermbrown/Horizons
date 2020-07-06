@@ -16,4 +16,5 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"

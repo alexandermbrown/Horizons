@@ -94,6 +94,7 @@ namespace li
 
 				batch->InstanceVA->Bind();
 				RendererAPI::DrawIndexedInstanced(batch->InstanceVA, batch->InstanceCount, DrawMode::Triangles);
+				batch->InstanceVA->Unbind();
 			}
 		}
 	}

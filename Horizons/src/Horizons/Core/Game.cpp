@@ -43,7 +43,6 @@ void Game::Run()
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
-
 	while (m_Running)
 	{
 		std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();

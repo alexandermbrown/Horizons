@@ -104,6 +104,8 @@ namespace li
 	void OpenGLWindow::SetSize(int width, int height)
 	{
 		SDL_SetWindowSize(m_Window, width, height);
+		m_Width = width;
+		m_Height = height;
 	}
 
 	void OpenGLWindow::SetPosition(int x, int y)

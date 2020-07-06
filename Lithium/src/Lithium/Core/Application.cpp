@@ -4,12 +4,13 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"
 #include "Lithium/Events/EventDispatcher.h"
+#include "Lithium/Renderer/Renderer.h"
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
 #include "Lithium/Localization/Localization.h"
-#include <SDL.h>
-#include <chrono>
+#include "Lithium/UI/UI.h"
 
+#include "SDL.h"
 #include "imgui.h"
 
 #define LI_MIN_MS_PER_FRAME 2
@@ -20,7 +21,7 @@ namespace li
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
-		: m_Running(false), m_LayerStack(), m_LastTicks(0), m_EventHandled(false), 
+		: m_Running(false), m_LayerStack(), m_EventHandled(false), 
 		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
@@ -59,6 +60,7 @@ namespace li
 		Localization::Init();
 		Renderer::Init();
 		AudioManager::Init();
+		UI::Init();
 	}
 
 	Application::~Application()
@@ -66,6 +68,7 @@ namespace li
 		delete m_CurrentScene;
 		m_LayerStack.Clear();
 		ResourceManager::Shutdown();
+		UI::Shutdown();
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
 		m_Window->Shutdown();
@@ -75,6 +78,7 @@ namespace li
 	void Application::Run()
 	{
 		m_Running = true;
+		m_LastUpdateTime = std::chrono::steady_clock::now();
 
 		while (m_Running)
 		{
@@ -90,15 +94,11 @@ namespace li
 			//////////////////////////
 			// Calculate Delta Time //
 			//////////////////////////
-			
-			unsigned int ticks = SDL_GetTicks();
-			unsigned int deltaTicks = ticks - m_LastTicks;
-			if (deltaTicks < LI_MIN_MS_PER_FRAME)
-				continue;
 
-			m_LastTicks = ticks;
+			std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
+			std::chrono::duration<float> dt = currentTime - m_LastUpdateTime;
+			m_LastUpdateTime = currentTime;
 
-			float dt = (float)deltaTicks * 0.001f;
 
 			//////////////////
 			// Update Scene //
@@ -106,7 +106,7 @@ namespace li
 
 			if (m_CurrentScene)
 			{
-				m_CurrentScene->OnUpdate(dt);
+				m_CurrentScene->OnUpdate(dt.count());
 
 				if (m_NextScene && m_CurrentScene->Finished())
 				{
@@ -136,7 +136,7 @@ namespace li
 					reachedFocused = true;
 				}
 
-				layer->OnUpdate(dt);
+				layer->OnUpdate(dt.count());
 
 				if (m_LayersDirty)
 					break;

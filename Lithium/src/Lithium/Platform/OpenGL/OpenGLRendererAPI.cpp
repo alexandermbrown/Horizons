@@ -44,7 +44,7 @@ namespace li
 		GLCall( glEnable(GL_DEPTH_TEST) );
 	}
 
-	void OpenGLRendererAPI::SetViewportImpl(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	void OpenGLRendererAPI::SetViewportImpl(int x, int y, int width, int height)
 	{
 		GLCall( glViewport(x, y, width, height) );
 	}

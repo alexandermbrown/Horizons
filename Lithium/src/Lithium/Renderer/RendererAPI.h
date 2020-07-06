@@ -22,7 +22,7 @@ namespace li
 			s_RendererAPI->InitImpl();
 		}
 
-		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+		inline static void SetViewport(int x, int y, int width, int height)
 		{
 			s_RendererAPI->SetViewportImpl(x, y, width, height);
 		}
@@ -68,7 +68,7 @@ namespace li
 
 	protected:
 		virtual void InitImpl() = 0;
-		virtual void SetViewportImpl(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+		virtual void SetViewportImpl(int x, int y, int width, int height) = 0;
 		virtual void SetClearColorImpl(const glm::vec4& color) = 0;
 		virtual void ClearImpl() = 0;
 

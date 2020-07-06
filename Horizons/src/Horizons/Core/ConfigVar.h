@@ -20,38 +20,42 @@ class ConfigVar
 {
 public:
 
-	ConfigVar(const std::string& name, bool value, uint32_t flags, const std::string& description);
-	ConfigVar(const std::string& name, int value, uint32_t flags, const std::string& description);
-	ConfigVar(const std::string& name, unsigned int value, uint32_t flags, const std::string& description);
-	ConfigVar(const std::string& name, float value, uint32_t flags, const std::string& description);
+	ConfigVar(const std::string& name, uint32_t flags);
+
+	ConfigVar(const std::string& name, bool value, uint32_t flags);
+	ConfigVar(const std::string& name, int value, uint32_t flags);
+	ConfigVar(const std::string& name, unsigned int value, uint32_t flags);
+	ConfigVar(const std::string& name, float value, uint32_t flags);
 
 	bool SetFromString(const std::string& value);
 
 	inline const std::string& GetName() const { return m_Name; }
 	inline uint32_t GetFlags() const { return m_Flags; }
-	inline const std::string& GetDescription() const { return m_Description; }
 
-	std::string GetString();
+	std::string GetString() const;
 
-	inline bool GetBool()
+	inline bool IsDirty() const { return m_Dirty; }
+	inline void Clean() { m_Dirty = false; }
+
+	inline bool GetBool() const
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_BOOL, "CVar is not of type HZ_CVAR_BOOL");
 		return m_BoolValue;
 	}
 
-	inline int GetInt()
+	inline int GetInt() const
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_INT, "CVar is not of type HZ_CVAR_INT");
 		return m_IntValue;
 	}
 
-	inline unsigned int GetUnsigned()
+	inline unsigned int GetUnsigned() const
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_UNSIGNED, "CVar is not of type HZ_CVAR_UNSIGNED");
 		return m_UnsignedValue;
 	}
 
-	inline float GetFloat()
+	inline float GetFloat() const
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_FLOAT, "CVar is not of type HZ_CVAR_FLOAT");
 		return m_FloatValue;
@@ -60,24 +64,36 @@ public:
 	inline void Set(bool value)
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_BOOL, "Cannot set CVar of type {} to bool.");
+		if (m_BoolValue != value)
+			m_Dirty = true;
+
 		m_BoolValue = value;
 	};
 
 	inline void Set(int value)
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_INT, "Cannot set CVar of type {} to int.");
+		if (m_IntValue != value)
+			m_Dirty = true;
+
 		m_IntValue = value;
 	};
 
 	inline void Set(unsigned int value)
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_UNSIGNED, "Cannot set CVar of type {} to unsigned int.");
+		if (m_UnsignedValue != value)
+			m_Dirty = true;
+
 		m_UnsignedValue = value;
 	};
 
 	inline void Set(float value)
 	{
 		LI_ASSERT(m_Flags & HZ_CVAR_FLOAT, "Cannot set CVar of type {} to float.");
+		if (m_FloatValue != value)
+			m_Dirty = true;
+
 		m_FloatValue = value;
 	};
 
@@ -92,34 +108,8 @@ private:
 	};
 
 	std::string m_Name;
-	std::string m_Description;
 
 	uint32_t m_Flags;
-};
 
-class ConfigStore
-{
-public:
-
-	ConfigStore();
-
-	inline bool Contains(const std::string& name)
-	{
-		return m_ConfigVars.find(name) != m_ConfigVars.end();
-	}
-	
-	inline void Add(const ConfigVar& var)
-	{
-		m_ConfigVars.insert({ var.GetName(), var });
-	}
-
-	inline ConfigVar& Get(const std::string& name)
-	{
-		LI_ASSERT(Contains(name), "Config variable '{}' not found.", name);
-		return m_ConfigVars.at(name);
-	}
-
-private:
-
-	std::unordered_map<std::string, ConfigVar> m_ConfigVars;
+	bool m_Dirty = true;
 };

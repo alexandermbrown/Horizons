@@ -112,16 +112,18 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 			{
 				uint32_t firstIndex = m_VertexCount;
 
-				const float resolution = 64;
-				for (float i = 0.0f; i < resolution; i++)
+				const int resolution = 32;
+				for (int i = 0; i < resolution; i++)
 				{
-					float angle = i / resolution * 2.0f * (float)M_PI;
+					float angle = (float)i / (float)resolution * 2.0f * (float)M_PI;
 					
-					m_Vertices[m_VertexCount].Position = { SDL_cosf(angle) * command.Radius, SDL_sinf(angle) * command.Radius };
+					m_Vertices[m_VertexCount].Position = { 
+						SDL_cosf(angle) * command.Radius + command.Point1.x, 
+						SDL_sinf(angle) * command.Radius + command.Point1.y };
 					m_Vertices[m_VertexCount].Color = command.Color;
 
 					m_Indices[m_IndexCount++] = m_VertexCount;
-					m_Indices[m_IndexCount++] = (i == command.VertexCount - 1) ? firstIndex : m_VertexCount + 1;
+					m_Indices[m_IndexCount++] = (i == resolution - 1) ? firstIndex : m_VertexCount + 1;
 
 					m_VertexCount++;
 				}
@@ -145,7 +147,7 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 		shader->Bind();
 		shader->SetFloat("u_ZPosition", z);
 		shader->SetMat4("u_ViewProjection", camera->GetViewProjectionMatrix());
-
+		
 		li::RendererAPI::DrawIndexed(m_VertexArray, m_IndexCount, li::DrawMode::Lines);
 		m_VertexArray->Unbind();
 	}

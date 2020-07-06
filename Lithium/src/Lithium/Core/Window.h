@@ -2,7 +2,7 @@
 
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/GraphicsContext.h"
-#include "Lithium/Renderer/Renderer.h"
+#include "Lithium/Renderer/RendererAPI.h"
 
 #include <SDL.h>
 
@@ -25,8 +25,8 @@ namespace li
 
 		virtual void SwapBuffers() = 0;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
+		virtual int GetWidth() const = 0;
+		virtual int GetHeight() const = 0;
 		virtual Ref<GraphicsContext> GetContext() const = 0;
 		virtual SDL_Window* GetWindow() const = 0;
 

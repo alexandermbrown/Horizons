@@ -2,26 +2,31 @@
 #include "ConfigVar.h"
 
 
-ConfigVar::ConfigVar(const std::string& name, bool value, uint32_t flags, const std::string& description)
-	: m_Name(name), m_Flags(flags), m_Description(description)
+ConfigVar::ConfigVar(const std::string& name, uint32_t flags)
+	: m_Name(name), m_Flags(flags)
+{
+}
+
+ConfigVar::ConfigVar(const std::string& name, bool value, uint32_t flags)
+	: m_Name(name), m_Flags(flags)
 {
 	m_BoolValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, int value, uint32_t flags, const std::string& description)
-	: m_Name(name), m_Flags(flags), m_Description(description)
+ConfigVar::ConfigVar(const std::string& name, int value, uint32_t flags)
+	: m_Name(name), m_Flags(flags)
 {
 	m_IntValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, unsigned int value, uint32_t flags, const std::string& description)
-	: m_Name(name), m_Flags(flags), m_Description(description)
+ConfigVar::ConfigVar(const std::string& name, unsigned int value, uint32_t flags)
+	: m_Name(name), m_Flags(flags)
 {
 	m_UnsignedValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, float value, uint32_t flags, const std::string& description)
-	: m_Name(name), m_Flags(flags), m_Description(description)
+ConfigVar::ConfigVar(const std::string& name, float value, uint32_t flags)
+	: m_Name(name), m_Flags(flags)
 {
 	m_FloatValue = value;
 }
@@ -32,11 +37,11 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		if (value == "true" || value == "on" || value == "t" || value == "1")
 		{
-			m_BoolValue = true;
+			Set(true);
 		}
 		else if (value == "false" || value == "off" || value == "f" || value == "0")
 		{
-			m_BoolValue = false;
+			Set(false);
 		}
 		else
 		{
@@ -47,7 +52,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		try
 		{
-			m_IntValue = std::stoi(value);
+			Set(std::stoi(value));
 		}
 		catch (const std::invalid_argument&)
 		{
@@ -66,7 +71,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 			if (value[0] == '-')
 				return false;
 
-			m_UnsignedValue = std::stoul(value);
+			Set((unsigned int)std::stoul(value));
 		}
 		catch (const std::invalid_argument&)
 		{
@@ -81,7 +86,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		try
 		{
-			m_FloatValue = std::stof(value);
+			Set(std::stof(value));
 		}
 		catch (const std::invalid_argument&)
 		{
@@ -95,7 +100,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 	return true;
 }
 
-std::string ConfigVar::GetString()
+std::string ConfigVar::GetString() const
 {
 	if (m_Flags & HZ_CVAR_BOOL)
 	{
@@ -115,9 +120,4 @@ std::string ConfigVar::GetString()
 		return std::to_string(m_FloatValue);
 	}
 	return "UNKNOWN";
-}
-
-ConfigStore::ConfigStore()
-	: m_ConfigVars()
-{
 }

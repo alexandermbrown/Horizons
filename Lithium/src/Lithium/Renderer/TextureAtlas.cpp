@@ -19,13 +19,10 @@ namespace li
 
 	void TextureAtlas::Bind()
 	{
-		if (m_Texture)
-		{
-			m_Texture->Bind();
-		}
-		else
+		if (m_Texture == nullptr)
 		{
 			m_Texture = ResourceManager::Get<Texture2D>(m_TextureAlias);
 		}
+		m_Texture->Bind();
 	}
 }

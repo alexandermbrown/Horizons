@@ -28,6 +28,7 @@ IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
 IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
 IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
 IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
+IncludeDir["layout"] = "Lithium/vendor/layout/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -87,7 +88,8 @@ project "Lithium"
         "%{IncludeDir.openal}",
         "%{IncludeDir.libogg}",
         "%{IncludeDir.libvorbis}",
-        "%{IncludeDir.readerwriterqueue}"
+        "%{IncludeDir.readerwriterqueue}",
+        "%{IncludeDir.layout}"
     }
 
     links {
@@ -103,6 +105,10 @@ project "Lithium"
 
         links {
             "Lithium/vendor/SDL2/lib/x64/SDL2.lib"
+        }
+
+        defines {
+            "LI_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"
@@ -150,7 +156,9 @@ project "Horizons"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.box2d}",
-        "%{IncludeDir.readerwriterqueue}"
+        "%{IncludeDir.readerwriterqueue}",
+        "%{IncludeDir.layout}",
+        "%{IncludeDir.simpleini}"
     }
 
     links {
@@ -161,6 +169,10 @@ project "Horizons"
     filter "system:windows"
         systemversion "latest"
         
+        defines {
+            "LI_PLATFORM_WINDOWS",
+            "HZ_PLATFORM_WINDOWS"
+        }
         
     filter "configurations:Debug"
         defines {

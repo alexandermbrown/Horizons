@@ -18,7 +18,7 @@ namespace li
 		s_Data->TextureShader = Shader::Create("data/shaders/Texture.glsl");
 
 		Ref<Window>& window = Application::Get()->GetWindow();
-		s_Data->UICamera = CreateScope<OrthographicCamera>(0, (float)window->GetWidth(), 0, (float)window->GetHeight());
+		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, (float)window->GetWidth(), 0.0f, (float)window->GetHeight());
 
 		RendererAPI::Init();
 		RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
@@ -32,16 +32,11 @@ namespace li
 		whiteTexture->SetData(&data, sizeof(data));
 
 		// SETUP SCENE FLAT COLOR TEXTURE ALTAS
-		Ref<TextureAtlas> sceneFlatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
+		Ref<TextureAtlas> flatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
 			{ "texture_white", glm::vec4(0.5f) }
 		}));
-		s_Data->SceneRenderer.AddTextureAtlas(sceneFlatColorAtlas);
-
-		// SETUP UI FLAT COLOR TEXTURE ALTAS
-		Ref<TextureAtlas> uiFlatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
-			{ "texture_white", glm::vec4(0.5f) }
-			}));
-		s_Data->UIRenderer.AddTextureAtlas(uiFlatColorAtlas);
+		s_Data->SceneRenderer.AddTextureAtlas(flatColorAtlas);
+		s_Data->UIRenderer.AddTextureAtlas(flatColorAtlas);
 
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
@@ -78,22 +73,27 @@ namespace li
 	void Renderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
 	{
 		s_Data->SceneRenderer.AddTextureAtlas(atlas);
+		s_Data->UIRenderer.AddTextureAtlas(atlas);
 	}
 
 	void Renderer::BeginScene(OrthographicCamera* camera)
 	{
 		s_Data->FontShader = ResourceManager::Get<Shader>("shader_label");
-		
-		RendererAPI::Clear();
 		s_Data->Camera = camera;
-		s_Data->SceneRenderer.BeginScene(camera);
+
+		if (s_Data->Camera)
+			s_Data->SceneRenderer.BeginScene(camera);
+
 		s_Data->UIRenderer.BeginScene(s_Data->UICamera.get());
 	}
 
 	void Renderer::EndScene()
 	{
 		RendererAPI::SetDepthTest(true);
-		s_Data->SceneRenderer.EndScene();
+
+		if (s_Data->Camera)
+			s_Data->SceneRenderer.EndScene();
+
 		s_Data->UIRenderer.EndScene();
 	}
 
@@ -152,7 +152,7 @@ namespace li
 		RendererAPI::DrawIndexed(s_Data->QuadVA);
 	}
 
-	void Renderer::Resize(uint32_t width, uint32_t height)
+	void Renderer::Resize(int width, int height)
 	{
 		s_Data->UICamera->SetProjection(0, (float)width, 0, (float)height);
 	}

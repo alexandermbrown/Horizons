@@ -4,6 +4,7 @@
 #include "Lithium.h"
 
 #include "Horizons/Layers/SplashScreenLayer.h"
+#include "Horizons/Layers/ConfigUpdateLayer.h"
 
 class SplashScreenScene : public li::Scene
 {
@@ -17,10 +18,10 @@ public:
 
 	virtual void OnUpdate(float dt) override;
 
-	virtual bool Finished() override { return true; };
+	virtual bool Finished() override { return true; }
 
 private:
 
 	SplashScreenLayer* m_SplashScreenLayer;
-
+	ConfigUpdateLayer* m_ConfigCleanLayer;
 };

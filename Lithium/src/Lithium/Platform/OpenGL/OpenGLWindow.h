@@ -14,8 +14,8 @@ namespace li
 		virtual void Shutdown() override;
 
 		virtual void SwapBuffers() override;
-		virtual inline unsigned int GetWidth() const override { return m_Width; }
-		virtual inline unsigned int GetHeight() const override { return m_Height; }
+		virtual inline int GetWidth() const override { return m_Width; }
+		virtual inline int GetHeight() const override { return m_Height; }
 		virtual inline Ref<GraphicsContext> GetContext() const override { return m_Context; }
 		virtual inline SDL_Window* GetWindow() const override { return m_Window; }
 

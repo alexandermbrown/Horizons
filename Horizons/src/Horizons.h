@@ -3,7 +3,7 @@
 #include "Lithium.h"
 
 #include "Horizons/Core/Core.h"
-#include "Horizons/Core/ConfigVar.h"
+#include "Horizons/Core/ConfigStore.h"
 
 #ifdef HZ_CONSOLE_ENABLED
 #include "Horizons/Layers/ConsoleLayer.h"
@@ -13,7 +13,7 @@ class Horizons : public li::Application
 {
 public:
 	Horizons();
-	virtual ~Horizons() = default;
+	virtual ~Horizons();
 
 	inline ConfigStore& GetConfig() { return m_ConfigStore; }
 
@@ -22,6 +22,9 @@ public:
 #endif
 
 private:
+
+	void LoadConfig();
+	void SaveConfig();
 
 	ConfigStore m_ConfigStore;
 

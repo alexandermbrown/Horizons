@@ -23,6 +23,7 @@ namespace li
 
 		static void AddTextureAtlas(Ref<TextureAtlas> atlas);
 
+		// Set camera to nullptr to render just UI.
 		static void BeginScene(OrthographicCamera* camera);
 
 		static void EndScene();
@@ -45,7 +46,7 @@ namespace li
 
 		static void UISubmit(const Ref<Texture>& texture, const glm::vec4& color = glm::vec4(1.0f), const glm::mat4& transform = glm::mat4(1.0f));
 
-		static void Resize(uint32_t width, uint32_t height);
+		static void Resize(int width, int height);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 

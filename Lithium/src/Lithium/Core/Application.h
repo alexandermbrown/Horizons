@@ -8,6 +8,7 @@
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
 #include <functional>
+#include <chrono>
 
 namespace li
 {
@@ -52,7 +53,7 @@ namespace li
 		void OnWindowEvent(SDL_Event* event);
 
 		bool m_Running;
-		unsigned int m_LastTicks;
+		std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 
 		Ref<Window> m_Window;
 		Scope<ImGuiRenderer> m_ImGuiRenderer;
