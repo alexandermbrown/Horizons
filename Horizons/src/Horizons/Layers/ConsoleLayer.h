@@ -39,6 +39,7 @@ public:
 	}
 
 	void Print(const Line& line);
+	void Clear();
 
 	int InputTextCallback(ImGuiInputTextCallbackData* data);
 

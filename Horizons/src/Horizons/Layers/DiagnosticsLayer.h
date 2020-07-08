@@ -20,7 +20,8 @@ public:
 
 private:
 
-	bool m_Open;
+	bool m_PerformanceOpen = false;
+	bool m_CVarsOpen = false;
 
 	float m_CurrentDelta = 0.0f;
 

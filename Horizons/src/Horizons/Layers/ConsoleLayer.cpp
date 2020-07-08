@@ -10,6 +10,13 @@ ConsoleLayer::ConsoleLayer()
 	m_HistoryIndex(-1), m_HistoryCount(0), m_LatestHistory(0)
 {
 	m_InputBuffer[0] = '\0';
+
+	CommandLayout clear_layout = {};
+
+	AddCommand(li::CreateRef<Command>("clear", "Clears the console.", clear_layout, [](std::vector<CommandValue>&& args, std::string* errorOut)
+		{
+			li::Application::Get<Horizons>()->GetConsole()->Clear();
+		}));
 }
 
 void ConsoleLayer::OnAttach()
@@ -87,6 +94,11 @@ void ConsoleLayer::OnImGuiRender()
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 
 		ImGui::End();
+
+		if (ImGui::GetIO().WantCaptureKeyboard)
+			li::Application::Get()->TakeFocus(this);
+		else
+			li::Application::Get()->TakeFocus(nullptr);
 	}
 }
 
@@ -102,7 +114,6 @@ void ConsoleLayer::OnEvent(SDL_Event* event)
 			if (m_ConsoleOpen)
 			{
 				m_ScrollToBottom = true;
-				li::Application::Get()->TakeFocus(this);
 			}
 			else
 			{
@@ -120,6 +131,12 @@ void ConsoleLayer::Print(const Line& line)
 	m_CurrentLine = (m_CurrentLine + 1) % HZ_CONSOLE_OUTPUT_NUM_LINES;
 	if (m_LineCount < HZ_CONSOLE_OUTPUT_NUM_LINES)
 		m_LineCount++;
+}
+
+void ConsoleLayer::Clear()
+{
+	m_CurrentLine = 0;
+	m_LineCount = 0;
 }
 
 int ConsoleLayer::InputTextCallback(ImGuiInputTextCallbackData* data)

@@ -31,6 +31,12 @@ public:
 		return m_ConfigVars.at(name);
 	}
 
+	std::unordered_map<std::string, ConfigVar>::iterator begin() { return m_ConfigVars.begin(); }
+	std::unordered_map<std::string, ConfigVar>::iterator end() { return m_ConfigVars.end(); }
+
+	std::unordered_map<std::string, ConfigVar>::const_iterator begin() const { return m_ConfigVars.begin(); }
+	std::unordered_map<std::string, ConfigVar>::const_iterator end()	const { return m_ConfigVars.end(); }
+
 private:
 
 	void LoadType(const char* str_type, uint32_t type, CSimpleIniA& ini);

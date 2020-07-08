@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "DiagnosticsLayer.h"
 
+#include "Horizons.h"
+
 #include "imgui.h"
 
 DiagnosticsLayer::DiagnosticsLayer()
-	: m_Open(true), m_Timer(0.1, false, true)
+	: m_Timer(0.1, false, true)
 {
 
 }
@@ -56,9 +58,9 @@ void DiagnosticsLayer::OnUpdate(float dt)
 
 void DiagnosticsLayer::OnImGuiRender()
 {
-	if (m_Open)
+	if (m_PerformanceOpen)
 	{
-		ImGui::Begin("Diagnostics", &m_Open);
+		ImGui::Begin("Performance", &m_PerformanceOpen);
 
 		ImGui::Text(("Avg. FPS: " + std::to_string(1 / m_Average)).c_str());
 		ImGui::Separator();
@@ -130,6 +132,24 @@ void DiagnosticsLayer::OnImGuiRender()
 
 		ImGui::End();
 	}
+
+	if (m_CVarsOpen)
+	{
+		ImGui::Begin("Config Variables", &m_CVarsOpen);
+
+		ConfigStore& config = li::Application::Get<Horizons>()->GetConfig();
+
+		ImGui::BeginChild("cvar_list");
+		for (auto& [name, var] : config)
+		{
+			ImGui::Text(name.c_str());
+			ImGui::SameLine(ImGui::GetWindowWidth() - 50.0f);
+			ImGui::Text(var.GetString().c_str());
+		}
+		ImGui::EndChild();
+
+		ImGui::End();
+	}
 }
 
 void DiagnosticsLayer::OnEvent(SDL_Event* event)
@@ -140,7 +160,13 @@ void DiagnosticsLayer::OnEvent(SDL_Event* event)
 		// TODO: Make scancode a keybind.
 		if (event->key.keysym.scancode == SDL_SCANCODE_F3)
 		{
-			m_Open = !m_Open;
+			m_PerformanceOpen = !m_PerformanceOpen;
+
+			li::Application::Get()->EventHandled();
+		}
+		else if (event->key.keysym.scancode == SDL_SCANCODE_F4)
+		{
+			m_CVarsOpen = !m_CVarsOpen;
 
 			li::Application::Get()->EventHandled();
 		}
