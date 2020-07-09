@@ -6,7 +6,8 @@
 class Matchmaker {
 public:
 	Matchmaker();
-	Server Match(Location location);
+	~Matchmaker();
+	Server* Match(std::string username, std::string location);
 private:
-	std::vector<Server> m_servers;
+	std::vector<Server*> m_Servers;
 };

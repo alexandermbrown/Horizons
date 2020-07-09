@@ -26,26 +26,17 @@ int main()
 
         const std::string& username = req.get_file_value("username").content;
         const std::string& password = req.get_file_value("password").content;
+        const std::string& location = req.get_file_value("location").content;
 
-
-        try
+        Server* server = matchmaker.Match(username, location);
+        if (server)
         {
-            Location location = (Location)std::stoul(req.get_file_value("location").content);
-            Server result = matchmaker.Match(location);
-            std::cout << (uint32_t)result.m_location << std::endl;
-            res.set_content("Yay good job.", "text/plain");
-            return;
-
+            std::cout << "Connecting " << username << " to " << server->GetAddress() << " with player count " << server->GetPlayerCount() << std::endl;
+            res.set_content("OK. ip: " + server->GetAddress(), "text/plain");
         }
-        catch (std::invalid_argument const& e)
+        else
         {
-            res.set_content("Error. Invalid location.", "text/plain");
-            return;
-        }
-        catch (std::out_of_range const& e)
-        {
-            res.set_content("Error. Invalid location.", "text/plain");
-            return;
+            res.set_content("Could not find a match.", "text/plain");
         }
         });
 
