@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Ref<Shader> LoadShader(std::string* outname, zstr::ifstream* inFile, size_t* pos)
+	ShaderArgs* ShaderArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
 	{
 		char name[64];
 		size_t shaderSize;
@@ -17,10 +17,11 @@ namespace li
 		LI_READ_FILE(*inFile, (char*)shaderData, shaderSize, *pos);
 		shaderData[shaderSize] = '\0';
 
-		Ref<Shader> shader = Shader::Create(name, shaderData);
-		delete[] shaderData;
+		return new ShaderArgs(name, shaderData);
+	}
 
-		*outname = std::string(name);
-		return shader;
+	ShaderArgs::~ShaderArgs()
+	{
+		delete[] m_Data;
 	}
 }

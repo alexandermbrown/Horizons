@@ -42,7 +42,7 @@ namespace li
 	}
 
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin)
-		: m_QuadOrigin(quadOrigin), m_Batches(), m_TextureLUT(), m_Camera(nullptr)
+		: m_QuadOrigin(quadOrigin), m_Batches(), m_TextureIndices(), m_Camera(nullptr)
 	{
 	}
 
@@ -55,7 +55,7 @@ namespace li
 	{
 		uint32_t index = (uint32_t)m_Batches.size();
 		for (auto& [alias, bounds]: atlas->GetEntries()) {
-			m_TextureLUT[alias] = index;
+			m_TextureIndices[alias] = index;
 		}
 
 		m_Batches.push_back(CreateRef<Batch>(atlas, m_QuadOrigin));
@@ -94,6 +94,7 @@ namespace li
 
 				batch->InstanceVA->Bind();
 				RendererAPI::DrawIndexedInstanced(batch->InstanceVA, batch->InstanceCount, DrawMode::Triangles);
+				batch->InstanceVA->Unbind();
 			}
 		}
 	}
@@ -103,7 +104,7 @@ namespace li
 		const glm::vec4& color, 
 		const glm::mat4& transform)
 	{
-		const Ref<Batch>& batch = m_Batches[m_TextureLUT[textureAlias]];
+		const Ref<Batch>& batch = m_Batches[m_TextureIndices[textureAlias]];
 		// TODO: flush instances and start new batch.
 		LI_CORE_ASSERT(batch->InstanceCount < LI_MAX_BATCH_INSTANCES, "Too many instanced submissions for this atlas!");
 

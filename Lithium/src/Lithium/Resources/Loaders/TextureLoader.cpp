@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Ref<Texture2D> LoadTexture2D(std::string* outname, zstr::ifstream* inFile, size_t* pos)
+	Texture2DArgs* Texture2DArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
 	{
 		char name[64];
 		li::FilterType min_filter;
@@ -25,12 +25,11 @@ namespace li
 		imageData = new uint8_t[imageSize];
 		LI_READ_FILE(*inFile, (char*)imageData, imageSize, *pos);
 
-		Ref<Texture2D> texture = Texture2D::Create(imageSize, imageData, wrap_s, wrap_t,
-			min_filter, mag_filter);
+		return new Texture2DArgs(name, imageSize, imageData, wrap_s, wrap_t, min_filter, mag_filter);
+	}
 
-		delete[] imageData;
-
-		*outname = std::string(name);
-		return texture;
+	Texture2DArgs::~Texture2DArgs()
+	{
+		delete[] m_Data;
 	}
 }

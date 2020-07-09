@@ -3,17 +3,21 @@
 
 namespace li
 {
-	Scope<Localization> Localization::s_Instance = CreateScope<Localization>();
+	Scope<Localization::LocalizationData> Localization::s_Data;
 
 	Locale::Locale(const std::string& code) : m_Code(code), m_Strings() {}
 
-	Localization::Localization() : m_Locales() {}
-
-	void Localization::SetLocaleImpl(const std::string& localeCode)
+	void Localization::Init()
 	{
-		for (const Ref<Locale>& locale : m_Locales) {
+		s_Data = CreateScope<Localization::LocalizationData>();
+		s_Data->m_Locales = std::vector<Ref<Locale>>();
+	}
+
+	void Localization::SetLocale(const std::string& localeCode)
+	{
+		for (const Ref<Locale>& locale : s_Data->m_Locales) {
 			if (locale->GetCode() == localeCode) {
-				m_Selected = locale;
+				s_Data->m_Selected = locale;
 				return;
 			}
 		}

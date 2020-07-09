@@ -23,8 +23,10 @@ namespace PlayerSystem
 		playerBodyDef.position.Set(0.0f, 0.0f); // TODO: define where the player is in the world.
 		physBody.body = world.world->CreateBody(&playerBodyDef);
 
-		b2PolygonShape playerShape;
-		playerShape.SetAsBox(0.5f, 0.5f); // TODO: Set player size.
+		
+		b2CircleShape playerShape;
+		playerShape.m_p.Set(0.0f, 0.0f);
+		playerShape.m_radius = 0.5f;
 
 		b2FixtureDef fixtureDef;
 		fixtureDef.shape = &playerShape;
@@ -33,5 +35,8 @@ namespace PlayerSystem
 		fixtureDef.restitution = 0.0f; // TODO: Set player restitution.
 
 		physBody.body->CreateFixture(&fixtureDef);
+
+		physBody.body->ApplyAngularImpulse(0.1f, true);
+		physBody.body->ApplyLinearImpulseToCenter({ 0.5f, 0.1f }, true);
 	}
 }

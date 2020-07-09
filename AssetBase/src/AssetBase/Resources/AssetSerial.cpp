@@ -38,8 +38,8 @@ namespace AssetBase
 
 		FontSegment::Init();
 
-		ASSETBASE_PUSH_SEGMENT(Texture2DSegment,	root->first_node("textures"),			path);
 		ASSETBASE_PUSH_SEGMENT(ShaderSegment,		root->first_node("shaders"),			path);
+		ASSETBASE_PUSH_SEGMENT(Texture2DSegment,	root->first_node("textures"),			path);
 		ASSETBASE_PUSH_SEGMENT(TextureAtlasSegment, root->first_node("texture_atlases"),	path);
 		ASSETBASE_PUSH_SEGMENT(FontSegment,			root->first_node("fonts"),				path);
 		ASSETBASE_PUSH_SEGMENT(AudioSegment,		root->first_node("audio"),				path);

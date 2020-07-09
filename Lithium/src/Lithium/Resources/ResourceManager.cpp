@@ -11,18 +11,98 @@
 #include "Loaders/AudioLoader.h"
 #include "Loaders/LocaleLoader.h"
 
+#include <thread>
+
 #define LI_READ_FILE(file, ptr, size, pos) file.read(ptr, size); pos += file.gcount()
 
 namespace li
 {
-	Scope<ResourceManager> ResourceManager::s_Instance = CreateScope<ResourceManager>();
+	Scope<ResourceManager::ResourceData> ResourceManager::s_Data;
+	std::atomic<bool> ResourceManager::s_Loaded(false);
 
-	ResourceManager::ResourceManager()
-		: m_Textures(), m_Shaders()
+	void ResourceManager::LoadAsync(const std::string& labFilePath)
 	{
+		s_Data = CreateScope<ResourceData>();
+
+		s_Data->LoadThread = std::thread(LoadFile, labFilePath);
 	}
 
-	void ResourceManager::InitImpl(const std::string& labFilePath)
+	void ResourceManager::Shutdown()
+	{
+		s_Data->LoadThread.join();
+		s_Data.reset();
+	}
+
+	bool ResourceManager::DequeueAsset()
+	{
+		ResourceArgs* resource;
+		if (s_Data->ArgsQueue.try_dequeue(resource))
+		{
+			switch (resource->GetType())
+			{
+			case SegmentType::Texture2D:
+			{
+				Texture2DArgs* texture = (Texture2DArgs*)resource;
+				s_Data->Textures[texture->GetName()] = texture->Create();
+				break;
+			}
+			case SegmentType::Shader:
+			{
+				ShaderArgs* shader = (ShaderArgs*)resource;
+				s_Data->Shaders[shader->GetName()] = shader->Create();
+				break;
+			}
+			case SegmentType::TextureAtlas:
+			{
+				TextureAtlasArgs* atlas = (TextureAtlasArgs*)resource;
+				s_Data->TextureAtlases[atlas->GetName()] = atlas->Create();
+				break;
+			}
+			case SegmentType::Font:
+			{
+				FontArgs* font = (FontArgs*)resource;
+				s_Data->Fonts[font->GetName()] = font->Create();
+				break;
+			}
+			case SegmentType::Audio:
+			{
+				AudioArgs* audio = (AudioArgs*)resource;
+				s_Data->Audio[audio->GetName()] = audio->Create();
+				break;
+			}
+			case SegmentType::Locale:
+			{
+				LocaleArgs* locale = (LocaleArgs*)resource;
+				Localization::AddLocale(locale->Create());
+				break;
+			}
+			default:
+				LI_CORE_ERROR("Unknown asset type!");
+				break;
+			}
+
+			delete resource;
+
+			return true;
+		}
+		return false;
+	}
+
+	void ResourceManager::PrintInfo()
+	{
+		LI_CORE_INFO("--------------------------------");
+		LI_CORE_INFO("    Lithium Asset Base Info");
+		LI_CORE_INFO("--------------------------------");
+		LI_CORE_INFO("    # Textures        | {}", s_Data->Textures.size());
+		LI_CORE_INFO("    # Shaders         | {}", s_Data->Shaders.size());
+		LI_CORE_INFO("    # TextureAtlases  | {}", s_Data->TextureAtlases.size());
+		LI_CORE_INFO("    # Fonts           | {}", s_Data->Fonts.size());
+		LI_CORE_INFO("    # Audio           | {}", s_Data->Audio.size());
+		LI_CORE_INFO("    # Locales         | {}", Localization::GetLocaleCount());
+		LI_CORE_INFO("--------------------------------");
+	}
+
+	void ResourceManager::LoadFile(std::string labFilePath)
 	{
 		LI_CORE_INFO("Loading asset base {}...", labFilePath);
 		zstr::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
@@ -47,78 +127,43 @@ namespace li
 		}
 
 		// Read in list of assets.
-		while (pos < header.infoTableOffset) {
-
+		while (pos < header.infoTableOffset)
+		{
 			SegmentType segmentType;
 			LI_READ_FILE(inFile, (char*)&segmentType, sizeof(segmentType), pos);
 
 			switch (segmentType)
 			{
 			case SegmentType::Texture2D:
-			{
-				std::string name;
-				Ref<Texture2D> texture = LoadTexture2D(&name, &inFile, &pos);
-				m_Textures[name] = texture;
+				s_Data->ArgsQueue.enqueue(Texture2DArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+
 			case SegmentType::Shader:
-			{
-				std::string name;
-				Ref<Shader> shader = LoadShader(&name, &inFile, &pos);
-				m_Shaders[name] = shader;
+				s_Data->ArgsQueue.enqueue(ShaderArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+
 			case SegmentType::TextureAtlas:
-			{
-				std::string name;
-				Ref<TextureAtlas> atlas = LoadTextureAtlas(m_Textures, &name, &inFile, &pos);
-				if (atlas) {
-					m_TextureAtlases[name] = atlas;
-				}
+				s_Data->ArgsQueue.enqueue(TextureAtlasArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+			
 			case SegmentType::Font:
-			{
-				std::string name;
-				Ref<Font> font = LoadFont(&name, &inFile, &pos);
-				m_Fonts[name] = font;
+				s_Data->ArgsQueue.enqueue(FontArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+			
 			case SegmentType::Audio:
-			{
-				std::string name;
-				Ref<Audio> audio = LoadAudio(&name, &inFile, &pos);
-				m_Audio[name] = audio;
+				s_Data->ArgsQueue.enqueue(AudioArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+			
 			case SegmentType::Locale:
-			{
-				std::string name;
-				Ref<Locale> locale = LoadLocale(&name, &inFile, &pos);
-				Localization::AddLocale(locale);
+				s_Data->ArgsQueue.enqueue(LocaleArgs::Deserialize(&inFile, &pos));
 				break;
-			}
+			
 			default:
 				LI_CORE_ERROR("Unknown asset type!");
 				break;
 			}
 		}
 
-		LI_CORE_INFO("Successfully loaded lithium asset base {}", labFilePath);
-		LI_CORE_INFO("    # Textures        | {}", m_Textures.size());
-		LI_CORE_INFO("    # Shaders         | {}", m_Shaders.size());
-		LI_CORE_INFO("    # TextureAtlases  | {}", m_TextureAtlases.size());
-		LI_CORE_INFO("    # Fonts           | {}", m_Fonts.size());
-		LI_CORE_INFO("    # Audio           | {}", m_Audio.size());
-		LI_CORE_INFO("    # Locales         | {}", Localization::GetLocaleCount());
-	}
-
-	void ResourceManager::ShutdownImpl()
-	{
-		m_Textures.clear();
-		m_Shaders.clear();
-		m_TextureAtlases.clear();
-		m_Fonts.clear();
-		m_Audio.clear();
+		s_Loaded = true;
 	}
 }

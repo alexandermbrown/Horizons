@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Ref<Audio> LoadAudio(std::string* outname, zstr::ifstream* inFile, size_t* pos)
+	AudioArgs* AudioArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
 	{
 		char name[64];
 		size_t fileSize;
@@ -16,10 +16,11 @@ namespace li
 		uint8_t* fileData = new uint8_t[fileSize];
 		LI_READ_FILE(*inFile, (char*)fileData, fileSize, *pos);
 
-		Ref<Audio> audio = CreateRef<Audio>(fileData, (uint32_t)fileSize);
-		delete[] fileData;
+		return new AudioArgs(name, fileData, (uint32_t)fileSize);
+	}
 
-		*outname = std::string(name);
-		return audio;
+	AudioArgs::~AudioArgs()
+	{
+		delete[] m_Data;
 	}
 }

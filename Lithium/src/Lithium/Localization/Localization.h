@@ -12,6 +12,7 @@ namespace li
 	public:
 
 		Locale(const std::string& code);
+		virtual ~Locale() = default;
 
 		inline const std::wstring& Get(const std::string& key) const
 		{
@@ -40,61 +41,37 @@ namespace li
 	{
 	public:
 
-		Localization();
-		virtual ~Localization() = default;
+		static void Init();
 
-		static inline void AddLocale(Ref<Locale> locale) 
-		{
-			s_Instance->AddLocaleImpl(locale);
+		static inline void AddLocale(Ref<Locale> locale)
+		{ 
+			s_Data->m_Locales.push_back(locale);
 		}
 
-		static inline void SetLocale(const std::string& localeID)
-		{
-			s_Instance->SetLocaleImpl(localeID);
-		}
+		static void SetLocale(const std::string& localeCode);
 
 		static inline const std::wstring& Get(const std::string& key)
-		{ 
-			return s_Instance->GetImpl(key);
+		{
+			return s_Data->m_Selected->Get(key);
 		}
 
 		static inline uint32_t GetLocaleCount()
 		{
-			return s_Instance->GetLocaleCountImpl();
+			return (uint32_t)s_Data->m_Locales.size();
 		}
 
 		static inline const std::string& GetCode()
 		{
-			return s_Instance->GetCodeImpl();
+			return s_Data->m_Selected->GetCode();
 		}
 
 	private:
-
-		inline void AddLocaleImpl(Ref<Locale> locale)
-		{ 
-			m_Locales.push_back(locale);
-		}
-
-		void SetLocaleImpl(const std::string& localeCode);
-
-		inline const std::wstring& GetImpl(const std::string& key) const
+		struct LocalizationData
 		{
-			return m_Selected->Get(key);
-		}
+			std::vector<Ref<Locale>> m_Locales;
+			Ref<Locale> m_Selected;
+		};
 
-		inline uint32_t GetLocaleCountImpl() const
-		{
-			return (uint32_t)m_Locales.size();
-		}
-
-		inline const std::string& GetCodeImpl() const
-		{
-			return m_Selected->GetCode();
-		}
-
-		std::vector<Ref<Locale>> m_Locales;
-		Ref<Locale> m_Selected;
-
-		static Scope<Localization> s_Instance;
+		static Scope<LocalizationData> s_Data;
 	};
 }

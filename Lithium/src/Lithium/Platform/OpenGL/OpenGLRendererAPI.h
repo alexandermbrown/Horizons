@@ -9,7 +9,7 @@ namespace li
 	{
 	protected:
 		virtual void InitImpl() override;
-		virtual void SetViewportImpl(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+		virtual void SetViewportImpl(int x, int y, int width, int height) override;
 
 		virtual void SetClearColorImpl(const glm::vec4& color) override;
 		virtual void ClearImpl() override;
@@ -24,5 +24,9 @@ namespace li
 			const Ref<VertexArray>& vertexArray,
 			uint32_t instanceCount,
 			DrawMode mode) override;
+
+	private:
+
+		bool m_DepthTest = false;
 	};
 }

@@ -48,7 +48,7 @@ namespace li
 
 	private:
 		std::vector<Ref<Batch>> m_Batches;
-		std::unordered_map<std::string, uint32_t> m_TextureLUT;
+		std::unordered_map<std::string, uint32_t> m_TextureIndices;
 
 		OrthographicCamera* m_Camera;
 		glm::vec2 m_QuadOrigin;

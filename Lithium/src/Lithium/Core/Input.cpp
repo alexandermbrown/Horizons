@@ -1,45 +1,40 @@
 #include "lipch.h"
 #include "Input.h"
 
-#include <SDL.h>
-
 namespace li
 {
-	Scope<Input> Input::s_Instance = CreateScope<Input>();
-
-	bool Input::IsKeyPressedImpl(int keycode)
+	Input::Input()
+		: m_KeyStates(), m_Mouse({ 0, 0, 0 }), m_Enabled(true)
 	{
-		SDL_Scancode scancode = SDL_GetScancodeFromKey(keycode);
-		SDL_PumpEvents();
-		const uint8_t* state = SDL_GetKeyboardState(nullptr);
-
-		return state[scancode];
 	}
 
-	bool Input::IsMouseButtonPressedImpl(int button)
+	void Input::OnEvent(SDL_Event* event)
 	{
-		SDL_PumpEvents();
-		const uint8_t state = SDL_GetMouseState(nullptr, nullptr);
+		// Keyboard events.
+		if (event->type == SDL_KEYDOWN)
+		{
+			m_KeyStates[event->key.keysym.scancode] = true;
+		}
+		else if (event->type == SDL_KEYUP)
+		{
+			m_KeyStates[event->key.keysym.scancode] = false;
+		}
+		
+		// Mouse button events.
+		else if (event->type == SDL_MOUSEBUTTONDOWN)
+		{
+			m_Mouse.ButtonStates |= SDL_BUTTON(event->button.button);
+		}
+		else if (event->type == SDL_MOUSEBUTTONUP)
+		{
+			m_Mouse.ButtonStates &= ~SDL_BUTTON(event->button.button);
+		}
 
-		return state & SDL_BUTTON(button);
-	}
-
-	glm::ivec2 Input::GetMousePositionImpl()
-	{
-		int x, y;
-		SDL_PumpEvents();
-		SDL_GetMouseState(&x, &y);
-
-		return glm::ivec2(x, y);
-	}
-
-	int Input::GetMouseXImpl()
-	{
-		return GetMousePositionImpl().x;
-	}
-
-	int Input::GetMouseYImpl()
-	{
-		return GetMousePositionImpl().y;
+		// Mouse motion event.
+		else if (event->type == SDL_MOUSEMOTION)
+		{
+			m_Mouse.X = event->motion.x;
+			m_Mouse.X = event->motion.y;
+		}
 	}
 }

@@ -43,7 +43,6 @@ void Game::Run()
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
-
 	while (m_Running)
 	{
 		std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
@@ -84,7 +83,7 @@ void Game::Run()
 	DebugDrawSystem::Shutdown(m_Registry);
 #endif
 
-	LI_TRACE("Tick thread closing...");
+	
 }
 
 void Game::OnEvent(SDL_Event* event)

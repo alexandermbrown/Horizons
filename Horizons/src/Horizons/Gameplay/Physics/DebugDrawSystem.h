@@ -37,7 +37,7 @@ public:
 	// Draw a solid circle.
 	virtual inline void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override
 	{
-		DrawSegment(center, center + axis, color);
+		DrawSegment(center, center + b2Vec2(axis.x * radius, axis.y * radius), color);
 		DrawCircle(center, radius, color);
 	}
 

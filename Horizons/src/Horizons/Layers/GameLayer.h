@@ -30,9 +30,6 @@ private:
 	
 	OrthographicCameraController m_Camera;
 	glm::mat4 m_Transform;
-	glm::vec4 m_QuadColor;
-
-	li::Ref<li::Label> m_Label;
 
 	li::Ref<li::AudioSource> m_AudioSource;
 

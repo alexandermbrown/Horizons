@@ -5,7 +5,7 @@
 
 namespace li
 {
-	Font::Font(const std::string& name, const FontProperties& props, const std::vector<Glyph> glyphs, Ref<Texture2D> texture)
+	Font::Font(const std::string& name, const FontProperties& props, const std::vector<Glyph>& glyphs, Ref<Texture2D> texture)
 		: m_Name(name), m_Properties(props), m_Glyphs(), m_Texture(texture)
 	{
 		for (const Glyph& glyph : glyphs)
@@ -52,6 +52,7 @@ namespace li
 
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArray->Unbind();
 	}
 
 	void Label::Calculate()

@@ -28,7 +28,6 @@ namespace AssetBase
 		virtual size_t GetSize() = 0;
 	};
 
-#pragma pack()
 	struct HeaderSerial
 	{
 		const uint32_t signature = 0x42414c2b;
@@ -40,7 +39,6 @@ namespace AssetBase
 		}
 	};
 
-#pragma pack()
 	struct SegmentInfoTableEntry
 	{
 		uint32_t id;

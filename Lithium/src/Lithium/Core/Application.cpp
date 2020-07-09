@@ -4,11 +4,13 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"
 #include "Lithium/Events/EventDispatcher.h"
+#include "Lithium/Renderer/Renderer.h"
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
-#include <SDL.h>
-#include <chrono>
+#include "Lithium/Localization/Localization.h"
+#include "Lithium/UI/UI.h"
 
+#include "SDL.h"
 #include "imgui.h"
 
 #define LI_MIN_MS_PER_FRAME 2
@@ -18,8 +20,9 @@ namespace li
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
-		: m_Running(false), m_LayerStack(), m_LastTicks(0)
+	Application::Application(const WindowProps& props)
+		: m_Running(false), m_LayerStack(), m_EventHandled(false), 
+		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
 		s_Instance = this;
@@ -50,18 +53,22 @@ namespace li
 
 		m_EventCallbackFn = LI_BIND_EVENT_FN(Application::OnEvent);
 
-		m_Window = Window::Create("Lithium Engine", 1280, 720, true, true, Renderer::GetAPI());
+		m_Window = Window::Create(props.Title, props.Width, props.Height, props.Resizable, props.Shown, props.Borderless, Renderer::GetAPI());
 
 		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
 
+		Localization::Init();
 		Renderer::Init();
 		AudioManager::Init();
+		UI::Init();
 	}
 
 	Application::~Application()
 	{
+		delete m_CurrentScene;
 		m_LayerStack.Clear();
 		ResourceManager::Shutdown();
+		UI::Shutdown();
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
 		m_Window->Shutdown();
@@ -71,36 +78,91 @@ namespace li
 	void Application::Run()
 	{
 		m_Running = true;
+		m_LastUpdateTime = std::chrono::steady_clock::now();
 
 		while (m_Running)
 		{
+			//////////////////////
+			// Propagate Events //
+			//////////////////////
 			SDL_Event sdlEvent;
 			while (SDL_PollEvent(&sdlEvent))
 			{
-				m_ImGuiRenderer->OnEvent(&sdlEvent);
-				// Capture ImGui keyboard and mouse input.
-				if (m_ImGuiRenderer->WantCapture(sdlEvent))
-					continue;
-
 				OnEvent(&sdlEvent);
 			}
-			
-			unsigned int ticks = SDL_GetTicks();
-			unsigned int deltaTicks = ticks - m_LastTicks;
-			if (deltaTicks < LI_MIN_MS_PER_FRAME)
-				continue;
 
-			m_LastTicks = ticks;
+			//////////////////////////
+			// Calculate Delta Time //
+			//////////////////////////
+
+			std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
+			std::chrono::duration<float> dt = currentTime - m_LastUpdateTime;
+			m_LastUpdateTime = currentTime;
+
+
+			//////////////////
+			// Update Scene //
+			//////////////////
+
+			if (m_CurrentScene)
+			{
+				m_CurrentScene->OnUpdate(dt.count());
+
+				if (m_NextScene && m_CurrentScene->Finished())
+				{
+					delete m_CurrentScene;
+					m_CurrentScene = m_NextScene;
+					m_CurrentScene->TransitionIn();
+					m_NextScene = nullptr;
+				}
+			}
+
+
+			///////////////////
+			// Update Layers //
+			///////////////////
+
+			bool reachedFocused = false;
+			if (m_FocusedLayer)
+				m_Input.Disable();
+
+			m_LayersDirty = false;
 
 			for (Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate((float)deltaTicks * 0.001f);
+				if (m_FocusedLayer == layer && !reachedFocused)
+				{
+					m_Input.Enable();
+					reachedFocused = true;
+				}
+
+				layer->OnUpdate(dt.count());
+
+				if (m_LayersDirty)
+					break;
 			}
+
+
+			//////////////////
+			// Render ImGui //
+			//////////////////
+
+			reachedFocused = false;
+			if (m_FocusedLayer)
+				m_Input.Disable();
 
 			m_ImGuiRenderer->Begin();
 			for (Layer* layer : m_LayerStack)
 			{
+				if (m_FocusedLayer == layer && !reachedFocused)
+				{
+					m_Input.Enable();
+					reachedFocused = true;
+				}
 				layer->OnImGuiRender();
+
+				if (m_LayersDirty)
+					break;
 			}
 			m_ImGuiRenderer->End();
 
@@ -108,14 +170,22 @@ namespace li
 		}
 	}
 
-	void Application::OnEvent(SDL_Event* e)
+	void Application::OnEvent(SDL_Event* event)
 	{
-		EventDispatcher dispatcher(e);
+		m_Input.OnEvent(event);
+
+		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_EVENT_FN(Application::OnWindowEvent));
+
+		m_ImGuiRenderer->OnEvent(event);
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
+			if (m_EventHandled) {
+				m_EventHandled = false;
+				break;
+			}
+			(*it)->OnEvent(event);
 		}
 	}
 
@@ -129,6 +199,42 @@ namespace li
 	{
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
+	}
+
+	void Application::PopLayer(Layer* layer)
+	{
+		m_LayersDirty = true;
+		m_LayerStack.PopLayer(layer);
+	}
+
+	void Application::PopOverlay(Layer* overlay)
+	{
+		m_LayersDirty = true;
+		m_LayerStack.PopOverlay(overlay);
+	}
+
+	void Application::Transition(Scene* nextScene)
+	{
+		m_NextScene = nullptr;
+		if (m_CurrentScene)
+		{
+			m_CurrentScene->TransitionOut();
+			if (m_CurrentScene->Finished())
+			{
+				delete m_CurrentScene;
+				m_CurrentScene = nextScene;
+				m_CurrentScene->TransitionIn();
+			}
+			else
+			{
+				m_NextScene = nextScene;
+			}
+		}
+		else
+		{
+			m_CurrentScene = nextScene;
+			nextScene->TransitionIn();
+		}
 	}
 
 	void Application::OnWindowEvent(SDL_Event* event)
