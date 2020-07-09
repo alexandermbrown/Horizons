@@ -21,12 +21,12 @@ Matchmaker::~Matchmaker()
 	}
 }
 
-Server* Matchmaker::Match(std::string username, std::string location)
+Server* Matchmaker::Match(Player* player, std::string location)
 {
 	for (Server* server : m_Servers)
 	{
-		if (server->GetLocation() == location && server->GetPlayerCount() < server->m_MaxPlayers) {
-			server->AddPlayer(username);
+		if (server->GetLocation() == location && server->GetPlayerCount() < server->MaxPlayers) {
+			server->AddPlayer(player);
 			return server;
 		}
 	}

@@ -28,16 +28,32 @@ int main()
         const std::string& password = req.get_file_value("password").content;
         const std::string& location = req.get_file_value("location").content;
 
-        Server* server = matchmaker.Match(username, location);
+        Player* player = new Player(username);
+        Server* server = matchmaker.Match(player, location);
         if (server)
         {
-            std::cout << "Connecting " << username << " to " << server->GetAddress() << " with player count " << server->GetPlayerCount() << std::endl;
+            std::cout << "Connecting " << player->username << " to " << server->GetAddress() << " with player count " << server->GetPlayerCount() << std::endl;
             res.set_content("OK. ip: " + server->GetAddress(), "text/plain");
         }
         else
         {
             res.set_content("Could not find a match.", "text/plain");
         }
+        });
+
+    svr.Get("/check", [&](const httplib::Request& req, httplib::Response& res) {
+        std::string toSend = "";
+
+        for (Server* server : matchmaker.CheckServers())
+        {
+            toSend += server->GetAddress() + " (" + std::to_string(server->GetPlayerCount()) + "/" + std::to_string(server->MaxPlayers)+ ")\n";
+            for (Player* player : server->CheckPlayers())
+            {
+                toSend += " -   " + player->username + "\n";
+            }
+        }
+
+        res.set_content(toSend, "text/plain");
         });
 
     svr.listen("localhost", 3001);
