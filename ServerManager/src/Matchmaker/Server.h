@@ -2,15 +2,20 @@
 
 #include <string>
 #include <array>
-
-enum class Location {
-	AUS,
-	USA,
-};
+#include "Player.h"
 
 class Server {
 public:
-	Location m_location;
-	std::string m_address;
-	std::array<std::string, 64> m_players;
+    Server(const std::string& location, const std::string& address);
+    ~Server();
+    inline const std::string& GetLocation() const { return m_Location; }
+    inline const std::string& GetAddress() const { return m_Address; }
+    inline int GetPlayerCount() const { return m_Players.size(); };
+    inline std::vector<Player*> CheckPlayers() { return m_Players; } // For development, remove later
+    void AddPlayer(Player*);
+    const int MaxPlayers;
+private:
+    std::string m_Location;
+    std::string m_Address;
+    std::vector<Player*> m_Players;
 };

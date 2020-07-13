@@ -26,27 +26,34 @@ int main()
 
         const std::string& username = req.get_file_value("username").content;
         const std::string& password = req.get_file_value("password").content;
+        const std::string& location = req.get_file_value("location").content;
 
+        Player* player = new Player(username);
+        Server* server = matchmaker.Match(player, location);
+        if (server)
+        {
+            std::cout << "Connecting " << player->username << " to " << server->GetAddress() << " with player count " << server->GetPlayerCount() << std::endl;
+            res.set_content("OK. ip: " + server->GetAddress(), "text/plain");
+        }
+        else
+        {
+            res.set_content("Could not find a match.", "text/plain");
+        }
+        });
 
-        try
-        {
-            Location location = (Location)std::stoul(req.get_file_value("location").content);
-            Server result = matchmaker.Match(location);
-            std::cout << (uint32_t)result.m_location << std::endl;
-            res.set_content("Yay good job.", "text/plain");
-            return;
+    svr.Get("/check", [&](const httplib::Request& req, httplib::Response& res) {
+        std::string toSend = "";
 
-        }
-        catch (std::invalid_argument const& e)
+        for (Server* server : matchmaker.CheckServers())
         {
-            res.set_content("Error. Invalid location.", "text/plain");
-            return;
+            toSend += server->GetAddress() + " (" + std::to_string(server->GetPlayerCount()) + "/" + std::to_string(server->MaxPlayers)+ ")\n";
+            for (Player* player : server->CheckPlayers())
+            {
+                toSend += " -   " + player->username + "\n";
+            }
         }
-        catch (std::out_of_range const& e)
-        {
-            res.set_content("Error. Invalid location.", "text/plain");
-            return;
-        }
+
+        res.set_content(toSend, "text/plain");
         });
 
     svr.listen("localhost", 3001);

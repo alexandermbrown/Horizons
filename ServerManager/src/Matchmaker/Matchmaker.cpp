@@ -4,24 +4,31 @@
 
 Matchmaker::Matchmaker()
 {
-	Server example1 = Server();
-	example1.m_location = Location::USA;
-	m_servers.push_back(example1);
+	Server* server1 = new Server("USA", "192.111");
+	Server* server2 = new Server("SYD", "192.222");
+	Server* server3 = new Server("USA", "192.333");
 
-	Server example2 = Server();
-	example2.m_location = Location::AUS;
-	m_servers.push_back(example2);
+	m_Servers.push_back(server1);
+	m_Servers.push_back(server2);
+	m_Servers.push_back(server3);
 }
 
-Server Matchmaker::Match(Location location)
+Matchmaker::~Matchmaker()
 {
-	Server result;
-	for (int i = 0; i < m_servers.size(); i++) {
-		if (m_servers[i].m_location == location) {
-			result = m_servers[i];
-			break;
+	for (Server* server : m_Servers)
+	{
+		delete server;
+	}
+}
+
+Server* Matchmaker::Match(Player* player, std::string location)
+{
+	for (Server* server : m_Servers)
+	{
+		if (server->GetLocation() == location && server->GetPlayerCount() < server->MaxPlayers) {
+			server->AddPlayer(player);
+			return server;
 		}
 	}
-
-	return result;
+	return nullptr;
 }
