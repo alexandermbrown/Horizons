@@ -28,7 +28,7 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 {
 	DebugDrawCommand command;
-	while (m_ThreadQueue->try_dequeue(command))
+	while (m_ThreadQueue->try_dequeue(command)) // TODO: check if there are multiple ENDs in the queue, only render most recent.
 	{
 		m_CommandQueue.push(command);
 	}
@@ -43,6 +43,12 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 		while (m_CommandQueue.size() > 0ULL)
 		{
 			DebugDrawCommand& command = m_CommandQueue.front();
+
+			if (command.Type == DebugDrawType::End)
+			{
+				m_CommandQueue.pop(); // TODO: check that this is OK.
+				break;
+			}
 
 			switch (command.Type)
 			{

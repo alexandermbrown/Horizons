@@ -7,16 +7,21 @@
 #include "Horizons/Rendering/DebugPhysicsRenderer.h"
 #endif
 
+#include "Horizons/Gameplay/Sync/Sync.h"
+#include "Horizons/Gameplay/Sync/SyncTransform.h"
+
 #include "Horizons/Gameplay/Player/OrthographicCameraController.h"
 
 #include "Lithium.h"
 #include "glm/glm.hpp"
 #include "readerwriterqueue/readerwriterqueue.h"
+#include "entt/entt.hpp"
 
 class GameLayer : public li::Layer
 {
 public:
 	GameLayer();
+	~GameLayer();
 
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -27,15 +32,16 @@ public:
 
 private:
 	li::Ref<li::Texture2D> m_TestTexture;
-	
-	OrthographicCameraController m_Camera;
-	glm::mat4 m_Transform;
 
 	li::Ref<li::AudioSource> m_AudioSource;
 
 	std::thread m_TickThread;
 
 	moodycamel::ReaderWriterQueue<SDL_Event> m_EventQueue;
+	SyncEventQueue m_SyncQueue;
+	SyncTransformQueue m_TransformQueue;
+
+	entt::registry m_Registry;
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	DebugDrawCommandQueue m_DebugDrawQueue;

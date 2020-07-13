@@ -4,43 +4,33 @@
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "PhysicsComponents.h"
 
-namespace DebugDrawSystem
+void DebugDrawSystem::Init(entt::registry& registry, DebugDrawCommandQueue* queue)
 {
-	void Init(entt::registry& registry, DebugDrawCommandQueue* queue)
-	{
-		// Get physics world from the registry.
-		auto worldView = registry.view<cp::physics_world>();
-		entt::entity worldEnt = worldView.front();
-		cp::physics_world& world = worldView.get(worldEnt);
+	cp::physics_world& world = registry.ctx<cp::physics_world>();
 
-		cp::physics_debug_draw& draw = registry.emplace<cp::physics_debug_draw>(worldEnt); 
-		draw.draw = new PhysicsDebugDraw(queue); // TODO: parse in reader writer queue pointer.
-		draw.draw->SetFlags(0b01011);
-		world.world->SetDebugDraw(draw.draw);
-	}
-
-	void Draw(entt::registry& registry)
-	{
-		// Get physics world from the registry.
-		auto worldView = registry.group<cp::physics_world, cp::physics_debug_draw>();
-		entt::entity entity = worldView.front();
-
-		cp::physics_world& world = worldView.get<cp::physics_world>(entity);
-		cp::physics_debug_draw debugDraw = worldView.get<cp::physics_debug_draw>(entity);
-
-		world.world->DebugDraw();
-		debugDraw.draw->EndDraw();
-	}
-
-	void Shutdown(entt::registry& registry)
-	{
-		// Get physics debug draw from the registry.
-		auto drawView = registry.view<cp::physics_debug_draw>();
-		cp::physics_debug_draw& debugDraw = drawView.get(drawView.front());
-
-		delete debugDraw.draw;
-	}
+	cp::physics_debug_draw& draw = registry.set<cp::physics_debug_draw>(); 
+	draw.draw = new PhysicsDebugDraw(queue); // TODO: parse in reader writer queue pointer.
+	draw.draw->SetFlags(0b01011);
+	world.world->SetDebugDraw(draw.draw);
 }
+
+void DebugDrawSystem::Draw(entt::registry& registry)
+{
+	cp::physics_world& world = registry.ctx<cp::physics_world>();
+
+	cp::physics_debug_draw debugDraw = registry.ctx<cp::physics_debug_draw>();
+
+	world.world->DebugDraw();
+	debugDraw.draw->EndDraw();
+}
+
+void DebugDrawSystem::Shutdown(entt::registry& registry)
+{
+	cp::physics_debug_draw debugDraw = registry.ctx<cp::physics_debug_draw>();
+
+	delete debugDraw.draw;
+}
+
 
 PhysicsDebugDraw::PhysicsDebugDraw(DebugDrawCommandQueue* queue)
 	: b2Draw(), m_CommandQueue(queue) {}

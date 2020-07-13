@@ -31,7 +31,7 @@ namespace li
 		// Set info to nullptr for an invisible element.
 		static void BeginChild(UIRenderInfo* info);
 
-		static void EndChild();
+		static uint32_t EndChild();
 
 		static void SetSize(lay_scalar width, lay_scalar height);
 
@@ -65,6 +65,8 @@ namespace li
 			float ZBottom = 0.5f;
 			float ZTop = 0.6f;
 			float ZIncrement = 0.0f;
+
+			int Click;
 		};
 
 		static Scope<UIData> s_Data;

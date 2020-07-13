@@ -27,6 +27,16 @@ Horizons::Horizons()
 	m_Console->AddCommand(CreateCVarGetCommand());
 #endif
 
+
+	uint32_t game_to_app = SDL_RegisterEvents(1);
+	uint32_t app_to_game = SDL_RegisterEvents(1);
+
+	LI_ASSERT(game_to_app != ((uint32_t)-1), "Failed to create user event.");
+	LI_ASSERT(app_to_game != ((uint32_t)-1), "Failed to create user event.");
+
+	m_ConfigStore.Add(ConfigVar("event_game_to_app", HZ_CVAR_UNSIGNED, game_to_app, false));
+	m_ConfigStore.Add(ConfigVar("event_app_to_game", HZ_CVAR_UNSIGNED, app_to_game, false));
+
 	Transition(new SplashScreenScene());
 }
 

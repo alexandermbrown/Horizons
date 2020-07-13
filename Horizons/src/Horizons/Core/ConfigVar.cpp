@@ -2,31 +2,31 @@
 #include "ConfigVar.h"
 
 
-ConfigVar::ConfigVar(const std::string& name, uint32_t flags)
-	: m_Name(name), m_Flags(flags)
+ConfigVar::ConfigVar(const std::string& name, uint32_t flags, bool save)
+	: m_Name(name), m_Flags(flags), m_Save(save)
 {
 }
 
-ConfigVar::ConfigVar(const std::string& name, bool value, uint32_t flags)
-	: m_Name(name), m_Flags(flags)
+ConfigVar::ConfigVar(const std::string& name, bool value, uint32_t flags, bool save)
+	: m_Name(name), m_Flags(flags), m_Save(save)
 {
 	m_BoolValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, int value, uint32_t flags)
-	: m_Name(name), m_Flags(flags)
+ConfigVar::ConfigVar(const std::string& name, int value, uint32_t flags, bool save)
+	: m_Name(name), m_Flags(flags), m_Save(save)
 {
 	m_IntValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, unsigned int value, uint32_t flags)
-	: m_Name(name), m_Flags(flags)
+ConfigVar::ConfigVar(const std::string& name, unsigned int value, uint32_t flags, bool save)
+	: m_Name(name), m_Flags(flags), m_Save(save)
 {
 	m_UnsignedValue = value;
 }
 
-ConfigVar::ConfigVar(const std::string& name, float value, uint32_t flags)
-	: m_Name(name), m_Flags(flags)
+ConfigVar::ConfigVar(const std::string& name, float value, uint32_t flags, bool save)
+	: m_Name(name), m_Flags(flags), m_Save(save)
 {
 	m_FloatValue = value;
 }

@@ -4,6 +4,8 @@
 #include "Horizons/Core/Core.h"
 #include "Horizons/Gameplay/Physics/PhysicsSystem.h"
 #include "Horizons/Gameplay/Player/PlayerSystem.h"
+#include "Horizons/Gameplay/Sync/SyncInitSystem.h"
+#include "Horizons/Gameplay/Sync/SyncTransformSendSystem.h"
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "Horizons/Gameplay/Physics/DebugDrawSystem.h"
@@ -11,25 +13,37 @@
 
 #include <chrono>
 
-Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue)
-	: m_Running(false), m_EventQueue(eventQueue), m_Registry()
+Game* Game::s_Instance = nullptr;
+
+Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config)
+	: m_Running(false), m_EventQueue(eventQueue), m_SyncQueue(syncQueue), m_TransformQueue(transformQueue), m_ConfigStore(config), m_Registry()
 {
+	LI_ASSERT(!s_Instance, "Game already created!");
+	s_Instance = this;
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, DebugDrawCommandQueue* debugDrawQueue)
-	: m_Running(false), m_EventQueue(eventQueue), m_DebugDrawQueue(debugDrawQueue)
+Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config, DebugDrawCommandQueue* debugDrawQueue)
+	: m_Running(false), m_EventQueue(eventQueue), m_SyncQueue(syncQueue), m_TransformQueue(transformQueue), m_ConfigStore(config), m_DebugDrawQueue(debugDrawQueue)
 {
+	LI_ASSERT(!s_Instance, "Game already created!");
+	s_Instance = this;
 }
 #endif
+
+Game::~Game()
+{
+	s_Instance = nullptr;
+}
 
 void Game::Run()
 {
 	m_Running = true;
 
 	// Initialize systems.
+	SyncInitSystem::Init(m_Registry);
 	PhysicsSystem::Init(m_Registry);
-	PlayerSystem::Init(m_Registry);
+	PlayerSystem::Init(m_Registry, m_SyncQueue);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	DebugDrawSystem::Init(m_Registry, m_DebugDrawQueue);
@@ -72,7 +86,9 @@ void Game::Run()
 			OnEvent(&event);
 		}
 		
+		PlayerSystem::Update(m_Registry, dt);
 		PhysicsSystem::Step(m_Registry, dt);
+		SyncTransformSendSystem::Update(m_Registry, m_TransformQueue);
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 		DebugDrawSystem::Draw(m_Registry);
 #endif
@@ -88,12 +104,13 @@ void Game::Run()
 
 void Game::OnEvent(SDL_Event* event)
 {
-	if (event->type == SDL_WINDOWEVENT)
+	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_CLOSE)
 	{
-		if (event->window.event == SDL_WINDOWEVENT_CLOSE)
-		{
-			m_Running = false;
-		}
+		m_Running = false;
+	}
+	else
+	{
+		PlayerSystem::OnEvent(m_Registry, event);
 	}
 }
 

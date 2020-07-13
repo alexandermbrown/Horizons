@@ -2,10 +2,11 @@
 
 #include "entt/entt.hpp"
 
-namespace MovementSystem
+class MovementSystem
 {
-	void Init(entt::registry& registry);
-	void Shutdown(entt::registry& registry);
+public:
+	//static void Init(entt::registry& registry);
+	//static void Shutdown(entt::registry& registry);
 
-	void Update(entt::registry& registry, float dt);
-}
+	static void Update(entt::registry& registry, float dt);
+};

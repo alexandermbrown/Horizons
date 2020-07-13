@@ -9,6 +9,8 @@
 #include "Horizons/Layers/ConsoleLayer.h"
 #endif
 
+#include "entt/entt.hpp"
+
 class Horizons : public li::Application
 {
 public:

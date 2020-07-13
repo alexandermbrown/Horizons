@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "ConsoleLayer.h"
 
+#ifdef HZ_CONSOLE_ENABLED
+
 #include "glm/glm.hpp"
 #include "Horizons.h"
+
 
 ConsoleLayer::ConsoleLayer()
 	: m_Commands(), m_InputBuffer(), m_HistoryBuffer(), m_ConsoleOpen(false), 
@@ -225,3 +228,5 @@ void ConsoleLayer::UpdateHistory(ImGuiInputTextCallbackData* data)
 	data->SelectionStart = data->CursorPos;
 	data->SelectionEnd = data->CursorPos;
 }
+
+#endif

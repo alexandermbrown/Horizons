@@ -3,11 +3,11 @@
 
 #include "Game.h"
 
-int TickThreadEntryPoint(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue)
+int TickThreadEntryPoint(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config)
 {
 	LI_INFO("Tick thread starting...");
 
-	Game game = Game(eventQueue);
+	Game game = Game(eventQueue, syncQueue, transformQueue, config);
 	game.Run();
 
 	LI_INFO("Tick thread closing...");
@@ -16,11 +16,11 @@ int TickThreadEntryPoint(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue)
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-int TickThreadEntryPointDebugDraw(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, DebugDrawCommandQueue* debugDrawQueue)
+int TickThreadEntryPointDebugDraw(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config, DebugDrawCommandQueue* debugDrawQueue)
 {
 	LI_INFO("Tick thread starting...");
 
-	Game game = Game(eventQueue, debugDrawQueue);
+	Game game = Game(eventQueue, syncQueue, transformQueue, config, debugDrawQueue);
 	game.Run();
 
 	LI_INFO("Tick thread closing...");

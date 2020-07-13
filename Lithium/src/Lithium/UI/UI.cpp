@@ -61,9 +61,11 @@ namespace li
 		s_Data->RenderInfo[element] = info;
 	}
 
-	void UI::EndChild()
+	uint32_t UI::EndChild()
 	{
+		uint32_t child = s_Data->ElementStack.top();
 		s_Data->ElementStack.pop();
+		return child;
 	}
 
 	void UI::SetSize(lay_scalar width, lay_scalar height)

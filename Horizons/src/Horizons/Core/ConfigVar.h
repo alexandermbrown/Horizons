@@ -20,12 +20,12 @@ class ConfigVar
 {
 public:
 
-	ConfigVar(const std::string& name, uint32_t flags);
+	ConfigVar(const std::string& name, uint32_t flags, bool save);
 
-	ConfigVar(const std::string& name, bool value, uint32_t flags);
-	ConfigVar(const std::string& name, int value, uint32_t flags);
-	ConfigVar(const std::string& name, unsigned int value, uint32_t flags);
-	ConfigVar(const std::string& name, float value, uint32_t flags);
+	ConfigVar(const std::string& name, bool value, uint32_t flags, bool save);
+	ConfigVar(const std::string& name, int value, uint32_t flags, bool save);
+	ConfigVar(const std::string& name, unsigned int value, uint32_t flags, bool save);
+	ConfigVar(const std::string& name, float value, uint32_t flags, bool save);
 
 	bool SetFromString(const std::string& value);
 
@@ -34,6 +34,7 @@ public:
 
 	std::string GetString() const;
 
+	inline bool DoSave() const { return m_Save; }
 	inline bool IsDirty() const { return m_Dirty; }
 	inline void Clean() { m_Dirty = false; }
 
@@ -112,4 +113,5 @@ private:
 	uint32_t m_Flags;
 
 	bool m_Dirty = true;
+	bool m_Save = false;
 };

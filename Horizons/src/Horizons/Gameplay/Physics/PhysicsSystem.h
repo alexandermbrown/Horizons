@@ -2,10 +2,11 @@
 
 #include "entt/entt.hpp"
 
-namespace PhysicsSystem
+class PhysicsSystem
 {
-	void Init(entt::registry& registry);
-	void Shutdown(entt::registry& registry);
+public:
+	static void Init(entt::registry& registry);
+	static void Shutdown(entt::registry& registry);
 
-	void Step(entt::registry& registry, float dt);
+	static void Step(entt::registry& registry, float dt);
 };

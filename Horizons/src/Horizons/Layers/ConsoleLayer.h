@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Horizons/Core/Core.h"
+#ifdef HZ_CONSOLE_ENABLED
+
 #include "Lithium.h"
 #include "imgui.h"
 
@@ -67,3 +70,5 @@ private:
 
 	bool m_ScrollToBottom;
 };
+
+#endif

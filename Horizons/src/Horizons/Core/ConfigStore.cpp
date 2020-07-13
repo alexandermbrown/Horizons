@@ -21,7 +21,6 @@ void ConfigStore::LoadTemplate(const char* path)
 	LoadType("int", HZ_CVAR_INT, ini);
 	LoadType("unsigned", HZ_CVAR_UNSIGNED, ini);
 	LoadType("float", HZ_CVAR_FLOAT, ini);
-
 }
 
 void ConfigStore::LoadConfigFile(const wchar_t* path)
@@ -47,7 +46,7 @@ void ConfigStore::LoadConfigFile(const wchar_t* path)
 	{
 		const char* user_value = ini.GetValue("config", key.c_str());
 
-		ConfigVar cvar = ConfigVar(key, template_value.GetFlags());
+		ConfigVar cvar = ConfigVar(key, template_value.GetFlags(), true);
 		if (user_value)
 		{
 			if (!cvar.SetFromString(user_value))
@@ -109,7 +108,7 @@ void ConfigStore::LoadType(const char* str_type, uint32_t type, CSimpleIniA& ini
 		const char* value_str = ini.GetValue(str_type, key.pItem);
 
 		std::string key_name = key.pItem;
-		ConfigVar cvar = ConfigVar(key_name, type);
+		ConfigVar cvar = ConfigVar(key_name, type, true);
 		if (!cvar.SetFromString(value_str))
 		{
 			LI_CORE_ERROR("Failed to set cvar template of type {} to {}", str_type, value_str);
@@ -124,8 +123,11 @@ void ConfigStore::SaveValues(std::unordered_map<std::string, ConfigVar>& store, 
 {
 	for (const auto& [key, value] : store)
 	{
-		SI_Error status = ini.SetValue("config", key.c_str(), value.GetString().c_str());
-		LI_ASSERT(status >= 0, "Failed to set value {} to {} in ini file.", key, value.GetString());
+		if (value.DoSave())
+		{
+			SI_Error status = ini.SetValue("config", key.c_str(), value.GetString().c_str());
+			LI_ASSERT(status >= 0, "Failed to set value {} to {} in ini file.", key, value.GetString());
+		}
 	}
 }
 

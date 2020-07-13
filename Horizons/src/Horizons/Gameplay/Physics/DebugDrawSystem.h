@@ -10,12 +10,13 @@
 #include "readerwriterqueue/readerwriterqueue.h"
 #include "glm/glm.hpp"
 
-namespace DebugDrawSystem
+class DebugDrawSystem
 {
-	void Init(entt::registry& registry, DebugDrawCommandQueue* queue);
-	void Draw(entt::registry& registry);
-	void Shutdown(entt::registry& registry);
-}
+public:
+	static void Init(entt::registry& registry, DebugDrawCommandQueue* queue);
+	static void Draw(entt::registry& registry);
+	static void Shutdown(entt::registry& registry);
+};
 
 class PhysicsDebugDraw : public b2Draw
 {
