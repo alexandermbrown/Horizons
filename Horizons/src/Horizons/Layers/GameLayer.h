@@ -10,8 +10,6 @@
 #include "Horizons/Gameplay/Sync/Sync.h"
 #include "Horizons/Gameplay/Sync/SyncTransform.h"
 
-#include "Horizons/Gameplay/Player/OrthographicCameraController.h"
-
 #include "Lithium.h"
 #include "glm/glm.hpp"
 #include "readerwriterqueue/readerwriterqueue.h"
@@ -31,8 +29,6 @@ public:
 	virtual void OnEvent(SDL_Event* event) override;
 
 private:
-	li::Ref<li::Texture2D> m_TestTexture;
-
 	li::Ref<li::AudioSource> m_AudioSource;
 
 	std::thread m_TickThread;

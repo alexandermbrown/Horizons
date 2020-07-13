@@ -34,6 +34,10 @@ public:
 
 private:
 
+	void Init();
+	void Update(float dt);
+	void Shutdown();
+
 	bool m_Running;
 	std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 	moodycamel::ReaderWriterQueue<SDL_Event>* m_EventQueue;

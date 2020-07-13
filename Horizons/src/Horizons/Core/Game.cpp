@@ -40,15 +40,7 @@ void Game::Run()
 {
 	m_Running = true;
 
-	// Initialize systems.
-	SyncInitSystem::Init(m_Registry);
-	PhysicsSystem::Init(m_Registry);
-	PlayerSystem::Init(m_Registry, m_SyncQueue);
-
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-	DebugDrawSystem::Init(m_Registry, m_DebugDrawQueue);
-#endif
-
+	Init();
 
 	using namespace std::chrono_literals;
 	constexpr float dt = 1.0f / HZ_TICKS_PER_SECOND;
@@ -86,20 +78,10 @@ void Game::Run()
 			OnEvent(&event);
 		}
 		
-		PlayerSystem::Update(m_Registry, dt);
-		PhysicsSystem::Step(m_Registry, dt);
-		SyncTransformSendSystem::Update(m_Registry, m_TransformQueue);
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-		DebugDrawSystem::Draw(m_Registry);
-#endif
+		Update(dt);
 	}
 
-	PhysicsSystem::Shutdown(m_Registry);
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-	DebugDrawSystem::Shutdown(m_Registry);
-#endif
-
-	
+	Shutdown();
 }
 
 void Game::OnEvent(SDL_Event* event)
@@ -112,6 +94,36 @@ void Game::OnEvent(SDL_Event* event)
 	{
 		PlayerSystem::OnEvent(m_Registry, event);
 	}
+}
+
+void Game::Init()
+{
+	// Initialize systems.
+	SyncInitSystem::Init(m_Registry);
+	PhysicsSystem::Init(m_Registry);
+	PlayerSystem::Init(m_Registry, m_SyncQueue);
+
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawSystem::Init(m_Registry, m_DebugDrawQueue);
+#endif
+}
+
+void Game::Update(float dt)
+{
+	PlayerSystem::Update(m_Registry, dt);
+	PhysicsSystem::Step(m_Registry, dt);
+	SyncTransformSendSystem::Update(m_Registry, m_TransformQueue);
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawSystem::Draw(m_Registry);
+#endif
+}
+
+void Game::Shutdown()
+{
+	PhysicsSystem::Shutdown(m_Registry);
+#ifdef HZ_PHYSICS_DEBUG_DRAW
+	DebugDrawSystem::Shutdown(m_Registry);
+#endif
 }
 
 

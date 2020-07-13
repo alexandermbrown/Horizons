@@ -67,6 +67,12 @@ void PlayerSystem::Update(entt::registry& registry, float dt)
 		(player.up ? 1.0f : 0.0f) - (player.down ? 1.0f : 0.0f)
 	};
 
+	// Ensure the move direction is of length 1.
+	if (glm::length(player.move_direction) > 1.0f)
+	{
+		player.move_direction = glm::normalize(player.move_direction);
+	}
+	
 	// Apply an impulse to the physics body to get instant movement.
 	b2Vec2 vel = body.body->GetLinearVelocity();
 	b2Vec2 desired_vel = { player.move_direction.x * player.move_speed, player.move_direction.y * player.move_speed };
