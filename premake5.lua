@@ -34,6 +34,7 @@ IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
 
 IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
+IncludeDir["nlohmann_json"] = "GameServer/vendor/nlohmann_json/include"
 
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
@@ -277,6 +278,7 @@ project "GameServer"
         "GameServer/src",
         "GameServer/vendor",
         "%{IncludeDir.yojimbo}",
+        "%{IncludeDir.nlohmann_json}"
     }
 
     links {
@@ -325,6 +327,7 @@ project "ServerManager"
         "ServerManager/src",
         "ServerManager/vendor",
         "%{IncludeDir.yojimbo}",
+        "%{IncludeDir.nlohmann_json}"
     }
 
     filter "system:windows"
