@@ -36,6 +36,9 @@ IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
 IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
 IncludeDir["nlohmann_json"] = "GameServer/vendor/nlohmann_json/include"
 
+IncludeDir["httplib"] = "ServerManager/vendor/httplib/include"
+IncludeDir["openssl"] = "ServerManager/vendor/OpenSSL/vc-win64a/include"
+
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
 
@@ -98,14 +101,15 @@ project "Lithium"
         "imgui",
         "zlib",
         "libvorbis",
-        "openal-soft"
+        "openal-soft",
+        "SDL2"
     }
 
     filter "system:windows"
         systemversion "latest"
 
-        links {
-            "Lithium/vendor/SDL2/lib/x64/SDL2.lib"
+        libdirs {
+            "Lithium/vendor/SDL2/lib/x64"
         }
 
         defines {
@@ -325,13 +329,23 @@ project "ServerManager"
 
     includedirs {
         "ServerManager/src",
-        "ServerManager/vendor",
+        "%{IncludeDir.httplib}",
         "%{IncludeDir.yojimbo}",
-        "%{IncludeDir.nlohmann_json}"
+        "%{IncludeDir.nlohmann_json}",
+        "%{IncludeDir.openssl}"
+    }
+
+    links {
+        "libcrypto",
+        "libssl"
     }
 
     filter "system:windows"
         systemversion "latest"
+
+        libdirs {
+            "ServerManager/vendor/OpenSSL/vc-win64a/lib"
+        }
         
     filter "configurations:Debug"
         defines "LI_DEBUG"
