@@ -37,11 +37,11 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		if (value == "true" || value == "on" || value == "t" || value == "1")
 		{
-			Set(true);
+			SetBool(true);
 		}
 		else if (value == "false" || value == "off" || value == "f" || value == "0")
 		{
-			Set(false);
+			SetBool(false);
 		}
 		else
 		{
@@ -52,7 +52,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		try
 		{
-			Set(std::stoi(value));
+			SetInt(std::stoi(value));
 		}
 		catch (const std::invalid_argument&)
 		{
@@ -71,7 +71,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 			if (value[0] == '-')
 				return false;
 
-			Set((unsigned int)std::stoul(value));
+			SetUnsigned((unsigned int)std::stoul(value));
 		}
 		catch (const std::invalid_argument&)
 		{
@@ -86,7 +86,7 @@ bool ConfigVar::SetFromString(const std::string& value)
 	{
 		try
 		{
-			Set(std::stof(value));
+			SetFloat(std::stof(value));
 		}
 		catch (const std::invalid_argument&)
 		{

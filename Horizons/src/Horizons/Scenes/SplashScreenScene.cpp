@@ -4,6 +4,8 @@
 #include "GameScene.h"
 #include "Horizons.h"
 
+#include "Horizons/Core/AppState.h"
+
 SplashScreenScene::SplashScreenScene()
 	: m_SplashScreenLayer(nullptr), m_ConfigCleanLayer(nullptr)
 {
@@ -11,7 +13,10 @@ SplashScreenScene::SplashScreenScene()
 
 void SplashScreenScene::TransitionIn()
 {
-	li::Application* app = li::Application::Get();
+	Horizons* app = li::Application::Get()->Get<Horizons>();
+
+	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::SplashScreen);
+
 	m_ConfigCleanLayer = new ConfigUpdateLayer();
 	app->PushLayer(m_ConfigCleanLayer);
 

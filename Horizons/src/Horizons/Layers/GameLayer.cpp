@@ -22,10 +22,17 @@ GameLayer::GameLayer()
 	, m_DebugDrawQueue(256ull), m_DebugPhysicsRenderer(&m_DebugDrawQueue)
 #endif
 {
+	// Start up tick thread.
+	TickThreadData threadData;
+	threadData.EventQueue = &m_EventQueue;
+	threadData.SyncQueue = &m_SyncQueue;
+	threadData.TransformQueue = &m_TransformQueue;
+	threadData.Config = li::Application::Get<Horizons>()->GetConfig();
+
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	m_TickThread = std::thread(TickThreadEntryPointDebugDraw, &m_EventQueue, &m_SyncQueue, &m_TransformQueue, li::Application::Get<Horizons>()->GetConfig(), &m_DebugDrawQueue);
+	m_TickThread = std::thread(TickThreadEntryPointDebugDraw, threadData, &m_DebugDrawQueue);
 #else
-	m_TickThread = std::thread(TickThreadEntryPoint, &m_EventQueue, &m_SyncQueue, &m_TransformQueue, li::Application::Get<Horizons>()->GetConfig());
+	m_TickThread = std::thread(TickThreadEntryPoint, threadData);
 #endif
 
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
