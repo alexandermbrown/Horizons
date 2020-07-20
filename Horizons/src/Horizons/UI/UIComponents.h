@@ -21,16 +21,17 @@ namespace cp
 
 	struct ui_element
 	{
-		int num_children = 0;
 		entt::entity first_child{ entt::null };
 		entt::entity next_sibling{ entt::null };
 		entt::entity parent{ entt::null };
+
 
 		lay_id layout_id = LAY_INVALID_ID;
 
 		lay_scalar width = 0;
 		lay_scalar height = 0;
 		
+		// Order: left, top, right, bottom.
 		lay_vec4 margins{ 0, 0, 0, 0 };
 
 		uint32_t layout_behave = 0;

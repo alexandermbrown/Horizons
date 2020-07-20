@@ -7,6 +7,10 @@
 
 void UIRenderSystem::Render(entt::registry& registry)
 {
+	registry.sort<cp::ui_transform>([](const cp::ui_transform& lhs, const cp::ui_transform& rhs) {
+		return lhs.z < rhs.z;
+	});
+
 	auto ui_transform_view = registry.view<cp::ui_transform>();
 	for (entt::entity entity : ui_transform_view)
 	{
