@@ -2,7 +2,7 @@ project "libb64"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     
 	targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -20,7 +20,6 @@ project "libb64"
     
 	filter "system:windows"
         systemversion "latest"
-        staticruntime "On"
 
         defines {
             "_CRT_SECURE_NO_WARNINGS"

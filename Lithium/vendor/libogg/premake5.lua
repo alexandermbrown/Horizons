@@ -1,7 +1,7 @@
 project "libogg"
     kind "StaticLib"
     language "C"
-    staticruntime "on"
+    staticruntime "off"
     
 	targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -19,5 +19,16 @@ project "libogg"
 	warnings "Off"
 
 	filter "system:windows"
-        systemversion "latest"
-        staticruntime "On"
+		systemversion "latest"
+		
+	filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+    filter "configurations:Release"
+        runtime "Release"
+		optimize "on"
+	
+	filter "configurations:Dist"
+		runtime "Release"
+		optimize "on"

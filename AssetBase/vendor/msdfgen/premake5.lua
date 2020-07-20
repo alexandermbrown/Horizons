@@ -1,7 +1,7 @@
 project "msdfgen"
     kind "StaticLib"
     language "C++"
-    staticruntime "on"
+    staticruntime "off"
     
 	targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -25,7 +25,6 @@ project "msdfgen"
 	filter "system:windows"
         systemversion "latest"
         cppdialect "C++17"
-        staticruntime "On"
     
     filter "configurations:Debug"
         runtime "Debug"

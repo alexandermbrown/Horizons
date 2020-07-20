@@ -1,7 +1,7 @@
 project "zlib"
     kind "StaticLib"
     language "C"
-    staticruntime "on"
+    staticruntime "off"
     
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -16,8 +16,20 @@ project "zlib"
     
     filter "system:windows"
         systemversion "latest"
-        staticruntime "On"
 
         defines {
             "_CRT_SECURE_NO_WARNINGS"
         }
+    
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+    filter "configurations:Release"
+        runtime "Release"
+		optimize "on"
+	
+	filter "configurations:Dist"
+		runtime "Release"
+		optimize "on"
+

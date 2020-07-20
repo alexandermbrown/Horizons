@@ -3,7 +3,7 @@ include "../libogg"
 project "libvorbis"
     kind "StaticLib"
     language "C"
-    staticruntime "on"
+    staticruntime "off"
     
 	targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -90,7 +90,6 @@ project "libvorbis"
     
 	filter "system:windows"
         systemversion "latest"
-        staticruntime "On"
 
         defines {
             "_CRT_SECURE_NO_WARNINGS"
