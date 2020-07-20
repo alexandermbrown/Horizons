@@ -87,7 +87,7 @@ namespace li
 	void ImGuiRenderer::Resize(int width, int height)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(width, height);
+		io.DisplaySize = ImVec2((float)width, (float)height);
 	}
 
 	bool ImGuiRenderer::WantCapture(const SDL_Event& event)
