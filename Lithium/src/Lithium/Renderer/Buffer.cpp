@@ -1,7 +1,6 @@
 #include "lipch.h"
 #include "Buffer.h"
 
-#include "Lithium/Renderer/Renderer.h"
 #include "Lithium/Renderer/RendererAPI.h"
 #include "Lithium/Platform/OpenGL/OpenGLBuffer.h"
 
@@ -9,7 +8,7 @@ namespace li
 {
 	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size, usage);
 		}
@@ -20,7 +19,7 @@ namespace li
 
 	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size, BufferUsage usage)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size, usage);
 		}
@@ -31,7 +30,7 @@ namespace li
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t size, BufferUsage usage)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(size, usage);
 		}
@@ -42,7 +41,7 @@ namespace li
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count);
 		}

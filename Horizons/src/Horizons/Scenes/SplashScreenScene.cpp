@@ -52,10 +52,13 @@ void SplashScreenScene::OnUpdate(float dt)
 	{
 		li::ResourceManager::PrintInfo();
 
+		// TODO: Make the renderer not dependant on the resource manager
+		// Instead, change the below function to set the shaders used for instancing, fonts, etc.
+		// In future, move the ResourceManager into Horizons and remove any references in Lithium.
+		li::Renderer::InitPostResourceLoad();
+
 		// TODO: make config.
 		li::Localization::SetLocale("en-us");
-
-		
 		
 		li::Application::Get()->Transition(new GameScene());
 	}

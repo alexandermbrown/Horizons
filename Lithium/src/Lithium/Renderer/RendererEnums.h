@@ -2,23 +2,28 @@
 
 namespace li
 {
+	enum class ShaderDataType
+	{
+		None = 0, Float, Float2, Float3, Float4, Mat4, Int, Int2, Int3, Int4
+	};
+
 	enum class BufferUsage
 	{
-		Error,
+		Error = 0,
 		StaticDraw,
 		DynamicDraw
 	};
 
 	enum class BufferTarget
 	{
-		Error,
+		Error = 0,
 		ArrayBuffer,
 		ElementArrayBuffer
 	};
 
 	enum class DrawMode
 	{
-		Error,
+		Error = 0,
 		Points,
 		Lines,
 		LineStrip,
@@ -28,7 +33,7 @@ namespace li
 
 	enum class WrapType
 	{
-		Error,
+		Error = 0,
 		Repeat,
 		MirroredRepeat,
 		ClampToEdge,
@@ -37,7 +42,7 @@ namespace li
 
 	enum class FilterType
 	{
-		Error,
+		Error = 0,
 		Nearest,
 		Linear,
 		NearestMipmapNearest,
@@ -47,14 +52,14 @@ namespace li
 
 	enum class FramebufferTarget
 	{
-		Framebuffer,
+		Framebuffer = 0,
 		ReadFramebuffer,
 		DrawFramebuffer
 	};
 
 	enum class FramebufferAttachment
 	{
-		ColorAttachment0,
+		ColorAttachment0 = 0,
 		ColorAttachment1,
 		ColorAttachment2,
 		ColorAttachment3,
@@ -69,7 +74,7 @@ namespace li
 
 	enum class ImageFormat
 	{
-		RGB8,
+		RGB8 = 0,
 		RGBA8,
 		Depth24Stencil8
 	};

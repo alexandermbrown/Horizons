@@ -24,7 +24,7 @@ void SplashScreenLayer::OnDetach()
 void SplashScreenLayer::OnUpdate(float dt)
 {
 	li::RendererAPI::Clear();
-	li::Renderer::UISubmit(m_Texture, glm::vec4(1.0f), m_Transform);
+	li::Renderer::UISubmit(m_Texture, m_Transform);
 }
 
 void SplashScreenLayer::OnImGuiRender()

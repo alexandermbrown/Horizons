@@ -67,11 +67,11 @@ void HUDLayer::OnUpdate(float dt)
 	UISystem::Update(m_Registry);
 
 
-	li::Renderer::BeginScene(nullptr);
+	li::Renderer::BeginUI();
 
 	UIRenderSystem::Render(m_Registry);
 
-	li::Renderer::EndScene();
+	li::Renderer::EndUI();
 }
 
 void HUDLayer::OnImGuiRender()

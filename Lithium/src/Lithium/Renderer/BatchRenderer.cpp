@@ -35,20 +35,17 @@ namespace li
 			{ ShaderDataType::Float4, "a_AtlasBounds", 4, false, 1 },
 			{ ShaderDataType::Float4, "a_Color", 5, false, 1 }
 		});
-	
+		
+		static_assert(sizeof(BatchData) == sizeof(glm::mat4) + sizeof(glm::vec4) + sizeof(glm::vec4));
+
 		InstanceBuffer = VertexBuffer::Create(LI_MAX_BATCH_INSTANCES * sizeof(BatchData), BufferUsage::DynamicDraw);
 		InstanceBuffer->SetLayout(instanceLayout);
 		InstanceVA->AddVertexBuffer(InstanceBuffer);
 	}
 
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin)
-		: m_QuadOrigin(quadOrigin), m_Batches(), m_TextureIndices(), m_Camera(nullptr)
+		: m_QuadOrigin(quadOrigin), m_Batches(), m_TextureIndices()
 	{
-	}
-
-	void BatchRenderer::Init(const std::string& shaderAlias)
-	{
-		m_ShaderAlias = shaderAlias;
 	}
 
 	void BatchRenderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
@@ -61,10 +58,14 @@ namespace li
 		m_Batches.push_back(CreateRef<Batch>(atlas, m_QuadOrigin));
 	}
 
+	void BatchRenderer::SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer)
+	{
+		m_Shader = ResourceManager::Get<Shader>("shader_instance");
+		m_Shader->AddUniformBuffer(viewProjBuffer);
+	}
+
 	void BatchRenderer::BeginScene(OrthographicCamera* camera)
 	{
-		m_Shader = ResourceManager::Get<Shader>(m_ShaderAlias);
-		m_Camera = camera;
 		for (const Ref<Batch>& batch : m_Batches)
 		{
 			batch->InstanceCount = 0;
@@ -74,8 +75,7 @@ namespace li
 	void BatchRenderer::EndScene()
 	{
 		m_Shader->Bind();
-		m_Shader->SetMat4("u_ViewProjection", m_Camera->GetViewProjectionMatrix());
-		m_Shader->SetInt("u_Texture", 0);
+		m_Shader->SetTexture("u_Texture", 0);
 
 		// Loop through batches and render each to framebuffer.
 		for (const Ref<Batch> batch : m_Batches)

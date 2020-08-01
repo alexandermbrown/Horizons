@@ -27,14 +27,14 @@ private:
 		glm::vec4 Color;
 	};
 
-	void RenderExisting(li::OrthographicCamera* camera, float z);
-
 	DebugDrawCommandQueue* m_ThreadQueue;
 	std::queue<DebugDrawCommand> m_CommandQueue;
 
 	li::Ref<li::VertexArray> m_VertexArray;
 	li::Ref<li::VertexBuffer> m_VertexBuffer;
 	li::Ref<li::IndexBuffer> m_IndexBuffer;
+
+	li::Ref<li::Shader> m_Shader;
 
 	uint32_t m_VertexCount;
 	uint32_t m_IndexCount;

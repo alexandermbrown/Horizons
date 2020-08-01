@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/RendererEnums.h"
+
+#include <string>
 
 namespace li 
 {

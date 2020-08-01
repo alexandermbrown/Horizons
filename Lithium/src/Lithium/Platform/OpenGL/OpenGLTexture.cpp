@@ -141,6 +141,7 @@ namespace li
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
-		GLCall( glBindTextureUnit(slot, m_RendererID) );
+		GLCall( glActiveTexture(GL_TEXTURE0 + slot) );
+		GLCall( glBindTexture(GL_TEXTURE_2D, m_RendererID) );
 	}
 }

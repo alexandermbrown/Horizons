@@ -8,7 +8,10 @@ layout(location = 5) in vec4 a_Color;
 layout(location = 6) in vec2 a_Position;
 layout(location = 7) in vec2 a_TexCoord;
 
-uniform mat4 u_ViewProjection;
+layout(std140, binding = 0) uniform ViewProjectionMatrix
+{
+	mat4 u_ViewProj;
+};
 
 out vec4 v_AtlasBounds;
 out vec4 v_Color;
@@ -19,7 +22,8 @@ void main()
 	v_AtlasBounds = a_AtlasBounds;
 	v_Color = a_Color;
 	v_TexCoord = a_TexCoord;
-	gl_Position = u_ViewProjection * a_Transform * vec4(a_Position, 0.0, 1.0);
+
+	gl_Position = u_ViewProj * a_Transform * vec4(a_Position, 0.0, 1.0);
 }
 
 #type fragment

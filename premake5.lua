@@ -206,7 +206,7 @@ project "AssetBase"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
