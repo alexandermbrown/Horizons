@@ -150,8 +150,7 @@ namespace li
 
 	void Renderer::SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
 	{
-		LI_CORE_ASSERT(false, "Not implemented.");
-		//RenderLabel(label, transform, color, s_Data->Camera->GetViewProjectionMatrix());
+		RenderLabel(label, transform, color);
 	}
 
 	void Renderer::UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform)
