@@ -11,7 +11,7 @@ public:
     inline const std::string& GetLocation() const { return m_Location; }
     inline const std::string& GetAddress() const { return m_Address; }
     inline int GetPlayerCount() const { return m_Players.size(); };
-    inline std::vector<Player*> CheckPlayers() { return m_Players; } // For development, remove later
+    inline const std::vector<Player*>& CheckPlayers() { return m_Players; } // dev, remove later
     void AddPlayer(Player*);
     const int MaxPlayers;
 private:

@@ -9,7 +9,7 @@ public:
 	Matchmaker();
 	~Matchmaker();
 	Server* Match(Player* player, std::string location);
-	inline std::vector<Server*> CheckServers() { return m_Servers; } // For development, remove later
+	inline const std::vector<Server*>& CheckServers() { return m_Servers; } // dev, remove later
 private:
 	std::vector<Server*> m_Servers;
 };
