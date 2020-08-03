@@ -4,6 +4,7 @@
 
 #include "Horizons/Core/Core.h"
 #include "Horizons/Core/ConfigStore.h"
+#include "Horizons/Core/AppState.h"
 
 #ifdef HZ_CONSOLE_ENABLED
 #include "Horizons/Layers/ConsoleLayer.h"

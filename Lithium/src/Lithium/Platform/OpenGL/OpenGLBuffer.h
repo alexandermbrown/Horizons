@@ -17,7 +17,6 @@ namespace li {
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-		virtual void SetData(float* data, uint32_t size, uint32_t offset, BufferUsage usage = BufferUsage::StaticDraw, BufferTarget target = BufferTarget::ArrayBuffer) override;
 		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ArrayBuffer) override;
 
 	private:

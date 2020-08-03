@@ -38,6 +38,7 @@ IncludeDir["nlohmann_json"] = "GameServer/vendor/nlohmann_json/include"
 
 IncludeDir["httplib"] = "ServerManager/vendor/httplib/include"
 IncludeDir["openssl"] = "ServerManager/vendor/OpenSSL/vc-win64a/include"
+IncludeDir["libb64"] = "ServerManager/vendor/libb64/include"
 
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
@@ -50,6 +51,7 @@ include "Lithium/vendor/libvorbis"
 include "Lithium/vendor/openal-soft"
 include "AssetBase/vendor/msdfgen"
 include "GameServer/vendor/yojimbo"
+include "ServerManager/vendor/libb64"
 include "Horizons/vendor/box2d"
 group  ""
 
@@ -60,7 +62,7 @@ project "Lithium"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -138,7 +140,7 @@ project "Horizons"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     dpiawareness "HighPerMonitor"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
@@ -204,7 +206,7 @@ project "AssetBase"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -265,7 +267,7 @@ project "GameServer"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -282,11 +284,13 @@ project "GameServer"
         "GameServer/src",
         "GameServer/vendor",
         "%{IncludeDir.yojimbo}",
-        "%{IncludeDir.nlohmann_json}"
+        "%{IncludeDir.nlohmann_json}",
+        "%{IncludeDir.libb64}"
     }
 
     links {
-        "yojimbo"
+        "yojimbo",
+        "libb64"
     }
 
     filter "system:windows"
@@ -314,7 +318,7 @@ project "ServerManager"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")
@@ -332,12 +336,14 @@ project "ServerManager"
         "%{IncludeDir.httplib}",
         "%{IncludeDir.yojimbo}",
         "%{IncludeDir.nlohmann_json}",
-        "%{IncludeDir.openssl}"
+        "%{IncludeDir.openssl}",
+        "%{IncludeDir.libb64}"
     }
 
     links {
         "libcrypto",
-        "libssl"
+        "libssl",
+        "libb64"
     }
 
     filter "system:windows"

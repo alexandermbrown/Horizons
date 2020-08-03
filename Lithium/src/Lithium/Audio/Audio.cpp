@@ -9,7 +9,7 @@
 #include "vorbis/vorbisfile.h"
 #include <stdlib.h>
 
-#define LI_AUDIO_BUFFER_SIZE 32768
+#define LI_AUDIO_BUFFER_SIZE 8192
 
 namespace li
 {
@@ -31,20 +31,20 @@ namespace li
 		memcpy(buffer,
 			(uint8_t*)((ogg_handle*)f)->buffer + ((ogg_handle*)f)->read_pos,
 			size * nmemb);
-		((ogg_handle*)f)->read_pos += size * nmemb;
+		((ogg_handle*)f)->read_pos += (off_t)(size * nmemb);
 		return nmemb;
 	}
 	static int audio_seek(void* f, ogg_int64_t off, int whence)
 	{
 		switch (whence) {
 		case SEEK_SET:
-			((ogg_handle*)f)->read_pos = off;
+			((ogg_handle*)f)->read_pos = (off_t)off;
 			break;
 		case SEEK_CUR:
-			((ogg_handle*)f)->read_pos += off;
+			((ogg_handle*)f)->read_pos += (off_t)off;
 			break;
 		case SEEK_END:
-			((ogg_handle*)f)->read_pos = (off_t)(((ogg_handle*)f)->size) + off;
+			((ogg_handle*)f)->read_pos = (off_t)(((ogg_handle*)f)->size) + (off_t)off;
 			break;
 		}
 		return ((ogg_handle*)f)->read_pos;

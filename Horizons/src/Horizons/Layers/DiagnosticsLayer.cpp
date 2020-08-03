@@ -6,7 +6,7 @@
 #include "imgui.h"
 
 DiagnosticsLayer::DiagnosticsLayer()
-	: m_Timer(0.1, false, true)
+	: m_Timer(0.1f, false, true)
 {
 
 }

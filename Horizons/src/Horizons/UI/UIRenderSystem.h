@@ -4,5 +4,6 @@
 
 class UIRenderSystem
 {
+public:
 	static void Render(entt::registry& registry);
 };

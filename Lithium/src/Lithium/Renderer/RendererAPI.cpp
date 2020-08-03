@@ -10,7 +10,6 @@ namespace li
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
-		//LI_CORE_INFO("CREATING RENDERER API");
 		switch (s_API)
 		{
 		case RendererAPI::API::OpenGL:

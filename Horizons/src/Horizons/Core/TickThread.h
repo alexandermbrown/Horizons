@@ -8,13 +8,20 @@
 #include "Lithium.h"
 #include "readerwriterqueue/readerwriterqueue.h"
 
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #	include "Horizons/Rendering/DebugPhysicsDrawShared.h"
 #endif
 
-int TickThreadEntryPoint(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config);
+struct TickThreadData
+{
+	moodycamel::ReaderWriterQueue<SDL_Event>* EventQueue;
+	SyncEventQueue* SyncQueue;
+	SyncTransformQueue* TransformQueue;
+	ConfigStore Config;
+};
+
+int TickThreadEntryPoint(const TickThreadData& data);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-int TickThreadEntryPointDebugDraw(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config, DebugDrawCommandQueue* debugDrawQueue);
+int TickThreadEntryPointDebugDraw(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue);
 #endif

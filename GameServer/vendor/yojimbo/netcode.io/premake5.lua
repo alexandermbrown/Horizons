@@ -21,7 +21,7 @@ solution "netcode"
     end
     rtti "Off"
     warnings "Extra"
-    staticruntime "On"
+    staticruntime "off"
     floatingpoint "Fast"
     vectorextensions "SSE2"
     configuration "Debug"

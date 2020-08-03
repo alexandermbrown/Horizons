@@ -221,7 +221,7 @@ void ConsoleLayer::UpdateHistory(ImGuiInputTextCallbackData* data)
 			index += HZ_CONSOLE_INPUT_HISTORY_COUNT;
 
 		strcpy_s(data->Buf, data->BufSize, m_HistoryBuffer[index].c_str());
-		data->BufTextLen = m_HistoryBuffer[index].size();
+		data->BufTextLen = (int)m_HistoryBuffer[index].size();
 	}
 	data->BufDirty = true;
 	data->CursorPos = data->BufTextLen;

@@ -4,7 +4,7 @@
 
 #include "OpenGLCore.h"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 namespace li {
 
@@ -41,12 +41,6 @@ namespace li {
 	void OpenGLVertexBuffer::Unbind() const
 	{
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, 0) );
-	}
-
-	void OpenGLVertexBuffer::SetData(float* data, uint32_t size, uint32_t offset, BufferUsage usage, BufferTarget target)
-	{
-		GLCall( glBindBuffer(ConvertOpenGL::BufferTarget(target), m_RendererID) );
-		GLCall( glBufferData(m_RendererID, size, data, ConvertOpenGL::BufferUsage(usage)) );
 	}
 
 	void OpenGLVertexBuffer::SetSubData(float* data, uint32_t size, uint32_t offset, BufferTarget target)

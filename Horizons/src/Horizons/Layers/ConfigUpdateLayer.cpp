@@ -38,8 +38,8 @@ void ConfigUpdateLayer::OnEvent(SDL_Event* event)
 
 			if (width != event->window.data1 || height != event->window.data2)
 			{
-				config.Get("window_width").Set(event->window.data1);
-				config.Get("window_height").Set(event->window.data2);
+				config.Get("window_width").SetInt(event->window.data1);
+				config.Get("window_height").SetInt(event->window.data2);
 			}
 		}
 	}

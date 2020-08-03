@@ -46,7 +46,7 @@ namespace li
 
 	void LayerStack::Clear()
 	{
-		for (int i = m_Layers.size() - 1; i >= 0; --i) {
+		for (int i = (int)m_Layers.size() - 1; i >= 0; --i) {
 			m_Layers[i]->OnDetach();
 			delete m_Layers[i];
 			m_Layers.pop_back();

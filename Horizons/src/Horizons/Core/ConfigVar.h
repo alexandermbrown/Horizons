@@ -62,36 +62,36 @@ public:
 		return m_FloatValue;
 	}
 	
-	inline void Set(bool value)
+	inline void SetBool(bool value)
 	{
-		LI_ASSERT(m_Flags & HZ_CVAR_BOOL, "Cannot set CVar of type {} to bool.");
+		LI_ASSERT(m_Flags & HZ_CVAR_BOOL, "Cannot set CVar to bool.");
 		if (m_BoolValue != value)
 			m_Dirty = true;
 
 		m_BoolValue = value;
 	};
 
-	inline void Set(int value)
+	inline void SetInt(int value)
 	{
-		LI_ASSERT(m_Flags & HZ_CVAR_INT, "Cannot set CVar of type {} to int.");
+		LI_ASSERT(m_Flags & HZ_CVAR_INT, "Cannot set CVar to int.");
 		if (m_IntValue != value)
 			m_Dirty = true;
 
 		m_IntValue = value;
 	};
 
-	inline void Set(unsigned int value)
+	inline void SetUnsigned(unsigned int value)
 	{
-		LI_ASSERT(m_Flags & HZ_CVAR_UNSIGNED, "Cannot set CVar of type {} to unsigned int.");
+		LI_ASSERT(m_Flags & HZ_CVAR_UNSIGNED, "Cannot set CVar to unsigned int.");
 		if (m_UnsignedValue != value)
 			m_Dirty = true;
 
 		m_UnsignedValue = value;
 	};
 
-	inline void Set(float value)
+	inline void SetFloat(float value)
 	{
-		LI_ASSERT(m_Flags & HZ_CVAR_FLOAT, "Cannot set CVar of type {} to float.");
+		LI_ASSERT(m_Flags & HZ_CVAR_FLOAT, "Cannot set CVar to float.");
 		if (m_FloatValue != value)
 			m_Dirty = true;
 

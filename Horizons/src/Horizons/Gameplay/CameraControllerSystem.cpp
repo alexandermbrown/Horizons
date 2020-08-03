@@ -14,7 +14,7 @@ void CameraControllerSystem::Init(entt::registry& registry)
 	camera.current_zoom = 10.0f;
 	camera.target_zoom = 10.0f;
 	camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-		/ (float)li::Application::Get()->GetWindow()->GetHeight();
+		/ (float)li::Application::Get()->GetWindow()->GetHeight() * 0.5f;
 
 	camera.camera = new li::OrthographicCamera(-camera.aspect_ratio * camera.current_zoom,
 		camera.aspect_ratio * camera.current_zoom, -camera.current_zoom, camera.current_zoom);
@@ -80,7 +80,7 @@ void CameraControllerSystem::OnEvent(entt::registry& registry, SDL_Event* event)
 			cp::camera& camera = registry.ctx<cp::camera>();
 
 			camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-				/ (float)li::Application::Get()->GetWindow()->GetHeight();
+				/ (float)li::Application::Get()->GetWindow()->GetHeight() * 0.5f;
 			camera.camera->SetProjection(-camera.aspect_ratio * camera.current_zoom,
 				camera.aspect_ratio * camera.current_zoom, -camera.current_zoom, camera.current_zoom);
 		}

@@ -36,8 +36,9 @@ namespace li
 	public:
 		BatchRenderer(glm::vec2 quadOrigin = glm::vec2(1.0f));
 		virtual ~BatchRenderer() = default;
-		void Init(const std::string& shaderAlias);
+
 		void AddTextureAtlas(Ref<TextureAtlas> atlas);
+		void SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer);
 
 		void BeginScene(OrthographicCamera* camera);
 		void EndScene();
@@ -50,10 +51,8 @@ namespace li
 		std::vector<Ref<Batch>> m_Batches;
 		std::unordered_map<std::string, uint32_t> m_TextureIndices;
 
-		OrthographicCamera* m_Camera;
 		glm::vec2 m_QuadOrigin;
 		
 		Ref<Shader> m_Shader;
-		std::string m_ShaderAlias;
 	};
 }

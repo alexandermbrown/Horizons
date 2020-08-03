@@ -5,7 +5,7 @@ libs = { "sodium", "mbedtls" }
 project "yojimbo"
     kind "StaticLib"
     language "C++"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("build/" .. outputdir .. "/%{prj.name}")
     objdir ("build-int/" .. outputdir .. "/%{prj.name}")

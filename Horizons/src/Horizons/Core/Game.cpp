@@ -6,6 +6,7 @@
 #include "Horizons/Gameplay/Player/PlayerSystem.h"
 #include "Horizons/Gameplay/Sync/SyncInitSystem.h"
 #include "Horizons/Gameplay/Sync/SyncTransformSendSystem.h"
+#include "Horizons/Gameplay/Sync/ConfigReceiveSystem.h"
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "Horizons/Gameplay/Physics/DebugDrawSystem.h"
@@ -15,16 +16,16 @@
 
 Game* Game::s_Instance = nullptr;
 
-Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config)
-	: m_Running(false), m_EventQueue(eventQueue), m_SyncQueue(syncQueue), m_TransformQueue(transformQueue), m_ConfigStore(config), m_Registry()
+Game::Game(const TickThreadData& data)
+	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue), m_ConfigStore(data.Config), m_Registry()
 {
 	LI_ASSERT(!s_Instance, "Game already created!");
 	s_Instance = this;
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-Game::Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config, DebugDrawCommandQueue* debugDrawQueue)
-	: m_Running(false), m_EventQueue(eventQueue), m_SyncQueue(syncQueue), m_TransformQueue(transformQueue), m_ConfigStore(config), m_DebugDrawQueue(debugDrawQueue)
+Game::Game(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue)
+	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue), m_ConfigStore(data.Config), m_DebugDrawQueue(debugDrawQueue)
 {
 	LI_ASSERT(!s_Instance, "Game already created!");
 	s_Instance = this;
@@ -92,7 +93,10 @@ void Game::OnEvent(SDL_Event* event)
 	}
 	else
 	{
-		PlayerSystem::OnEvent(m_Registry, event);
+		if (!ConfigReceiveSystem::OnEvent(event))
+		{
+			PlayerSystem::OnEvent(m_Registry, event);
+		}
 	}
 }
 

@@ -62,6 +62,37 @@ void UISystem::OnEvent(entt::registry& registry, SDL_Event* event)
 	}
 }
 
+void UISystem::AddChild(entt::registry& registry, entt::entity parent, entt::entity child)
+{
+	cp::ui_element& parent_ui = registry.get<cp::ui_element>(parent);
+	cp::ui_element& child_ui = registry.get<cp::ui_element>(child);
+
+	if (parent_ui.first_child == entt::null)
+	{
+		parent_ui.first_child = child;
+	}
+	else
+	{
+		AddSibling(registry, parent_ui.first_child, child);
+	}
+
+	child_ui.parent = parent;
+}
+
+void UISystem::AddSibling(entt::registry& registry, entt::entity existing, entt::entity new_ent)
+{
+	cp::ui_element& existing_ui = registry.get<cp::ui_element>(existing);
+
+	if (existing_ui.next_sibling == entt::null)
+	{
+		existing_ui.next_sibling = new_ent;
+	}
+	else
+	{
+		AddSibling(registry, existing_ui.next_sibling, new_ent);
+	}
+}
+
 void UISystem::Rebuild(entt::registry& registry, entt::entity context_ent)
 {
 	LI_TRACE("Rebuilding UI...");

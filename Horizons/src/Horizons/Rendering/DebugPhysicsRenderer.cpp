@@ -23,6 +23,9 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 	m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+
+	m_Shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
+	m_Shader->AddUniformBuffer(li::Renderer::GetViewProjUniformBuffer());
 }
 
 void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
@@ -149,10 +152,8 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 	if (m_IndexCount > 0)
 	{
 		m_VertexArray->Bind();
-		li::Ref<li::Shader> shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
-		shader->Bind();
-		shader->SetFloat("u_ZPosition", z);
-		shader->SetMat4("u_ViewProjection", camera->GetViewProjectionMatrix());
+		
+		m_Shader->Bind();
 		
 		li::RendererAPI::DrawIndexed(m_VertexArray, m_IndexCount, li::DrawMode::Lines);
 		m_VertexArray->Unbind();

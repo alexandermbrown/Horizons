@@ -14,6 +14,11 @@ public:
 
 	static void OnEvent(entt::registry& registry, SDL_Event* event);
 
+
+	static void AddChild(entt::registry& registry, entt::entity parent, entt::entity child);
+	static void AddSibling(entt::registry& registry, entt::entity existing, entt::entity new_ent);
+
+
 	static const lay_id MaxItemCount = 1024u;
 
 private:

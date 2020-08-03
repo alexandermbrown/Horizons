@@ -13,15 +13,17 @@
 #include "Horizons/Rendering/DebugPhysicsDrawShared.h"
 #endif
 
+#include "TickThread.h"
+
 class Game
 {
 public:
 	static Game* Get() { return s_Instance; }
 
-	Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config);
+	Game(const TickThreadData& data);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	Game(moodycamel::ReaderWriterQueue<SDL_Event>* eventQueue, SyncEventQueue* syncQueue, SyncTransformQueue* transformQueue, const ConfigStore& config, DebugDrawCommandQueue* debugDrawQueue);
+	Game(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue);
 #endif
 
 	~Game();

@@ -3,6 +3,9 @@
 #include "Horizons.h"
 #include "Lithium.h"
 
+#include "Horizons/Core/UserEvents.h"
+#include "Horizons/Core/AppState.h"
+
 #ifdef HZ_CONSOLE_ENABLED
 #include "CVarCommands.h"
 
@@ -27,7 +30,49 @@ li::Ref<Command> CreateCVarSetCommand()
 			ConfigStore& store = li::Application::Get<Horizons>()->GetConfig();
 			if (store.Contains(args[0].StringValue))
 			{
-				if (!store.Get(args[0].StringValue).SetFromString(args[1].StringValue))
+				auto& var = store.Get(args[0].StringValue);
+				if (var.SetFromString(args[1].StringValue))
+				{
+					if (store.Get("app_state").GetUnsigned() == (uint32_t)AppState::InGame)
+					{
+						// Create event to change the variable in the game thread.
+						SDL_Event event;
+						SDL_zero(event);
+						event.type = store.Get("event_app_to_game").GetUnsigned();
+						event.user.code = (uint32_t)UserEvent::SetConfig;
+
+						size_t size = args[0].StringValue.length() + 1;
+						event.user.data1 = new char[size];
+						strcpy_s((char*)event.user.data1, size, args[0].StringValue.c_str());
+
+						switch (var.GetFlags())
+						{
+						case HZ_CVAR_BOOL:
+							event.user.data2 = new bool(var.GetBool());
+							break;
+
+						case HZ_CVAR_INT:
+							event.user.data2 = new int(var.GetInt());
+							break;
+
+						case HZ_CVAR_UNSIGNED:
+							event.user.data2 = new unsigned int(var.GetUnsigned());
+							break;
+
+						case HZ_CVAR_FLOAT:
+							event.user.data2 = new float(var.GetFloat());
+							break;
+
+						default:
+							LI_CORE_ERROR("Unknown CVAR type!");
+							break;
+						}
+
+						SDL_PushEvent(&event);
+						LI_TRACE("Pushed change event for console variable {}", args[0].StringValue);
+					}
+				}
+				else
 				{
 					*errorOut = "Failed to set CVar " + args[0].StringValue + " to " + args[1].StringValue;
 				}
