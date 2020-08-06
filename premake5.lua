@@ -42,6 +42,7 @@ IncludeDir["libb64"] = "ServerManager/vendor/libb64/include"
 
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
+IncludeDir["steam"] = "Horizons/vendor/steam/include"
 
 group "vendor"
 include "Lithium/vendor/glad"
@@ -165,7 +166,8 @@ project "Horizons"
         "%{IncludeDir.box2d}",
         "%{IncludeDir.readerwriterqueue}",
         "%{IncludeDir.layout}",
-        "%{IncludeDir.simpleini}"
+        "%{IncludeDir.simpleini}",
+        "%{IncludeDir.steam}"
     }
 
     links {
@@ -180,6 +182,9 @@ project "Horizons"
             "LI_PLATFORM_WINDOWS",
             "HZ_PLATFORM_WINDOWS"
         }
+
+        libdirs { "Horizons/vendor/steam/lib/win64" }
+        links { "steam_api64" }
         
     filter "configurations:Debug"
         defines {
@@ -285,7 +290,8 @@ project "GameServer"
         "GameServer/vendor",
         "%{IncludeDir.yojimbo}",
         "%{IncludeDir.nlohmann_json}",
-        "%{IncludeDir.libb64}"
+        "%{IncludeDir.libb64}",
+        "%{IncludeDir.steam}"
     }
 
     links {
@@ -295,6 +301,9 @@ project "GameServer"
 
     filter "system:windows"
         systemversion "latest"
+
+        libdirs { "Horizons/vendor/steam/lib/win64" }
+        links { "steam_api64" }
         
     filter "configurations:Debug"
         defines "LI_DEBUG"
@@ -337,7 +346,8 @@ project "ServerManager"
         "%{IncludeDir.yojimbo}",
         "%{IncludeDir.nlohmann_json}",
         "%{IncludeDir.openssl}",
-        "%{IncludeDir.libb64}"
+        "%{IncludeDir.libb64}",
+        "%{IncludeDir.steam}"
     }
 
     links {
@@ -350,8 +360,10 @@ project "ServerManager"
         systemversion "latest"
 
         libdirs {
-            "ServerManager/vendor/OpenSSL/vc-win64a/lib"
+            "ServerManager/vendor/OpenSSL/vc-win64a/lib",
+            "Horizons/vendor/steam/lib/win64"
         }
+        links { "steam_api64" }
         
     filter "configurations:Debug"
         defines "LI_DEBUG"
