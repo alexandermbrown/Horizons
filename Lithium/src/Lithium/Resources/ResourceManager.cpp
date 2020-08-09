@@ -17,13 +17,87 @@
 
 namespace li
 {
-	Scope<ResourceManager::ResourceData> ResourceManager::s_Data;
-	std::atomic<bool> ResourceManager::s_Loaded(false);
+	Scope<ResourceManager::ResourceData> ResourceManager::s_Data = CreateScope<ResourceData>();
+	std::atomic<bool> ResourceManager::s_Loaded(true);
+
+	void ResourceManager::Load(const std::string& labFilePath)
+	{
+		LI_CORE_INFO("Loading asset base {}...", labFilePath);
+		zstr::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
+
+		if (!inFile.good()) {
+			LI_CORE_ERROR("Error opening lithium asset base {}", labFilePath);
+			return;
+		}
+
+		size_t pos = 0;
+
+		// Read file header.
+		HeaderSerial header;
+		uint32_t signature;
+		LI_READ_FILE(inFile, (char*)&signature, sizeof(signature), pos);
+		LI_READ_FILE(inFile, (char*)&header.fileSize, sizeof(header.fileSize), pos);
+		LI_READ_FILE(inFile, (char*)&header.infoTableOffset, sizeof(header.infoTableOffset), pos);
+
+		if (signature != 0x42414c2bU) {
+			LI_CORE_ERROR("Lithium asset base {} has an incorrect header.", labFilePath);
+			return;
+		}
+
+		// Read in list of assets.
+		while (pos < header.infoTableOffset)
+		{
+			SegmentType segmentType;
+			LI_READ_FILE(inFile, (char*)&segmentType, sizeof(segmentType), pos);
+
+			switch (segmentType)
+			{
+			case SegmentType::Texture2D:
+			{
+				Texture2DArgs args = Texture2DArgs(&inFile, &pos);
+				s_Data->Textures[args.GetName()] = args.Create();
+				break;
+			}
+			case SegmentType::Shader:
+			{
+				ShaderArgs args = ShaderArgs(&inFile, &pos);
+				s_Data->Shaders[args.GetName()] = args.Create();
+				break;
+			}
+			case SegmentType::TextureAtlas:
+			{
+				TextureAtlasArgs args = TextureAtlasArgs(&inFile, &pos);
+				s_Data->TextureAtlases[args.GetName()] = args.Create();
+				break;
+			}
+			case SegmentType::Font:
+			{
+				FontArgs args = FontArgs(&inFile, &pos);
+				s_Data->Fonts[args.GetName()] = args.Create();
+				break;
+			}
+			case SegmentType::Audio:
+			{
+				AudioArgs args = AudioArgs(&inFile, &pos);
+				s_Data->Audio[args.GetName()] = args.Create();
+				break;
+			}
+			case SegmentType::Locale:
+			{
+				LocaleArgs args = LocaleArgs(&inFile, &pos);
+				Localization::AddLocale(args.Create());
+				break;
+			}
+			default:
+				LI_CORE_ERROR("Unknown asset type!");
+				break;
+			}
+		}
+	}
 
 	void ResourceManager::LoadAsync(const std::string& labFilePath)
 	{
-		s_Data = CreateScope<ResourceData>();
-
+		s_Loaded = false;
 		s_Data->LoadThread = std::thread(LoadFile, labFilePath);
 	}
 
@@ -104,7 +178,7 @@ namespace li
 
 	void ResourceManager::LoadFile(std::string labFilePath)
 	{
-		LI_CORE_INFO("Loading asset base {}...", labFilePath);
+		LI_CORE_INFO("Loading asset base {} asynchronously...", labFilePath);
 		zstr::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
 
 		if (!inFile.good()) {
@@ -135,27 +209,27 @@ namespace li
 			switch (segmentType)
 			{
 			case SegmentType::Texture2D:
-				s_Data->ArgsQueue.enqueue(Texture2DArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new Texture2DArgs(&inFile, &pos));
 				break;
 
 			case SegmentType::Shader:
-				s_Data->ArgsQueue.enqueue(ShaderArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new ShaderArgs(&inFile, &pos));
 				break;
 
 			case SegmentType::TextureAtlas:
-				s_Data->ArgsQueue.enqueue(TextureAtlasArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new TextureAtlasArgs(&inFile, &pos));
 				break;
 			
 			case SegmentType::Font:
-				s_Data->ArgsQueue.enqueue(FontArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new FontArgs(&inFile, &pos));
 				break;
 			
 			case SegmentType::Audio:
-				s_Data->ArgsQueue.enqueue(AudioArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new AudioArgs(&inFile, &pos));
 				break;
 			
 			case SegmentType::Locale:
-				s_Data->ArgsQueue.enqueue(LocaleArgs::Deserialize(&inFile, &pos));
+				s_Data->ArgsQueue.enqueue(new LocaleArgs(&inFile, &pos));
 				break;
 			
 			default:

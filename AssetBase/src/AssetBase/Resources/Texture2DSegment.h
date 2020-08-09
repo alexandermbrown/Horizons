@@ -20,7 +20,7 @@ namespace AssetBase
 		size_t imageSize;
 		uint8_t* imageData;
 
-		Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath);
+		Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~Texture2DSegment();
 		virtual size_t GetSize() override;
 	};

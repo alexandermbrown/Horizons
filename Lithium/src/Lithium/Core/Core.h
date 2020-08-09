@@ -22,6 +22,13 @@
 #define BIT(x) (1 << x)
 #define LI_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 
+#ifdef LI_PLATFORM_WINDOWS
+#	define LI_INCLUDE_OPENGL
+#	define LI_INCLUDE_D3D11
+#else
+#	define LI_INCLUDE_OPENGL
+#endif
+
 namespace li 
 {
 	template<typename T>

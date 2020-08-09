@@ -3,11 +3,11 @@
 #include "RendererAPI.h"
 #include "Lithium/Resources/ResourceManager.h"
 
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/type_ptr.hpp"
 
 namespace li
 {
-	Batch::Batch(Ref<TextureAtlas> atlas, const glm::vec2& quadOrigin)
+	Batch::Batch(Ref<TextureAtlas> atlas, const glm::vec2& quadOrigin, const Ref<Shader>& shader)
 		: Atlas(atlas), InstanceCount(0), InstanceData(), InstanceVA(VertexArray::Create())
 	{
 		float quadVertices[16] = {
@@ -23,29 +23,34 @@ namespace li
 		Ref<IndexBuffer> quadIB = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 
 		quadVB->SetLayout({
-			{ ShaderDataType::Float2, "a_Position", 6 },
-			{ ShaderDataType::Float2, "a_TexCoord", 7 }
+			{ ShaderDataType::Float2, "POSITION", 6 },
+			{ ShaderDataType::Float2, "TEXCOORD", 7 }
 		});
 
 		InstanceVA->SetIndexBuffer(quadIB);
 		InstanceVA->AddVertexBuffer(quadVB);
-
-		BufferLayout instanceLayout ({
-			{ ShaderDataType::Mat4, "a_Transform", 0, false, 1 },
-			{ ShaderDataType::Float4, "a_AtlasBounds", 4, false, 1 },
-			{ ShaderDataType::Float4, "a_Color", 5, false, 1 }
-		});
 		
 		static_assert(sizeof(BatchData) == sizeof(glm::mat4) + sizeof(glm::vec4) + sizeof(glm::vec4));
 
 		InstanceBuffer = VertexBuffer::Create(LI_MAX_BATCH_INSTANCES * sizeof(BatchData), BufferUsage::DynamicDraw);
-		InstanceBuffer->SetLayout(instanceLayout);
+		InstanceBuffer->SetLayout({
+			{ ShaderDataType::Mat4, "I_TRANSFORM", 0, false, 1 },
+			{ ShaderDataType::Float4, "I_ATLASBOUNDS", 4, false, 1 },
+			{ ShaderDataType::Float4, "COLOR", 5, false, 1 }
+		});
 		InstanceVA->AddVertexBuffer(InstanceBuffer);
+
+		InstanceVA->Finalize(shader);
 	}
 
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin)
 		: m_QuadOrigin(quadOrigin), m_Batches(), m_TextureIndices()
 	{
+	}
+
+	void BatchRenderer::PostResourceLoad()
+	{
+		m_Shader = ResourceManager::Get<Shader>("shader_instance");
 	}
 
 	void BatchRenderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
@@ -55,16 +60,15 @@ namespace li
 			m_TextureIndices[alias] = index;
 		}
 
-		m_Batches.push_back(CreateRef<Batch>(atlas, m_QuadOrigin));
+		m_Batches.push_back(CreateRef<Batch>(atlas, m_QuadOrigin, m_Shader));
 	}
 
 	void BatchRenderer::SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer)
 	{
-		m_Shader = ResourceManager::Get<Shader>("shader_instance");
 		m_Shader->AddUniformBuffer(viewProjBuffer);
 	}
 
-	void BatchRenderer::BeginScene(OrthographicCamera* camera)
+	void BatchRenderer::BeginScene()
 	{
 		for (const Ref<Batch>& batch : m_Batches)
 		{
@@ -84,16 +88,15 @@ namespace li
 			{
 				batch->Atlas->Bind();
 
-				static_assert(sizeof(BatchData) == 24 * sizeof(float));
 				batch->InstanceBuffer->SetSubData(
-					(float*)&batch->InstanceData,
+					(float*)batch->InstanceData.data(),
 					sizeof(BatchData) * batch->InstanceCount,
-					0,
-					BufferTarget::ArrayBuffer
+					0, true, BufferTarget::ArrayBuffer
 				);
 
 				batch->InstanceVA->Bind();
-				RendererAPI::DrawIndexedInstanced(batch->InstanceVA, batch->InstanceCount, DrawMode::Triangles);
+				li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
+				RendererAPI::DrawIndexedInstanced(batch->InstanceVA->GetIndexBuffer()->GetCount(), batch->InstanceCount);
 				batch->InstanceVA->Unbind();
 			}
 		}

@@ -33,7 +33,7 @@ namespace AssetBase
 		throw "Unknown wrap type!";
 	}
 	
-	Texture2DSegment::Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath)
+	Texture2DSegment::Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::Texture2D), min_filter(li::FilterType::Error), mag_filter(li::FilterType::Error),
 		wrap_s(li::WrapType::Error), wrap_t(li::WrapType::Error)
 	{

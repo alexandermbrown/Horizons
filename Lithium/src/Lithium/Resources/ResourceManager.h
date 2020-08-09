@@ -19,6 +19,7 @@ namespace li
 	{
 	public:
 
+		static void Load(const std::string& labFilePath);
 		static void LoadAsync(const std::string& labFilePath);
 		static void Shutdown();
 

@@ -17,7 +17,7 @@ public:
 
 	DebugPhysicsRenderer(DebugDrawCommandQueue* queue);
 
-	void Render(li::OrthographicCamera* camera, float z);
+	void Render();
 
 private:
 

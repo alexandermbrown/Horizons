@@ -2,7 +2,13 @@
 #include "Buffer.h"
 
 #include "Lithium/Renderer/RendererAPI.h"
+
+#ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLBuffer.h"
+#endif
+#ifdef LI_INCLUDE_D3D11
+#include "Lithium/Platform/D3D11/D3D11Buffer.h"
+#endif
 
 namespace li
 {
@@ -10,7 +16,12 @@ namespace li
 	{
 		switch (RendererAPI::GetAPI())
 		{
+#ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size, usage);
+#endif
+#ifdef LI_INCLUDE_D3D11
+		case RendererAPI::API::D3D11:  return CreateRef<D3D11VertexBuffer>(size, usage);
+#endif
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -21,7 +32,12 @@ namespace li
 	{
 		switch (RendererAPI::GetAPI())
 		{
+#ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size, usage);
+#endif
+#ifdef LI_INCLUDE_D3D11
+		case RendererAPI::API::D3D11:  return CreateRef<D3D11VertexBuffer>(vertices, size, usage);
+#endif
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -32,7 +48,12 @@ namespace li
 	{
 		switch (RendererAPI::GetAPI())
 		{
+#ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(size, usage);
+#endif
+#ifdef LI_INCLUDE_D3D11
+		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(size, usage);
+#endif
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -43,7 +64,12 @@ namespace li
 	{
 		switch (RendererAPI::GetAPI())
 		{
+#ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count);
+#endif
+#ifdef LI_INCLUDE_D3D11
+		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(indices, count);
+#endif
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");

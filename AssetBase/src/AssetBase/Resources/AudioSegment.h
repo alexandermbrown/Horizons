@@ -12,10 +12,10 @@ namespace AssetBase
 	{
 	public:
 		char name[64];
-		size_t fileSize;
+		uint32_t fileSize;
 		char* fileData;
 
-		AudioSegment(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath);
+		AudioSegment(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~AudioSegment();
 
 		virtual size_t GetSize() override;

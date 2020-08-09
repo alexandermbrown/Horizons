@@ -22,7 +22,7 @@ namespace AssetBase
 		msdfgen::deinitializeFreetype(ft);
 	}
 
-	FontSegment::FontSegment(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath)
+	FontSegment::FontSegment(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::Font)
 	{
 		name[0] = '\0';

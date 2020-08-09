@@ -10,11 +10,10 @@ namespace li
 	{
 	public:
 		OpenGLContext(SDL_Window* windowHandle);
+		virtual ~OpenGLContext();
 
-		virtual void Init();
-		virtual void Shutdown();
+		void SwapBuffers();
 
-		virtual void SwapBuffers();
 		virtual inline SDL_GLContext* GetGLContext() { return &m_Context; }
 
 	private:

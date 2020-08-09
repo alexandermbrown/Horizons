@@ -10,20 +10,17 @@ namespace li
 	class AudioArgs : public ResourceArgs
 	{
 	public:
-		static AudioArgs* Deserialize(zstr::ifstream* inFile, size_t* pos);
-
-		AudioArgs(const std::string& name, uint8_t* data, uint32_t size)
-			: ResourceArgs(SegmentType::Audio, name), m_Data(data), m_Size(size) {}
+		AudioArgs(zstr::ifstream* inFile, size_t* pos);
 
 		virtual ~AudioArgs();
 
 		inline Ref<Audio> Create()
 		{
-			return CreateRef<Audio>(m_Data, m_Size);
+			return CreateRef<Audio>(m_GlslData, m_Size);
 		};
 
 	private:
-		uint8_t* m_Data;
+		uint8_t* m_GlslData;
 		uint32_t m_Size;
 	};
 }

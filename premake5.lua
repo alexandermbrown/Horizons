@@ -119,6 +119,12 @@ project "Lithium"
             "LI_PLATFORM_WINDOWS"
         }
 
+        links {
+            "d3d11.lib",
+            "dxgi.lib",
+            "d3dcompiler.lib"
+        }
+
     filter "configurations:Debug"
         defines "LI_DEBUG"
         runtime "Debug"
@@ -249,6 +255,12 @@ project "AssetBase"
 
     filter "system:windows"
         systemversion "latest"
+
+        links {
+            "d3d11.lib",
+            "dxgi.lib",
+            "d3dcompiler.lib"
+        }
         
     filter "configurations:Debug"
         defines "LI_DEBUG"

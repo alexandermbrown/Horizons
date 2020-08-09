@@ -23,8 +23,7 @@ namespace AssetBase
 	{
 	public:
 
-		TextureAtlasSegment();
-		TextureAtlasSegment(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath);
+		TextureAtlasSegment(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~TextureAtlasSegment() = default;
 
 		virtual size_t GetSize() override;

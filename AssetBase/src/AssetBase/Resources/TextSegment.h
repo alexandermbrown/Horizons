@@ -15,7 +15,7 @@ namespace AssetBase
 		size_t fileSize;
 		char* textData;
 
-		TextSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath);
+		TextSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~TextSegment();
 
 		virtual size_t GetSize() override;

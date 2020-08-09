@@ -12,10 +12,17 @@ namespace AssetBase
 	{
 	public:
 		char name[64];
-		size_t shaderSize;
-		char* shaderData;
 
-		ShaderSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath);
+		size_t glslSize;
+		char* glslData;
+
+		size_t hlslVsSize;
+		char* hlslVsData;
+
+		size_t hlslPsSize;
+		char* hlslPsData;
+
+		ShaderSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~ShaderSegment();
 
 		virtual size_t GetSize() override;

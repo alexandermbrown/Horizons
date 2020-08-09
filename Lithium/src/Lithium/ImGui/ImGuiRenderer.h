@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Core.h"
 #include "Lithium/Core/Layer.h"
 
 #include "SDL.h"
@@ -9,17 +10,13 @@ namespace li
 	class ImGuiRenderer
 	{
 	public:
-		ImGuiRenderer();
-		virtual ~ImGuiRenderer();
+		virtual ~ImGuiRenderer() = default;
 
-		void Begin();
-		void End();
+		virtual void Begin() = 0;
+		virtual void End() = 0;
 		void OnEvent(SDL_Event* event);
 		void Resize(int width, int height);
 
-		bool WantCapture(const SDL_Event& event);
-	private:
-		float m_Time = 0.0f;
+		static Ref<ImGuiRenderer> Create();
 	};
-
 }

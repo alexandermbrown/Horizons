@@ -5,31 +5,26 @@
 
 namespace li
 {
-	Texture2DArgs* Texture2DArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	Texture2DArgs::Texture2DArgs(zstr::ifstream* inFile, size_t* pos)
+		: ResourceArgs(SegmentType::Texture2D)
 	{
 		char name[64];
-		li::FilterType min_filter;
-		li::FilterType mag_filter;
-		li::WrapType wrap_s;
-		li::WrapType wrap_t;
-		size_t imageSize;
-		uint8_t* imageData;
 
 		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
-		LI_READ_FILE(*inFile, (char*)&min_filter, sizeof(min_filter), *pos);
-		LI_READ_FILE(*inFile, (char*)&mag_filter, sizeof(mag_filter), *pos);
-		LI_READ_FILE(*inFile, (char*)&wrap_s, sizeof(wrap_s), *pos);
-		LI_READ_FILE(*inFile, (char*)&wrap_t, sizeof(wrap_t), *pos);
-		LI_READ_FILE(*inFile, (char*)&imageSize, sizeof(imageSize), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_MinFilter, sizeof(m_MinFilter), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_MagFilter, sizeof(m_MagFilter), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_WrapS, sizeof(m_WrapS), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_WrapT, sizeof(m_WrapT), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Size, sizeof(m_Size), *pos);
 
-		imageData = new uint8_t[imageSize];
-		LI_READ_FILE(*inFile, (char*)imageData, imageSize, *pos);
+		m_GlslData = new uint8_t[m_Size];
+		LI_READ_FILE(*inFile, (char*)m_GlslData, m_Size, *pos);
 
-		return new Texture2DArgs(name, imageSize, imageData, wrap_s, wrap_t, min_filter, mag_filter);
+		m_Name = name;
 	}
 
 	Texture2DArgs::~Texture2DArgs()
 	{
-		delete[] m_Data;
+		delete[] m_GlslData;
 	}
 }

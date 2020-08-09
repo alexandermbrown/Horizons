@@ -23,7 +23,11 @@ void SplashScreenScene::TransitionIn()
 	m_SplashScreenLayer = new SplashScreenLayer();
 	app->PushLayer(m_SplashScreenLayer);
 
+#ifdef LI_DEBUG
+	li::ResourceManager::LoadAsync("data/resources.lab-debug");
+#else
 	li::ResourceManager::LoadAsync("data/resources.lab");
+#endif
 }
 
 void SplashScreenScene::TransitionOut()
@@ -34,7 +38,7 @@ void SplashScreenScene::TransitionOut()
 	int width = app->GetConfig().Get("window_width").GetInt();
 	int height = app->GetConfig().Get("window_height").GetInt();
 
-	li::Ref<li::Window>& window = app->GetWindow();
+	li::Window* window = app->GetWindow();
 	window->SetBordered(true);
 	window->SetSize(width, height);
 	window->SetPosition(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);

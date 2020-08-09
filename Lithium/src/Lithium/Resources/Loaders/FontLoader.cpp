@@ -5,34 +5,24 @@
 
 namespace li
 {
-	FontArgs* FontArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	FontArgs::FontArgs(zstr::ifstream* inFile, size_t* pos)
+		: ResourceArgs(SegmentType::Font), m_Glyphs()
 	{
 		char name[64];
-		uint16_t glyphWidth = 0;
-		uint16_t textureWidth = 0;
-
-		float emSize;
-		float ascenderY, descenderY;
-		float lineHeight;
-		float underlineY, underlineThickness;
 
 		uint32_t numGlyphs;
-		std::vector<Glyph> glyphs;
-
-		uint32_t imageSize;
-		uint8_t* imageData;
 
 		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
 
-		LI_READ_FILE(*inFile, (char*)&glyphWidth, sizeof(glyphWidth), *pos);
-		LI_READ_FILE(*inFile, (char*)&textureWidth, sizeof(textureWidth), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.GlyphWidth, sizeof(m_Props.GlyphWidth), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.TextureWidth, sizeof(m_Props.TextureWidth), *pos);
 
-		LI_READ_FILE(*inFile, (char*)&emSize, sizeof(emSize), *pos);
-		LI_READ_FILE(*inFile, (char*)&ascenderY, sizeof(ascenderY), *pos);
-		LI_READ_FILE(*inFile, (char*)&descenderY, sizeof(descenderY), *pos);
-		LI_READ_FILE(*inFile, (char*)&lineHeight, sizeof(lineHeight), *pos);
-		LI_READ_FILE(*inFile, (char*)&underlineY, sizeof(underlineY), *pos);
-		LI_READ_FILE(*inFile, (char*)&underlineThickness, sizeof(underlineThickness), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.EmSize, sizeof(m_Props.EmSize), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.AscenderY, sizeof(m_Props.AscenderY), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.DescenderY, sizeof(m_Props.DescenderY), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.LineHeight, sizeof(m_Props.LineHeight), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.UnderlineY, sizeof(m_Props.UnderlineY), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Props.UnderlineThickness, sizeof(m_Props.UnderlineThickness), *pos);
 
 		LI_READ_FILE(*inFile, (char*)&numGlyphs, sizeof(numGlyphs), *pos);
 		for (uint32_t i = 0; i < numGlyphs; i++)
@@ -47,24 +37,14 @@ namespace li
 			LI_READ_FILE(*inFile, (char*)&glyph.HorizontalAdvance, sizeof(glyph.HorizontalAdvance), *pos);
 			LI_READ_FILE(*inFile, (char*)&glyph.BearingX, sizeof(glyph.BearingX), *pos);
 			LI_READ_FILE(*inFile, (char*)&glyph.BearingY, sizeof(glyph.BearingY), *pos);
-			glyphs.push_back(glyph);
+			m_Glyphs.push_back(glyph);
 		}
 
-		LI_READ_FILE(*inFile, (char*)&imageSize, sizeof(imageSize), *pos);
-		imageData = new unsigned char[imageSize];
-		LI_READ_FILE(*inFile, (char*)imageData, imageSize, *pos);
+		LI_READ_FILE(*inFile, (char*)&m_ImageSize, sizeof(m_ImageSize), *pos);
+		m_ImageData = new unsigned char[m_ImageSize];
+		LI_READ_FILE(*inFile, (char*)m_ImageData, m_ImageSize, *pos);
 
-		FontProperties props;
-		props.GlyphWidth = glyphWidth;
-		props.TextureWidth = textureWidth;
-		props.EmSize = emSize;
-		props.AscenderY = ascenderY;
-		props.DescenderY = descenderY;
-		props.LineHeight = lineHeight;
-		props.UnderlineY = underlineY;
-		props.UnderlineThickness = underlineThickness;
-
-		return new FontArgs(name, imageSize, imageData, props, std::move(glyphs));
+		m_Name = name;
 	}
 
 	FontArgs::~FontArgs()

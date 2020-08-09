@@ -21,7 +21,7 @@ HUDLayer::HUDLayer()
 	bar_element.margins = lay_vec4_xyzw(30, 0, 30, 20);
 	bar_element.height = 70;
 
-	m_Registry.emplace<cp::ui_transform>(item_bar, 0.501f);
+	m_Registry.emplace<cp::ui_transform>(item_bar, 0.201f);
 	m_Registry.emplace<cp::color>(item_bar, glm::vec4(0.4f, 0.4f, 0.4f, 0.6f));
 
 	UISystem::AddChild(m_Registry, context_ent, item_bar);
@@ -36,7 +36,7 @@ HUDLayer::HUDLayer()
 		item_element.height = 50;
 		item_element.margins = lay_vec4_xyzw(10, 0, 10, 0);
 
-		m_Registry.emplace<cp::ui_transform>(item_slot, 0.502f);
+		m_Registry.emplace<cp::ui_transform>(item_slot, 0.202f);
 		m_Registry.emplace<cp::color>(item_slot, glm::vec4(0.7f, 0.5f, 0.4f, 0.7f));
 
 		UISystem::AddChild(m_Registry, item_bar, item_slot);

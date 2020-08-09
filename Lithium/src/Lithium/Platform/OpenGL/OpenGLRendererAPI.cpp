@@ -8,45 +8,9 @@
 
 namespace li
 {
-	void OpenGLMessageCallback(
-		unsigned source,
-		unsigned type,
-		unsigned id,
-		unsigned severity,
-		int length,
-		const char* message,
-		const void* userParam)
+	void OpenGLRendererAPI::ResizeViewImpl(int width, int height)
 	{
-		switch (severity)
-		{
-		case GL_DEBUG_SEVERITY_HIGH:         LI_CORE_CRITICAL(message); return;
-		case GL_DEBUG_SEVERITY_MEDIUM:       LI_CORE_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          LI_CORE_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: LI_CORE_TRACE(message); return;
-		}
-
-		LI_CORE_ASSERT(false, "Unknown severity level!");
-	}
-
-	void OpenGLRendererAPI::InitImpl()
-	{
-#ifdef LI_DEBUG
-		GLCall( glEnable(GL_DEBUG_OUTPUT) );
-		GLCall( glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS) );
-		GLCall( glDebugMessageCallback(OpenGLMessageCallback, nullptr) );
-
-		GLCall( glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE) );
-#endif
-
-		GLCall( glEnable(GL_BLEND) );
-		GLCall( glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) );
-
-		GLCall( glEnable(GL_DEPTH_TEST) );
-	}
-
-	void OpenGLRendererAPI::SetViewportImpl(int x, int y, int width, int height)
-	{
-		GLCall( glViewport(x, y, width, height) );
+		GLCall( glViewport(0, 0, width, height) );
 	}
 
 	void OpenGLRendererAPI::SetClearColorImpl(const glm::vec4& color)
@@ -74,27 +38,19 @@ namespace li
 		}
 	}
 
-	void OpenGLRendererAPI::DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+	void OpenGLRendererAPI::DrawArraysImpl(uint32_t vertexCount)
 	{
-		GLCall( glDrawArrays(ConvertOpenGL::DrawMode(mode), 0, (int)count) );
+		GLCall( glDrawArrays(ConvertOpenGL::DrawMode(m_DrawMode), 0, (GLsizei)vertexCount) );
 	}
 
-	void OpenGLRendererAPI::DrawIndexedImpl(const Ref<VertexArray>& vertexArray)
+	void OpenGLRendererAPI::DrawIndexedImpl(uint32_t indexCount)
 	{
-		GLCall( glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr) );
+		GLCall( glDrawElements(ConvertOpenGL::DrawMode(m_DrawMode), indexCount, GL_UNSIGNED_INT, nullptr) );
 	}
 
-	void OpenGLRendererAPI::DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+	void OpenGLRendererAPI::DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount)
 	{
-		GLCall( glDrawElements(ConvertOpenGL::DrawMode(mode), count, GL_UNSIGNED_INT, nullptr) );
-	}
-
-	void OpenGLRendererAPI::DrawIndexedInstancedImpl(const Ref<VertexArray>& vertexArray, uint32_t instanceCount, DrawMode mode)
-	{
-		GLCall( glDrawElementsInstanced(
-			ConvertOpenGL::DrawMode(mode),
-			vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT,
-			nullptr, instanceCount
-		) );
+		GLCall( glDrawElementsInstanced(ConvertOpenGL::DrawMode(m_DrawMode), 
+			indexCount, GL_UNSIGNED_INT, nullptr, instanceCount) );
 	}
 }

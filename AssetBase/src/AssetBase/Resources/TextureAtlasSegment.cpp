@@ -6,13 +6,7 @@
 
 namespace AssetBase
 {
-	TextureAtlasSegment::TextureAtlasSegment()
-		: Segment(SegmentType::TextureAtlas), entries()
-	{
-
-	}
-
-	TextureAtlasSegment::TextureAtlasSegment(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath)
+	TextureAtlasSegment::TextureAtlasSegment(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::TextureAtlas), entries()
 	{
 		for (rapidxml::xml_attribute<>* attr = atlasNode->first_attribute(); attr; attr = attr->next_attribute())

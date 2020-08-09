@@ -12,16 +12,6 @@
 
 namespace li
 {
-	struct WindowProps
-	{
-		char* Title;
-		int Width;
-		int Height;
-		bool Resizable;
-		bool Shown;
-		bool Borderless;
-	};
-
 	class Application
 	{
 	public:
@@ -43,7 +33,7 @@ namespace li
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		inline Ref<Window>& GetWindow() { return m_Window;  }
+		inline Window* GetWindow() { return m_Window;  }
 		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
 		inline const Input& GetInput() { return m_Input; }
 
@@ -55,8 +45,8 @@ namespace li
 		bool m_Running;
 		std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 
-		Ref<Window> m_Window;
-		Scope<ImGuiRenderer> m_ImGuiRenderer;
+		Window* m_Window;
+		Ref<ImGuiRenderer> m_ImGuiRenderer;
 		LayerStack m_LayerStack;
 		Input m_Input;
 

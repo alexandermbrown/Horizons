@@ -10,12 +10,13 @@
 #include "AudioSegment.h"
 #include "LocaleSegment.h"
 
-#define ASSETBASE_PUSH_SEGMENT(type, parentNode, path) for (rapidxml::xml_node<>* node = parentNode->first_node(); node; node = node->next_sibling())\
-	m_Segments.push_back(std::make_shared<type>(node, path))
+#define ASSETBASE_PUSH_SEGMENT(type, parentNode, path, debug) if (parentNode)\
+for (rapidxml::xml_node<>* node = parentNode->first_node(); node; node = node->next_sibling())\
+	m_Segments.push_back(std::make_shared<type>(node, path, debug))
 
 namespace AssetBase
 {
-	AssetSerial::AssetSerial(const std::filesystem::path& path)
+	AssetSerial::AssetSerial(const std::filesystem::path& path, bool debugMode)
 	{
 		std::cout << "Building from resource definition file " << path.string() << "\n";
 		std::ifstream xmlFile(path.string());
@@ -36,16 +37,13 @@ namespace AssetBase
 
 		rapidxml::xml_node<>* root = doc.first_node();
 
-		FontSegment::Init();
-
-		ASSETBASE_PUSH_SEGMENT(ShaderSegment,		root->first_node("shaders"),			path);
-		ASSETBASE_PUSH_SEGMENT(Texture2DSegment,	root->first_node("textures"),			path);
-		ASSETBASE_PUSH_SEGMENT(TextureAtlasSegment, root->first_node("texture_atlases"),	path);
-		ASSETBASE_PUSH_SEGMENT(FontSegment,			root->first_node("fonts"),				path);
-		ASSETBASE_PUSH_SEGMENT(AudioSegment,		root->first_node("audio"),				path);
-		ASSETBASE_PUSH_SEGMENT(LocaleSegment,		root->first_node("locales"),			path);
-
-		FontSegment::Shutdown();
+		ASSETBASE_PUSH_SEGMENT(ShaderSegment,		root->first_node("shaders"),			path, debugMode);
+		ASSETBASE_PUSH_SEGMENT(Texture2DSegment,	root->first_node("textures"),			path, debugMode);
+		ASSETBASE_PUSH_SEGMENT(TextureAtlasSegment, root->first_node("texture_atlases"),	path, debugMode);
+		ASSETBASE_PUSH_SEGMENT(FontSegment,			root->first_node("fonts"),				path, debugMode);
+		ASSETBASE_PUSH_SEGMENT(AudioSegment,		root->first_node("audio"),				path, debugMode);
+		ASSETBASE_PUSH_SEGMENT(LocaleSegment,		root->first_node("locales"),			path, debugMode);
+		
 
 		m_HeaderSerial.infoTableOffset = HeaderSerial::GetSize();
 		m_SegmentInfoTable = std::make_unique<SegmentInfoTable>(m_Segments);

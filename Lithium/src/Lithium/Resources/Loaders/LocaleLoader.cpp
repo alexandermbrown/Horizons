@@ -5,24 +5,22 @@
 
 namespace li
 {
-	LocaleArgs* LocaleArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	LocaleArgs::LocaleArgs(zstr::ifstream* inFile, size_t* pos)
+		: ResourceArgs(SegmentType::Locale)
 	{
 		char name[64];
 
-		size_t keysLength;
-		size_t valuesLength;
-
 		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
 
-		LI_READ_FILE(*inFile, (char*)&keysLength, sizeof(keysLength), *pos);
-		char* keysData = new char[keysLength];
-		LI_READ_FILE(*inFile, keysData, keysLength, *pos);
+		LI_READ_FILE(*inFile, (char*)&m_KeysLength, sizeof(m_KeysLength), *pos);
+		m_KeysData = new char[m_KeysLength];
+		LI_READ_FILE(*inFile, m_KeysData, m_KeysLength, *pos);
 
-		LI_READ_FILE(*inFile, (char*)&valuesLength, sizeof(valuesLength), *pos);
-		wchar_t* valuesData = new wchar_t[valuesLength];
-		LI_READ_FILE(*inFile, (char*)valuesData, valuesLength * sizeof(wchar_t), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_ValuesLength, sizeof(m_ValuesLength), *pos);
+		m_ValuesData = new wchar_t[m_ValuesLength];
+		LI_READ_FILE(*inFile, (char*)m_ValuesData, m_ValuesLength * sizeof(wchar_t), *pos);
 
-		return new LocaleArgs(name, keysLength, keysData, valuesLength, valuesData);
+		m_Name = name;
 	}
 
 	LocaleArgs::~LocaleArgs()

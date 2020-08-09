@@ -51,7 +51,7 @@ namespace AssetBase
 		uint32_t imageSize;
 		std::vector<uint8_t> imageData;
 
-		FontSegment(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath);
+		FontSegment(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~FontSegment();
 		virtual size_t GetSize() override;
 	};

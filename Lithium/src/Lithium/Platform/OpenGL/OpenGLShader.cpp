@@ -188,11 +188,6 @@ namespace li
 		GLCall( glUseProgram(m_RendererID) );
 	}
 
-	void OpenGLShader::Unbind() const
-	{
-		GLCall( glUseProgram(0) );
-	}
-
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());

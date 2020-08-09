@@ -3,7 +3,7 @@
 
 namespace AssetBase
 {
-	TextSegment::TextSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath)
+	TextSegment::TextSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::Shader)
 	{
 		name[0] = '\0';

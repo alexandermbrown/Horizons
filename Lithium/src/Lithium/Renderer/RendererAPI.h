@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Lithium/Core/Core.h"
-#include "Lithium/Renderer/VertexArray.h"
+#include "RendererEnums.h"
+#include "GraphicsContext.h"
 
 #include <glm/glm.hpp>
 
@@ -12,6 +13,7 @@ namespace li
 	public:
 		enum class API
 		{
+			None = 0,
 			OpenGL,
 			Vulkan,
 			D3D11,
@@ -20,14 +22,11 @@ namespace li
 
 		virtual ~RendererAPI() = default;
 
-		inline static void Init()
-		{
-			s_RendererAPI->InitImpl();
-		}
+		static void Create(RendererAPI::API api);
 
-		inline static void SetViewport(int x, int y, int width, int height)
+		inline static void ResizeView(int width, int height)
 		{
-			s_RendererAPI->SetViewportImpl(x, y, width, height);
+			s_RendererAPI->ResizeViewImpl(width, height);
 		}
 
 		inline static void SetClearColor(const glm::vec4& color)
@@ -40,25 +39,19 @@ namespace li
 			s_RendererAPI->ClearImpl();
 		}
 
-		inline static void DrawArrays(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+		inline static void DrawArrays(uint32_t vertexCount)
 		{
-			s_RendererAPI->DrawArraysImpl(vertexArray, count, mode);
+			s_RendererAPI->DrawArraysImpl(vertexCount);
 		}
 
-		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray)
+		inline static void DrawIndexed(uint32_t indexCount)
 		{
-			s_RendererAPI->DrawIndexedImpl(vertexArray);
+			s_RendererAPI->DrawIndexedImpl(indexCount);
 		}
 
-		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode)
+		inline static void DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount)
 		{
-			s_RendererAPI->DrawIndexedImpl(vertexArray, count, mode);
-		}
-
-		inline static void DrawIndexedInstanced(const Ref<VertexArray>& vertexArray,
-			uint32_t instanceCount, DrawMode mode = DrawMode::Triangles)
-		{
-			s_RendererAPI->DrawIndexedInstancedImpl(vertexArray, instanceCount, mode);
+			s_RendererAPI->DrawIndexedInstancedImpl(indexCount, instanceCount);
 		}
 
 		inline static void SetDepthTest(bool enabled)
@@ -66,23 +59,33 @@ namespace li
 			s_RendererAPI->SetDepthTestImpl(enabled);
 		}
 
+		inline static void SetDrawMode(DrawMode mode)
+		{
+			s_RendererAPI->SetDrawModeImpl(mode);
+		}
+
+		inline static void SetContext(GraphicsContext* context)
+		{
+			s_RendererAPI->SetContextImpl(context);
+		}
+
 		inline static API GetAPI() { return s_API; }
-		static Scope<RendererAPI> Create();
 
 	protected:
-		virtual void InitImpl() = 0;
-		virtual void SetViewportImpl(int x, int y, int width, int height) = 0;
+		virtual void ResizeViewImpl(int width, int height) = 0;
 		virtual void SetClearColorImpl(const glm::vec4& color) = 0;
 		virtual void ClearImpl() = 0;
 
 		virtual void SetDepthTestImpl(bool enabled) = 0;
 
-		virtual void DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) = 0;
+		virtual void DrawArraysImpl(uint32_t vertexCount) = 0;
 
-		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray) = 0;
-		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) = 0;
-		virtual void DrawIndexedInstancedImpl(const Ref<VertexArray>& vertexArray, 
-			uint32_t instanceCount, DrawMode mode) = 0;
+		virtual void DrawIndexedImpl(uint32_t indexCount) = 0;
+		virtual void DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount) = 0;
+
+		virtual void SetDrawModeImpl(DrawMode mode) = 0;
+
+		virtual void SetContextImpl(GraphicsContext* context) = 0;
 
 	private:
 		static API s_API;

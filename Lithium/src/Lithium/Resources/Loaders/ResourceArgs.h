@@ -7,6 +7,8 @@ namespace li
 	class ResourceArgs
 	{
 	public:
+		ResourceArgs(SegmentType type)
+			: m_Type(type) {}
 		ResourceArgs(SegmentType type, const std::string& name)
 			: m_Type(type), m_Name(name) {}
 

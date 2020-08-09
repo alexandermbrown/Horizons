@@ -9,7 +9,7 @@ namespace li
 	class OpenGLTexture2D : public Texture2D
 	{
 	public:
-		OpenGLTexture2D(uint32_t width, uint32_t height,
+		OpenGLTexture2D(int width, int height, void* data,
 			WrapType wrapS, WrapType wrapT,
 			FilterType minFilter, FilterType magFilter);
 		OpenGLTexture2D(const std::string& path,
@@ -21,11 +21,10 @@ namespace li
 
 		virtual ~OpenGLTexture2D();
 
-		virtual uint32_t GetWidth() const override { return m_Width;  }
-		virtual uint32_t GetHeight() const override { return m_Height; }
+		virtual int GetWidth() const override { return m_Width;  }
+		virtual int GetHeight() const override { return m_Height; }
 		
-		virtual void SetData(void* data, uint32_t size) override;
-		virtual void Resize(uint32_t width, uint32_t height) override;
+		virtual void Resize(int width, int height) override;
 		virtual void AttachToFramebuffer(
 			FramebufferAttachment attachment,
 			FramebufferTarget target = FramebufferTarget::Framebuffer
@@ -33,8 +32,8 @@ namespace li
 
 		virtual void Bind(uint32_t slot = 0) const override;
 	private:
-		std::string m_Path;
-		uint32_t m_Width, m_Height;
+		int m_Width;
+		int m_Height;
 		uint32_t m_RendererID;
 		GLenum m_InternalFormat, m_DataFormat;
 	};

@@ -5,12 +5,12 @@
 
 namespace li
 {
-	TextureAtlasArgs* TextureAtlasArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	TextureAtlasArgs::TextureAtlasArgs(zstr::ifstream* inFile, size_t* pos)
+		: ResourceArgs(SegmentType::TextureAtlas), m_Entries()
 	{
 		char name[64];
 		char texture[64];
 		uint32_t numEntries;
-		std::unordered_map<std::string, glm::vec4> entries;
 
 		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
 		LI_READ_FILE(*inFile, (char*)&texture, sizeof(texture), *pos);
@@ -23,9 +23,10 @@ namespace li
 			LI_READ_FILE(*inFile, alias, sizeof(alias), *pos);
 			LI_READ_FILE(*inFile, (char*)&bounds, sizeof(bounds), *pos);
 
-			entries[alias] = bounds;
+			m_Entries[alias] = bounds;
 		}
 
-		return new TextureAtlasArgs(name, texture, std::move(entries));
+		m_Name = name;
+		m_Texture = texture;
 	}
 }

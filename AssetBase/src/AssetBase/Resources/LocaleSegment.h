@@ -19,7 +19,7 @@ namespace AssetBase
 		size_t valuesLength;
 		wchar_t* values = nullptr;
 
-		LocaleSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath);
+		LocaleSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, bool debugMode);
 		virtual ~LocaleSegment();
 
 		virtual size_t GetSize() override;

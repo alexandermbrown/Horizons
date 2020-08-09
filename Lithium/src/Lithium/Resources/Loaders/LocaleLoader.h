@@ -11,11 +11,7 @@ namespace li
 	class LocaleArgs : public ResourceArgs
 	{
 	public:
-		static LocaleArgs* Deserialize(zstr::ifstream* inFile, size_t* pos);
-
-		LocaleArgs(const std::string& name, size_t keysLength, char* keysData, size_t valuesLength, wchar_t* valuesData)
-			: ResourceArgs(SegmentType::Locale, name), m_KeysLength(keysLength), m_KeysData(keysData),
-			m_ValuesLength(valuesLength), m_ValuesData(valuesData) {}
+		LocaleArgs(zstr::ifstream* inFile, size_t* pos);
 
 		virtual ~LocaleArgs();
 

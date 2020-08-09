@@ -5,22 +5,22 @@
 
 namespace li
 {
-	AudioArgs* AudioArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	AudioArgs::AudioArgs(zstr::ifstream* inFile, size_t* pos)
+		: ResourceArgs(SegmentType::Audio)
 	{
 		char name[64];
-		size_t fileSize;
 
 		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
-		LI_READ_FILE(*inFile, (char*)&fileSize, sizeof(fileSize), *pos);
+		LI_READ_FILE(*inFile, (char*)&m_Size, sizeof(m_Size), *pos);
 
-		uint8_t* fileData = new uint8_t[fileSize];
-		LI_READ_FILE(*inFile, (char*)fileData, fileSize, *pos);
+		m_GlslData = new uint8_t[m_Size];
+		LI_READ_FILE(*inFile, (char*)m_GlslData, m_Size, *pos);
 
-		return new AudioArgs(name, fileData, (uint32_t)fileSize);
+		m_Name = name;
 	}
 
 	AudioArgs::~AudioArgs()
 	{
-		delete[] m_Data;
+		delete[] m_GlslData;
 	}
 }

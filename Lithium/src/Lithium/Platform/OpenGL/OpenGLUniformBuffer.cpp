@@ -11,7 +11,7 @@ namespace li
 		: m_Name(name), m_Slot(bindingSlot), m_Elements()
 	{
 		m_DataSize = layout.GetByteSize();
-		m_Data = new uint8_t[m_DataSize];
+		m_GlslData = new uint8_t[m_DataSize];
 
 		for (const UniformBufferElement& element : layout)
 		{
@@ -27,7 +27,7 @@ namespace li
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
 		GLCall( glDeleteBuffers(1, &m_RendererID) );
-		delete[] m_Data;
+		delete[] m_GlslData;
 	}
 
 	void OpenGLUniformBuffer::SetInt(const std::string& name, int value)
@@ -38,7 +38,7 @@ namespace li
 #ifdef LI_ENABLE_ASSERTS
 		m_Changed = true;
 #endif
-		LI_CORE_RUN_ASSERT(!memcpy_s(m_Data + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
+		LI_CORE_RUN_ASSERT(!memcpy_s(m_GlslData + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
 	}
 
 	void OpenGLUniformBuffer::SetFloat(const std::string& name, float value)
@@ -49,7 +49,7 @@ namespace li
 #ifdef LI_ENABLE_ASSERTS
 		m_Changed = true;
 #endif
-		LI_CORE_RUN_ASSERT(!memcpy_s(m_Data + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
+		LI_CORE_RUN_ASSERT(!memcpy_s(m_GlslData + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
 	}
 
 	void OpenGLUniformBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
@@ -60,7 +60,7 @@ namespace li
 #ifdef LI_ENABLE_ASSERTS
 		m_Changed = true;
 #endif
-		LI_CORE_RUN_ASSERT(!memcpy_s(m_Data + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
+		LI_CORE_RUN_ASSERT(!memcpy_s(m_GlslData + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
 	}
 
 	void OpenGLUniformBuffer::SetFloat4(const std::string& name, const glm::vec4& value)
@@ -71,7 +71,7 @@ namespace li
 #ifdef LI_ENABLE_ASSERTS
 		m_Changed = true;
 #endif
-		LI_CORE_RUN_ASSERT(!memcpy_s(m_Data + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
+		LI_CORE_RUN_ASSERT(!memcpy_s(m_GlslData + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
 	}
 
 	void OpenGLUniformBuffer::SetMat4(const std::string& name, const glm::mat4& value)
@@ -83,7 +83,7 @@ namespace li
 		m_Changed = true;
 #endif
 		
-		LI_CORE_RUN_ASSERT(!memcpy_s(m_Data + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
+		LI_CORE_RUN_ASSERT(!memcpy_s(m_GlslData + element.Offset, m_DataSize, &value, sizeof(value)), "Failed to copy memory!");
 	}
 
 	void OpenGLUniformBuffer::UploadData()
@@ -92,11 +92,17 @@ namespace li
 
 		// TODO: Orphan buffer or use multiple buffers.
 		GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID));
-		GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, (GLsizeiptr)m_DataSize, m_Data));
+		GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, (GLsizeiptr)m_DataSize, m_GlslData));
 	}
 
 	void OpenGLUniformBuffer::BindToSlot() const
 	{
 		glBindBufferBase(GL_UNIFORM_BUFFER, m_Slot, m_RendererID);
+	}
+
+	ShaderType OpenGLUniformBuffer::GetShaderType() const
+	{
+		LI_CORE_WARN("OpenGL uniform buffers do not have a shader type.");
+		return ShaderType::None;
 	}
 }

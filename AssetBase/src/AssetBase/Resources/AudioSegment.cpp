@@ -3,7 +3,7 @@
 
 namespace AssetBase
 {
-	AudioSegment::AudioSegment(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath)
+	AudioSegment::AudioSegment(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::Audio)
 	{
 		name[0] = '\0';
@@ -35,7 +35,7 @@ namespace AssetBase
 		}
 
 		audioFile.ignore(std::numeric_limits<std::streamsize>::max());
-		fileSize = audioFile.gcount();
+		fileSize = (uint32_t)audioFile.gcount();
 		audioFile.clear();
 		audioFile.seekg(0, std::ios_base::beg);
 

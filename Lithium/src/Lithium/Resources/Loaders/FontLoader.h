@@ -10,10 +10,7 @@ namespace li
 	class FontArgs : public ResourceArgs
 	{
 	public:
-		static FontArgs* Deserialize(zstr::ifstream* inFile, size_t* pos);
-
-		FontArgs(const std::string& name, uint32_t imageSize, uint8_t* imageData, FontProperties props, std::vector<Glyph>&& glyphs)
-			: ResourceArgs(SegmentType::Font, name), m_ImageSize(imageSize), m_ImageData(imageData), m_Props(props), m_Glyphs(glyphs) {}
+		FontArgs(zstr::ifstream* inFile, size_t* pos);
 
 		virtual ~FontArgs();
 

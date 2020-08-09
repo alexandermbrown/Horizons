@@ -36,7 +36,7 @@ namespace li
 
 		s_Data->RenderInfo[s_Data->Root] = nullptr;
 
-		Ref<Window>& window = Application::Get()->GetWindow();
+		Window* window = Application::Get()->GetWindow();
 		lay_set_size_xy(&s_Data->Context, s_Data->Root, (lay_scalar)window->GetWidth(), (lay_scalar)window->GetHeight());
 	}
 

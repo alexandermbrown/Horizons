@@ -8,7 +8,7 @@
 
 namespace AssetBase
 {
-	LocaleSegment::LocaleSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath)
+	LocaleSegment::LocaleSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, bool debugMode)
 		: Segment(SegmentType::Locale), keysLength(0ULL), valuesLength(0ULL)
 	{
 		name[0] = '\0';

@@ -8,15 +8,13 @@ namespace li
 	class OpenGLWindow : public Window
 	{
 	public:
-		OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown, bool borderless);
+		OpenGLWindow(const WindowProps& props);
 		virtual ~OpenGLWindow();
-
-		virtual void Shutdown() override;
 
 		virtual void SwapBuffers() override;
 		virtual inline int GetWidth() const override { return m_Width; }
 		virtual inline int GetHeight() const override { return m_Height; }
-		virtual inline Ref<GraphicsContext> GetContext() const override { return m_Context; }
+		virtual inline GraphicsContext* GetContext() const override { return m_Context; }
 		virtual inline SDL_Window* GetWindow() const override { return m_Window; }
 
 		virtual void SetVSync(bool enabled) override;
@@ -32,11 +30,11 @@ namespace li
 
 		virtual void SetIcon(const std::string& path) override;
 
-		virtual void OnWindowEvent(SDL_Event* event) override;
+		virtual void OnWindowResize(int width, int height) override;
 
 	private:
 		SDL_Window* m_Window;
-		Ref<OpenGLContext> m_Context;
+		OpenGLContext* m_Context;
 
 		SDL_Surface* m_Icon;
 		unsigned char* m_IconData;

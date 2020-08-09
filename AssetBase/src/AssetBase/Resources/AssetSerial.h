@@ -10,7 +10,7 @@ namespace AssetBase
 	class AssetSerial
 	{
 	public:
-		AssetSerial(const std::filesystem::path& path);
+		AssetSerial(const std::filesystem::path& path, bool debugMode);
 		virtual ~AssetSerial() = default;
 
 		inline const HeaderSerial& GetHeaderSerial() const { return m_HeaderSerial; }
