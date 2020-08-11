@@ -4,12 +4,14 @@
 
 #include "Manager.h"
 #include "Matchmaker/Matchmaker.h"
+#include "SteamWeb/SteamWeb.h"
 
 int main()
 {
     Matchmaker matchmaker = Matchmaker();
 
     httplib::Server svr;
+    SteamWeb steam = SteamWeb("REDACTED", "1389330");
 
     svr.Post("/authenticate", [&](const httplib::Request& req, httplib::Response& res) {
         auto size = req.files.size();
@@ -27,6 +29,8 @@ int main()
         const std::string& username = req.get_file_value("username").content;
         const std::string& password = req.get_file_value("password").content;
         const std::string& location = req.get_file_value("location").content;
+
+        const bool verified = steam.AuthenticateTicket(username);
 
         Player* player = new Player(username);
         Server* server = matchmaker.Match(player, location);
