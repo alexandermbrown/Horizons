@@ -129,7 +129,7 @@ namespace li
 		D3D11Call(m_DeviceHandle->CreateSamplerState(&samplerDesc, &m_SamplerState));
 	}
 
-	D3D11Texture2D::D3D11Texture2D(size_t imageSize, uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
+	D3D11Texture2D::D3D11Texture2D(size_t imageSize, const uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);

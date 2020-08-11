@@ -1,38 +1,17 @@
 #pragma once
 
-#include "Segment.h"
-
-#include <stdint.h>
-#include <filesystem>
 #include "rapidxml/rapidxml.hpp"
-#include "glm/glm.hpp"
+
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
+
+#include <filesystem>
 
 namespace AssetBase
 {
-	struct AtlasEntry
-	{
-		char alias[64];
-		glm::vec4 bounds;
-
-		static size_t GetSize() {
-			return sizeof(alias) + sizeof(bounds);
-		}
-	};
-
-	class TextureAtlasSegment : public Segment
+	class TextureAtlasSegment
 	{
 	public:
-
-		TextureAtlasSegment(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, bool debugMode);
-		virtual ~TextureAtlasSegment() = default;
-
-		virtual size_t GetSize() override;
-
-	public:
-		char name[64];
-		char texture[64];
-		std::vector<AtlasEntry> entries;
+		static flatbuffers::Offset<Assets::TextureAtlas> Serialize(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
 	};
-
-	std::ostream& operator<<(std::ostream& os, const TextureAtlasSegment& ta);
 }

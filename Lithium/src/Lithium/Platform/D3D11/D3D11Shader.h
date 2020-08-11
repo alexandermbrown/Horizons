@@ -15,7 +15,7 @@ namespace li
 		D3D11Shader(const std::string& name, const std::filesystem::path& filepath);
 #endif
 
-		D3D11Shader(const std::string& name, void* vs_bytecode, uint32_t vs_size, void* ps_bytecode, uint32_t ps_size);
+		D3D11Shader(const std::string& name, const void* vs_bytecode, uint32_t vs_size, const void* ps_bytecode, uint32_t ps_size);
 		virtual ~D3D11Shader();
 
 		virtual void Bind() const override;

@@ -1,12 +1,10 @@
 #include "pch.h"
 #include "FontSegment.h"
 
-#include <fstream>
-#include <sstream>
-
 #include "Helpers.h"
-#include "glm/gtc/type_ptr.hpp"
-#include "zstr/zstr.hpp"
+
+#include "msdfgen/msdfgen.h"
+#include "msdfgen/msdfgen-ext.h"
 
 namespace AssetBase
 {
@@ -22,124 +20,105 @@ namespace AssetBase
 		msdfgen::deinitializeFreetype(ft);
 	}
 
-	FontSegment::FontSegment(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath, bool debugMode)
-		: Segment(SegmentType::Font)
+	flatbuffers::Offset<Assets::Font> FontSegment::Serialize(rapidxml::xml_node<>* fontNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
 	{
-		name[0] = '\0';
-		for (rapidxml::xml_attribute<>* attr = fontNode->first_attribute(); attr; attr = attr->next_attribute())
+		flatbuffers::Offset<flatbuffers::String> name_offset = NULL;
+		char* name = nullptr;
+		if (auto* name_attr = fontNode->first_attribute("name"))
 		{
-			if (!strcmp(attr->name(), "name")) {
-				strcpy_s(name, attr->value());
-				break;
-			}
+			name = name_attr->value();
+			name_offset = builder.CreateString(name);
+			std::cout << "Loading font '" << name << "' ... ";
 		}
-		if (strlen(name) == 0)
-			throw "Attribute 'name' not found in font.";
+		else throw "Attribute 'name' not found in font.";
 
-		std::string fontPath;
-		for (rapidxml::xml_node<>* node = fontNode->first_node(); node; node = node->next_sibling())
-		{
-			const char* name = node->name();
-			const char* value = node->value();
-			if (!strcmp(name, "source"))
-				fontPath = value;
+		char* fontPath = nullptr;
+		if (auto* node = fontNode->first_node("source"))
+			fontPath = node->value();
+		else throw "Node <source> not found in font.";
 
-			else if (!strcmp(name, "glyph_width"))
-				glyphWidth = Helpers::StringToInt(value, "glyph_width");
+		int16_t glyphWidth;
+		if (auto* node = fontNode->first_node("glyph_width"))
+			glyphWidth = Helpers::StringToInt(node->value(), "glyph_width");
+		else throw "Node <glyph_width> not found in font.";
 
-			else if (!strcmp(name, "texture_width"))
-				textureWidth = Helpers::StringToInt(value, "texture_width");
-			
-		}
-		if (fontPath.empty())
-			throw "Missing <source> in font.\n";
+		int16_t textureWidth;
+		if (auto* node = fontNode->first_node("texture_width"))
+			textureWidth = Helpers::StringToInt(node->value(), "texture_width");
+		else throw "Node <texture_width> not found in font.";
 
-		if (glyphWidth == 0)
-			throw "Missing <glyph_width> in font.\n";
-
-		if (textureWidth == 0)
-			throw "Missing <texture_width> in font.\n";
+		float emSize, ascenderY, descenderY;
+		float lineHeight, underlineY, underlineThickness;
+		
+		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> image = NULL;
+		
+		flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>>> glyphs_offset = NULL;
 
 		bool useCache = false;
 		std::filesystem::path cachePath = "./.lab-cache/fonts/" + std::string(name) + ".cache";
 		if (std::filesystem::exists(cachePath))
 		{
-			zstr::ifstream cacheFile(cachePath.string(), std::ios::in | std::ios::binary);
+			std::ifstream cacheFile(cachePath.string(), std::ios::in | std::ios::binary);
 
-			uint32_t cache_type;
-			char cache_name[64];
-			uint16_t cache_glyphWidth = 0;
-			uint16_t cache_textureWidth = 0;
+			cacheFile.seekg(0, std::ios::end);
+			int filesize = (int)cacheFile.tellg();
+			cacheFile.seekg(0, std::ios::beg);
+			uint8_t* buffer = new uint8_t[filesize];
+			cacheFile.read((char*)buffer, filesize);
+			cacheFile.close();
 
-			cacheFile.read((char*)&cache_type				, sizeof(cache_type));
-			cacheFile.read((char*)&cache_name				, sizeof(cache_name));
-			cacheFile.read((char*)&cache_glyphWidth			, sizeof(cache_glyphWidth));
-			cacheFile.read((char*)&cache_textureWidth		, sizeof(cache_textureWidth));
+			const Assets::Font* font = flatbuffers::GetRoot<Assets::Font>(buffer);
 
-			if ((uint32_t)type == cache_type &&
-				!strcmp(cache_name, name) &&
-				glyphWidth == cache_glyphWidth &&
-				textureWidth == cache_textureWidth
-				)
+			if (font->Verify(flatbuffers::Verifier(buffer, filesize)))
 			{
-				useCache = true;
-
-				cacheFile.read((char*)&emSize, sizeof(emSize));
-				cacheFile.read((char*)&ascenderY, sizeof(ascenderY));
-				cacheFile.read((char*)&descenderY, sizeof(descenderY));
-				cacheFile.read((char*)&lineHeight, sizeof(lineHeight));
-				cacheFile.read((char*)&underlineY, sizeof(underlineY));
-				cacheFile.read((char*)&underlineThickness, sizeof(underlineThickness));
-
-				cacheFile.read((char*)&numGlyphs, sizeof(numGlyphs));
-
-				std::cout << "Loading font " << name << " with " << numGlyphs << " glyphs ... ";
-				glyphs = new GlyphEntry[numGlyphs];
-
-				for (uint32_t i = 0; i < numGlyphs; i++)
+				if (strcmp(name, font->name()->c_str()) != 0
+					|| glyphWidth != font->glyph_width()
+					|| textureWidth != font->texture_width())
 				{
-					cacheFile.read((char*)&glyphs[i].character, sizeof(glyphs[i].character));
-					cacheFile.read((char*)&glyphs[i].textureOffset, sizeof(glyphs[i].textureOffset));
-
-					cacheFile.read((char*)&glyphs[i].width, sizeof(glyphs[i].width));
-					cacheFile.read((char*)&glyphs[i].height, sizeof(glyphs[i].height));
-
-					cacheFile.read((char*)&glyphs[i].horizontalAdvance, sizeof(glyphs[i].horizontalAdvance));
-					cacheFile.read((char*)&glyphs[i].bearingX, sizeof(glyphs[i].bearingX));
-					cacheFile.read((char*)&glyphs[i].bearingY, sizeof(glyphs[i].bearingY));
+					std::cout << "\nInvalid font cache file! Rebuilding font... ";
 				}
-
-				cacheFile.read((char*)&imageSize, sizeof(imageSize));
-				unsigned char* rawImageData = new unsigned char[imageSize];
-				cacheFile.read((char*)rawImageData, imageSize);
-
-				for (uint32_t i = 0; i < imageSize; i++)
+				else
 				{
-					imageData.push_back(rawImageData[i]);
-				}
-				delete[] rawImageData;
+					std::vector<flatbuffers::Offset<Assets::GlyphEntry>> glyphs;
+					useCache = true;
+					emSize = font->em_size();
+					ascenderY = font->ascender_y();
+					descenderY = font->descender_y();
+					lineHeight = font->line_height();
+					underlineY = font->underline_y();
+					underlineThickness = font->underline_thickness();
 
-				std::cout << "done.\n";
+					auto imageVector = font->image();
+					image = builder.CreateVector(imageVector->data(), imageVector->size());
+
+					const auto* glyphsVector = font->glyphs();
+					for (auto cachedGlyph : *glyphsVector)
+					{
+						glyphs.push_back(Assets::CreateGlyphEntry(builder, cachedGlyph->character(), cachedGlyph->texture_offset(), cachedGlyph->width(), 
+							cachedGlyph->height(), cachedGlyph->horizontal_advance(), cachedGlyph->bearing_x(), cachedGlyph->bearing_y()));
+					}
+					glyphs_offset = builder.CreateVector(glyphs);
+				}
 			}
+			else std::cout << "\nInvalid font cache file! Rebuilding font... ";
+
+			delete[] buffer;
 		}
 
 		if (!useCache)
 		{
-			msdfgen::FontHandle* font = msdfgen::loadFont(ft, fontPath.c_str());
+			msdfgen::FontHandle* font = msdfgen::loadFont(ft, fontPath);
 			if (font)
 			{
-				numGlyphs = msdfgen::getGlyphCount(font);
-				uint32_t maxGliphs = (textureWidth * textureWidth) / (glyphWidth * glyphWidth);
+				long numGlyphs = msdfgen::getGlyphCount(font);
+				long maxGliphs = (textureWidth * textureWidth) / (glyphWidth * glyphWidth);
 
 				if (numGlyphs > maxGliphs)
 					throw std::stringstream("The number of glyphs in font ") << numGlyphs << " is greater than the maximum of " << numGlyphs << ".\n";
 
-
-				glyphs = new GlyphEntry[numGlyphs];
-
 				unsigned long charcode;
 				uint32_t gindex;
-				uint32_t count = 0;
+				long count = 0;
 				std::cout << "Loading font " << name << " with " << numGlyphs << " glyphs.\n";
 				std::cout << "[" << count << " / " << numGlyphs << "]\r";
 
@@ -154,6 +133,10 @@ namespace AssetBase
 				underlineY = (float)metrics.underlineY;
 				underlineThickness = (float)metrics.underlineThickness;
 
+				flatbuffers::FlatBufferBuilder cacheBuidler(1024);
+				auto cache_name = cacheBuidler.CreateString(name);
+				std::vector<flatbuffers::Offset<Assets::GlyphEntry>> glyphs, cache_glyphs;
+
 				charcode = msdfgen::getFirstChar(font, &gindex);
 				while (gindex != 0 && count < maxGliphs)
 				{
@@ -167,8 +150,8 @@ namespace AssetBase
 						msdfgen::generateMSDF(msdf, shape, 12.0, msdfgen::Vector2(glyphWidth * 0.75 / emSize), msdfgen::Vector2(4.0, 10.0));
 
 						// Combine images.
-						for (uint32_t y = 0; y < glyphWidth; y++) {
-							for (uint32_t x = 0; x < glyphWidth; x++) {
+						for (int y = 0; y < glyphWidth; y++) {
+							for (int x = 0; x < glyphWidth; x++) {
 								for (uint32_t channel = 0; channel < 3; channel++) {
 									*(atlas((glyphWidth * count) % textureWidth + x, (int)std::floor((float)(glyphWidth * count) / (float)textureWidth) * glyphWidth + y) + channel * sizeof(float))
 										= *(msdf(x, y) + channel * sizeof(float));
@@ -178,87 +161,51 @@ namespace AssetBase
 
 						msdfgen::GlyphMetrics metrics;
 						msdfgen::getGlyphMetrics(metrics, font);
-						glyphs[count].character = (wchar_t)charcode;
-						glyphs[count].textureOffset = glm::vec2(((glyphWidth * count) % textureWidth) / float(textureWidth),
+						Assets::Vec2 textureOffset = Assets::Vec2(((glyphWidth * count) % textureWidth) / float(textureWidth),
 							(std::floor((float)(glyphWidth * count) / (float)textureWidth) * glyphWidth) / (float)textureWidth);
 
-						glyphs[count].width = (float)metrics.width;
-						glyphs[count].height = (float)metrics.height;
+						glyphs.push_back(Assets::CreateGlyphEntry(builder, (int16_t)charcode, &textureOffset, (float)metrics.width, 
+							(float)metrics.height, (float)metrics.horiAdvance, (float)metrics.horiBearingX, (float)metrics.horiBearingY));
 
-						glyphs[count].horizontalAdvance = (float)metrics.horiAdvance;
-						glyphs[count].bearingX = (float)metrics.horiBearingX;
-						glyphs[count].bearingY = (float)metrics.horiBearingY;
+						cache_glyphs.push_back(Assets::CreateGlyphEntry(cacheBuidler, (int16_t)charcode, &textureOffset, (float)metrics.width,
+							(float)metrics.height, (float)metrics.horiAdvance, (float)metrics.horiBearingX, (float)metrics.horiBearingY));
 
-						std::cout << "[" << count << " / " << numGlyphs << "]\r";
+						if (count % 10 == 0)
+							std::cout << "[" << count << " / " << numGlyphs << "]\r";
 					}
 					else throw std::stringstream("Failed to load character ") << charcode << " in font " << name << ".\n";
 
 					count++;
 					charcode = msdfgen::getNextChar(font, charcode, &gindex);
 				}
-				std::cout << "[ done! ]         \n";
-				
-				msdfgen::savePng(atlas, "jeff.png");
+
+				std::vector<uint8_t> imageData;
 				msdfgen::savePng(atlas, imageData);
-				imageSize = (uint32_t)(sizeof(uint8_t) * imageData.size());
-
 				msdfgen::destroyFont(font);
+				glyphs_offset = builder.CreateVector(glyphs);
+				image = builder.CreateVector(imageData);
 
-				// Write cache file.
-				zstr::ofstream cacheFile(cachePath.string(), std::ios::out | std::ios::trunc | std::ios::binary);
-				cacheFile << *this;
+				auto cache_glyphs_offset = cacheBuidler.CreateVector(cache_glyphs);
+				auto cache_image_offset = cacheBuidler.CreateVector(imageData);
+				
+				auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyphWidth, textureWidth, emSize,
+					ascenderY, descenderY, lineHeight, underlineY, underlineThickness, cache_glyphs_offset, cache_image_offset);
+				cacheBuidler.Finish(cache_font, "FONT");
+
+				std::ofstream cacheFile(cachePath.string(), std::ios::out | std::ios::trunc | std::ios::binary);
+				if (!cacheFile.is_open() || !cacheFile.good()) {
+					throw "Failed to write cache file!";
+				}
+
+				cacheFile.write((const char*)cacheBuidler.GetBufferPointer(), cacheBuidler.GetSize());
+				cacheFile.close();
+
 			}
 			else throw std::stringstream("Failed to load font '") << name << "'\n";
 		}
-	}
+		std::cout << "[ done! ]         \n";
 
-	FontSegment::~FontSegment()
-	{
-		delete[] glyphs;
-	}
-
-	size_t FontSegment::GetSize()
-	{
-		return sizeof(type) + sizeof(name) + sizeof(uint16_t) * 2 + sizeof(float) * 6 + 
-			sizeof(numGlyphs) + numGlyphs * GlyphEntry::GetSize() + sizeof(imageSize) + imageSize;
-	}
-
-	std::ostream& operator<<(std::ostream& os, const FontSegment& f)
-	{
-		os.write((const char*)&f.type, sizeof(f.type));
-		os.write(f.name, sizeof(f.name));
-
-		os.write((const char*)&f.glyphWidth, sizeof(f.glyphWidth));
-		os.write((const char*)&f.textureWidth, sizeof(f.textureWidth));
-
-		os.write((const char*)&f.emSize, sizeof(f.emSize));
-		os.write((const char*)&f.ascenderY, sizeof(f.ascenderY));
-		os.write((const char*)&f.descenderY, sizeof(f.descenderY));
-
-		os.write((const char*)&f.lineHeight, sizeof(f.lineHeight));
-		os.write((const char*)&f.underlineY, sizeof(f.underlineY));
-		os.write((const char*)&f.underlineThickness, sizeof(f.underlineThickness));
-
-		os.write((const char*)&f.numGlyphs, sizeof(f.numGlyphs));
-		for (uint32_t i = 0; i < f.numGlyphs; i++)
-		{
-			os.write((const char*)&f.glyphs[i].character					, sizeof(wchar_t));
-			os.write((const char*)glm::value_ptr(f.glyphs[i].textureOffset)	, sizeof(glm::vec2));
-
-			os.write((const char*)&f.glyphs[i].width						, sizeof(float));
-			os.write((const char*)&f.glyphs[i].height						, sizeof(float));
-
-			os.write((const char*)&f.glyphs[i].horizontalAdvance			, sizeof(float));
-			os.write((const char*)&f.glyphs[i].bearingX						, sizeof(float));
-			os.write((const char*)&f.glyphs[i].bearingY						, sizeof(float));
-		}
-
-		os.write((const char*)&f.imageSize, sizeof(f.imageSize));
-		for (int i = 0; i < f.imageData.size(); i++)
-		{
-			os.write((const char*)&f.imageData.at(i), sizeof(uint8_t));
-		}
-
-		return os;
+		return Assets::CreateFont(builder, name_offset, glyphWidth, textureWidth, emSize,
+			ascenderY, descenderY, lineHeight, underlineY, underlineThickness, glyphs_offset, image);
 	}
 }

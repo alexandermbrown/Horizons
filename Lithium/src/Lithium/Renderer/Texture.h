@@ -35,7 +35,7 @@ namespace li
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
 
-		static Ref<Texture2D> Create(size_t imageSize, uint8_t* rawData,
+		static Ref<Texture2D> Create(size_t imageSize, const uint8_t* rawData,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
 	};

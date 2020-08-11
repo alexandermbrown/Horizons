@@ -5,11 +5,10 @@
 #include "Resources/FontSegment.h"
 
 #include <stdlib.h>
-#include "zstr/zstr.hpp"
 
 int main(int argc, char* argv[])
 {
-	std::cout << "AssetBase v0.1.0\n" << std::string(32, '-') << '\n';
+	std::cout << "AssetBase v0.2.0\n";
 
 	std::ifstream resfiles("./resfiles.txt");
 	if (!resfiles.is_open())
@@ -23,7 +22,6 @@ int main(int argc, char* argv[])
 	std::string xml_path, lab_path;
 	while (resfiles >> xml_path >> lab_path)
 	{
-		std::cout << "LOADING ASSET BASE " << xml_path << " --> " << lab_path << '\n';
 		try {
 			LoadAssetBase(xml_path, lab_path + "-debug", true);
 			LoadAssetBase(xml_path, lab_path, false);
@@ -41,14 +39,12 @@ int main(int argc, char* argv[])
 
 void LoadAssetBase(const std::string& xml_path, const std::string& lab_path, bool debugMode)
 {
+	std::cout << std::string(32, '-') << "\nLoading " << xml_path << (debugMode ? " in debug mode" : " in release mode") << "...\n";
 	AssetBase::AssetSerial serial(xml_path, debugMode);
 
-	zstr::ofstream outFile(std::string(lab_path), std::ios::out | std::ios::trunc | std::ios::binary);
+	std::ofstream outFile(std::string(lab_path), std::ios::out | std::ios::trunc | std::ios::binary);
 
-	std::cout << std::string(32, '-') << "\nCompressing " << serial.GetHeaderSerial().fileSize << " bytes to file " << lab_path << "  ...\n";
+	std::cout << "\nWriting " << serial.GetBufferSize() << " bytes to file " << lab_path << "...\n";
 	outFile << serial;
-	if (outFile.good())
-		std::cout << "Finished!" << std::endl;
-	else
-		std::cout << "Something may have gone wrong..." << std::endl;
+	outFile.close();
 }

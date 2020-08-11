@@ -24,9 +24,9 @@ void SplashScreenScene::TransitionIn()
 	app->PushLayer(m_SplashScreenLayer);
 
 #ifdef LI_DEBUG
-	li::ResourceManager::LoadAsync("data/resources.lab-debug");
+	li::ResourceManager::BeginStaggeredLoad("data/resources.lab-debug");
 #else
-	li::ResourceManager::LoadAsync("data/resources.lab");
+	li::ResourceManager::BeginStaggeredLoad("data/resources.lab");
 #endif
 }
 
@@ -52,7 +52,7 @@ void SplashScreenScene::OnUpdate(float dt)
 {
 	li::RendererAPI::Clear();
 
-	if (!li::ResourceManager::DequeueAsset() && li::ResourceManager::IsLoaded())
+	if (!li::ResourceManager::UpdateStaggeredLoad())
 	{
 		li::ResourceManager::PrintInfo();
 

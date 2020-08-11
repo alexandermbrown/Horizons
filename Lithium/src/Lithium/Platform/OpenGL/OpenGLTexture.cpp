@@ -71,7 +71,7 @@ namespace li
 		stbi_image_free(data);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(size_t imageSize, uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
+	OpenGLTexture2D::OpenGLTexture2D(size_t imageSize, const uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);

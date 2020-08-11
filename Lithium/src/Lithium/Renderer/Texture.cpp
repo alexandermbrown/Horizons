@@ -54,7 +54,7 @@ namespace li
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(size_t imageSize, uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
+	Ref<Texture2D> Texture2D::Create(size_t imageSize, const uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
 	{
 		switch (Renderer::GetAPI())
 		{

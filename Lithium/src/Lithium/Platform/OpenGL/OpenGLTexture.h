@@ -15,7 +15,7 @@ namespace li
 		OpenGLTexture2D(const std::string& path,
 			WrapType wrapS, WrapType wrapT,
 			FilterType minFilter, FilterType magFilter);
-		OpenGLTexture2D(size_t imageSize, uint8_t* rawData,
+		OpenGLTexture2D(size_t imageSize, const uint8_t* rawData,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Linear);
 

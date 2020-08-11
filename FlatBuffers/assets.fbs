@@ -1,0 +1,99 @@
+include "math.fbs";
+
+namespace Assets;
+
+enum FilterType:byte {
+	Error = 0,
+	Nearest,
+	Linear,
+	NearestMipmapNearest,
+	LinearMipmapNearest,
+	NearestMipmapLinear
+}
+
+enum WrapType:byte {
+	Error = 0,
+	Repeat,
+	MirroredRepeat,
+	ClampToEdge,
+	ClampToBorder
+}
+
+table AssetBundle {
+	textures:[Texture2D];
+	shaders:[Shader];
+	atlases:[TextureAtlas];
+	fonts:[Font];
+	audio:[Audio];
+	locales:[Locale];
+}
+
+table Texture2D {
+	name:string;
+	min_filter:FilterType;
+	mag_filter:FilterType;
+	wrap_s:WrapType;
+	wrap_t:WrapType;
+	data:[ubyte];
+}
+
+table Shader {
+	name:string;
+	glsl:string;
+	hlsl_vs:[ubyte];
+	hlsl_ps:[ubyte];
+}
+
+table AtlasEntry {
+	alias:string;
+	bounds:Vec4;
+}
+
+table TextureAtlas {
+	name:string;
+	texture:string;
+	entries:[AtlasEntry];
+}
+
+table GlyphEntry {
+	character:short;
+	texture_offset:Vec2;
+	width:float;
+	height:float;
+	horizontal_advance:float;
+	bearing_x:float;
+	bearing_y:float;
+}
+
+table Font {
+	name:string;
+	glyph_width:short;
+	texture_width:short;
+	em_size:float;
+	ascender_y:float;
+	descender_y:float;
+	line_height:float;
+	underline_y:float;
+	underline_thickness:float;
+	glyphs:[GlyphEntry];
+	image:[ubyte];
+}
+
+table Audio {
+	name:string;
+	data:[ubyte];
+}
+
+table LocaleEntry {
+	key:string;
+	value:[short];
+}
+
+table Locale {
+	name:string;
+	entries:[LocaleEntry];
+}
+
+file_identifier "LAB+";
+file_extension "lab";
+root_type AssetBundle;

@@ -1,27 +1,15 @@
 #pragma once
 
 #include "Lithium/Renderer/TextureAtlas.h"
-#include "zstr/zstr.hpp"
 
-#include "ResourceArgs.h"
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace li
 {
-	class TextureAtlasArgs : public ResourceArgs
+	class TextureAtlasLoader
 	{
 	public:
-		TextureAtlasArgs(zstr::ifstream* inFile, size_t* pos);
-
-		virtual ~TextureAtlasArgs() = default;
-
-		inline Ref<TextureAtlas> Create()
-		{
-			return CreateRef<TextureAtlas>(m_Texture, m_Entries);
-		};
-
-	private:
-
-		std::string m_Texture;
-		std::unordered_map<std::string, glm::vec4> m_Entries;
+		static Ref<TextureAtlas> Load(const Assets::TextureAtlas* atlas);
 	};
 }

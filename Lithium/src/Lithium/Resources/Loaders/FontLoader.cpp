@@ -1,54 +1,40 @@
 #include "lipch.h"
 #include "FontLoader.h"
 
-#define LI_READ_FILE(file, ptr, size, pos) (file).read(ptr, size); pos += (file).gcount()
-
 namespace li
 {
-	FontArgs::FontArgs(zstr::ifstream* inFile, size_t* pos)
-		: ResourceArgs(SegmentType::Font), m_Glyphs()
+	Ref<Font> FontLoader::Load(const Assets::Font* font)
 	{
-		char name[64];
+		FontProperties props;
+		props.GlyphWidth = font->glyph_width();
+		props.TextureWidth = font->texture_width();
+		props.EmSize = font->em_size();
+		props.AscenderY = font->ascender_y();
+		props.DescenderY = font->descender_y();
+		props.LineHeight = font->line_height();
+		props.UnderlineY = font->underline_y();
+		props.UnderlineThickness = font->underline_thickness();
 
-		uint32_t numGlyphs;
-
-		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
-
-		LI_READ_FILE(*inFile, (char*)&m_Props.GlyphWidth, sizeof(m_Props.GlyphWidth), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.TextureWidth, sizeof(m_Props.TextureWidth), *pos);
-
-		LI_READ_FILE(*inFile, (char*)&m_Props.EmSize, sizeof(m_Props.EmSize), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.AscenderY, sizeof(m_Props.AscenderY), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.DescenderY, sizeof(m_Props.DescenderY), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.LineHeight, sizeof(m_Props.LineHeight), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.UnderlineY, sizeof(m_Props.UnderlineY), *pos);
-		LI_READ_FILE(*inFile, (char*)&m_Props.UnderlineThickness, sizeof(m_Props.UnderlineThickness), *pos);
-
-		LI_READ_FILE(*inFile, (char*)&numGlyphs, sizeof(numGlyphs), *pos);
-		for (uint32_t i = 0; i < numGlyphs; i++)
+		const auto* saved_glyphs = font->glyphs();
+		std::unordered_map<wchar_t, Glyph> glyphs(saved_glyphs->size());
+		for (const Assets::GlyphEntry* entry : *saved_glyphs)
 		{
-			Glyph glyph;
-			LI_READ_FILE(*inFile, (char*)&glyph.Character, sizeof(glyph.Character), *pos);
-			LI_READ_FILE(*inFile, (char*)&glyph.TextureOffset, sizeof(glyph.TextureOffset), *pos);
+			Glyph& glyph = glyphs[entry->character()];
+			glyph.Character = entry->character();
 
-			LI_READ_FILE(*inFile, (char*)&glyph.Width, sizeof(glyph.Width), *pos);
-			LI_READ_FILE(*inFile, (char*)&glyph.Height, sizeof(glyph.Height), *pos);
+			const Assets::Vec2* texture_offset = entry->texture_offset();
+			glyph.TextureOffset = { texture_offset->x(), texture_offset->y() };
 
-			LI_READ_FILE(*inFile, (char*)&glyph.HorizontalAdvance, sizeof(glyph.HorizontalAdvance), *pos);
-			LI_READ_FILE(*inFile, (char*)&glyph.BearingX, sizeof(glyph.BearingX), *pos);
-			LI_READ_FILE(*inFile, (char*)&glyph.BearingY, sizeof(glyph.BearingY), *pos);
-			m_Glyphs.push_back(glyph);
+			glyph.Width = entry->width();
+			glyph.Height = entry->height();
+			glyph.HorizontalAdvance = entry->horizontal_advance();
+			glyph.BearingX = entry->bearing_x();
+			glyph.BearingY = entry->bearing_y();
 		}
 
-		LI_READ_FILE(*inFile, (char*)&m_ImageSize, sizeof(m_ImageSize), *pos);
-		m_ImageData = new unsigned char[m_ImageSize];
-		LI_READ_FILE(*inFile, (char*)m_ImageData, m_ImageSize, *pos);
+		const auto* image = font->image();
+		Ref<Texture2D> texture = Texture2D::Create(image->size(), image->data(), WrapType::ClampToEdge, WrapType::ClampToEdge, FilterType::Linear, FilterType::Linear);
 
-		m_Name = name;
-	}
-
-	FontArgs::~FontArgs()
-	{
-		delete[] m_ImageData;
+		return CreateRef<Font>(font->name()->str(), props, std::move(glyphs), texture);
 	}
 }

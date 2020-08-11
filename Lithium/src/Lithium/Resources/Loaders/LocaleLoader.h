@@ -3,25 +3,14 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Localization/Localization.h"
 
-#include "zstr/zstr.hpp"
-#include "ResourceArgs.h"
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace li
 {
-	class LocaleArgs : public ResourceArgs
+	class LocaleLoader
 	{
 	public:
-		LocaleArgs(zstr::ifstream* inFile, size_t* pos);
-
-		virtual ~LocaleArgs();
-
-		Ref<Locale> Create();
-
-	private:
-		size_t m_KeysLength;
-		char* m_KeysData;
-
-		size_t m_ValuesLength;
-		wchar_t* m_ValuesData;
+		static Ref<Locale> Load(const Assets::Locale* locale);
 	};
 }

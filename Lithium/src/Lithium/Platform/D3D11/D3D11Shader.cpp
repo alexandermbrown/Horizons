@@ -55,11 +55,12 @@ namespace li
 	}
 #endif
 
-	D3D11Shader::D3D11Shader(const std::string& name, void* vs_bytecode, uint32_t vs_size, void* ps_bytecode, uint32_t ps_size)
+	D3D11Shader::D3D11Shader(const std::string& name, const void* vs_bytecode, uint32_t vs_size, const void* ps_bytecode, uint32_t ps_size)
 		: m_Name(name)
 	{
-		m_VSBufferData = vs_bytecode;
 		m_VSBufferSize = vs_size;
+		m_VSBufferData = new uint8_t[vs_size];
+		memcpy(m_VSBufferData, vs_bytecode, vs_size);
 
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
 		m_DeviceHandle = context->GetDevice();

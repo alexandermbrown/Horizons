@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Segment.h"
-#include <string>
-#include <vector>
+#include "lab_serial/assets_generated.h"
+
 #include <filesystem>
 
 namespace AssetBase
@@ -11,16 +10,12 @@ namespace AssetBase
 	{
 	public:
 		AssetSerial(const std::filesystem::path& path, bool debugMode);
-		virtual ~AssetSerial() = default;
 
-		inline const HeaderSerial& GetHeaderSerial() const { return m_HeaderSerial; }
-		inline const std::unique_ptr<SegmentInfoTable>& GetSegmentInfoTable() const { return m_SegmentInfoTable; }
-		inline const std::vector<std::shared_ptr<Segment>> GetSegments() const { return m_Segments; }
+		inline uint8_t* GetBufferPointer() const { return m_Builder.GetBufferPointer(); }
+		inline uint32_t GetBufferSize() const { return m_Builder.GetSize(); }
 
 	private:
-		HeaderSerial m_HeaderSerial;
-		std::vector<std::shared_ptr<Segment>> m_Segments;
-		std::unique_ptr<SegmentInfoTable> m_SegmentInfoTable;
+		flatbuffers::FlatBufferBuilder m_Builder;
 	};
 
 	std::ostream& operator<<(std::ostream& os, const AssetSerial& e);

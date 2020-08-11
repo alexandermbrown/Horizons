@@ -1,32 +1,17 @@
 #include "lipch.h"
 #include "TextureAtlasLoader.h"
 
-#define LI_READ_FILE(file, ptr, size, pos) (file).read(ptr, size); pos += (file).gcount()
-
 namespace li
 {
-	TextureAtlasArgs::TextureAtlasArgs(zstr::ifstream* inFile, size_t* pos)
-		: ResourceArgs(SegmentType::TextureAtlas), m_Entries()
+	Ref<TextureAtlas> TextureAtlasLoader::Load(const Assets::TextureAtlas* atlas)
 	{
-		char name[64];
-		char texture[64];
-		uint32_t numEntries;
-
-		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
-		LI_READ_FILE(*inFile, (char*)&texture, sizeof(texture), *pos);
-		LI_READ_FILE(*inFile, (char*)&numEntries, sizeof(numEntries), *pos);
-
-		for (uint32_t i = 0; i < numEntries; i++)
+		std::unordered_map<std::string, glm::vec4> entries;
+		for (const Assets::AtlasEntry* entry : *atlas->entries())
 		{
-			glm::vec4 bounds;
-			char alias[64];
-			LI_READ_FILE(*inFile, alias, sizeof(alias), *pos);
-			LI_READ_FILE(*inFile, (char*)&bounds, sizeof(bounds), *pos);
-
-			m_Entries[alias] = bounds;
+			const Assets::Vec4* bounds = entry->bounds();
+			entries[entry->alias()->str()] = { bounds->x(), bounds->y(), bounds->z(), bounds->w() };
 		}
 
-		m_Name = name;
-		m_Texture = texture;
+		return CreateRef<TextureAtlas>(atlas->texture()->str(), std::move(entries));
 	}
 }

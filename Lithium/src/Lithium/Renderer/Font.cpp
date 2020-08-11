@@ -15,6 +15,11 @@ namespace li
 		}
 	}
 
+	Font::Font(const std::string& name, const FontProperties& props, std::unordered_map<wchar_t, Glyph>&& glyphs, Ref<Texture2D> texture)
+		: m_Name(name), m_Properties(props), m_Glyphs(glyphs), m_Texture(texture)
+	{
+	}
+
 	Label::Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color, uint32_t maxChars)
 		: m_Text(text), m_PointSize(pointSize), m_Font(font), m_MaxChars(maxChars)
 	{

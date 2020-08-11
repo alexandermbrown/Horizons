@@ -1,29 +1,16 @@
 #pragma once
 
-#include "Lithium/Renderer/RendererEnums.h"
-#include "Segment.h"
-
-#include <stdint.h>
 #include <filesystem>
+
 #include "rapidxml/rapidxml.hpp"
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace AssetBase
 {
-	class Texture2DSegment : public Segment
+	class Texture2DSegment
 	{
 	public:
-		char name[64];
-		li::FilterType min_filter;
-		li::FilterType mag_filter;
-		li::WrapType wrap_s;
-		li::WrapType wrap_t;
-		size_t imageSize;
-		uint8_t* imageData;
-
-		Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, bool debugMode);
-		virtual ~Texture2DSegment();
-		virtual size_t GetSize() override;
+		static flatbuffers::Offset<Assets::Texture2D> Serialize(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
 	};
-	std::ostream& operator<<(std::ostream& os, const Texture2DSegment& t);
-
 }

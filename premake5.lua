@@ -22,7 +22,6 @@ IncludeDir["glm"] = "Lithium/vendor/glm"
 IncludeDir["imgui"] = "Lithium/vendor/imgui"
 IncludeDir["stb_image"] = "Lithium/vendor/stb_image"
 IncludeDir["zlib"] = "Lithium/vendor/zlib"
-IncludeDir["zstr"] = "Lithium/vendor/zstr"
 IncludeDir["openal"] = "Lithium/vendor/openal-soft/include"
 IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
 IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
@@ -32,6 +31,8 @@ IncludeDir["layout"] = "Lithium/vendor/layout/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
+IncludeDir["flatbuffers"] = "AssetBase/vendor/flatbuffers/include"
+IncludeDir["lab_serial"] = "FlatBuffers/include"
 
 IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
 IncludeDir["nlohmann_json"] = "GameServer/vendor/nlohmann_json/include"
@@ -79,7 +80,6 @@ project "Lithium"
         "%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
         "%{prj.name}/vendor/glm/glm/**.h",
-        "%{prj.name}/vendor/zstr/zstr/**.hpp"
     }
 
     includedirs {
@@ -91,12 +91,13 @@ project "Lithium"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.zlib}",
-        "%{IncludeDir.zstr}",
         "%{IncludeDir.openal}",
         "%{IncludeDir.libogg}",
         "%{IncludeDir.libvorbis}",
         "%{IncludeDir.readerwriterqueue}",
-        "%{IncludeDir.layout}"
+        "%{IncludeDir.layout}",
+        "%{IncludeDir.flatbuffers}",
+        "%{IncludeDir.lab_serial}"
     }
 
     links {
@@ -173,7 +174,9 @@ project "Horizons"
         "%{IncludeDir.readerwriterqueue}",
         "%{IncludeDir.layout}",
         "%{IncludeDir.simpleini}",
-        "%{IncludeDir.steam}"
+        "%{IncludeDir.steam}",
+        "%{IncludeDir.flatbuffers}",
+        "%{IncludeDir.lab_serial}"
     }
 
     links {
@@ -229,7 +232,6 @@ project "AssetBase"
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/rapidxml/rapidxml/**.hpp",
-        "%{prj.name}/vendor/zstr/zstr/**.hpp",
         "%{prj.name}/vendor/zlib/**.h",
         "%{prj.name}/vendor/zlib/**.c"
     }
@@ -239,11 +241,12 @@ project "AssetBase"
         "Lithium/src",
         "AssetBase/vendor/rapidxml",
         "%{IncludeDir.zlib}",
-        "%{IncludeDir.zstr}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.freetype}",
         "%{IncludeDir.msdfgen}",
-        "%{IncludeDir.simpleini}"
+        "%{IncludeDir.simpleini}",
+        "%{IncludeDir.flatbuffers}",
+        "%{IncludeDir.lab_serial}"
     }
 
     links {
