@@ -12,11 +12,10 @@ namespace li
 	public:
 		virtual ~Texture() = default;
 
-		virtual uint32_t GetWidth() const = 0;
-		virtual uint32_t GetHeight() const = 0;
+		virtual int GetWidth() const = 0;
+		virtual int GetHeight() const = 0;
 
-		virtual void SetData(void* data, uint32_t size) = 0;
-		virtual void Resize(uint32_t width, uint32_t height) = 0;
+		virtual void Resize(int width, int height) = 0;
 		virtual void AttachToFramebuffer(
 			FramebufferAttachment attachment = FramebufferAttachment::DepthStencilAttachment,
 			FramebufferTarget target = FramebufferTarget::Framebuffer
@@ -28,7 +27,7 @@ namespace li
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(uint32_t width, uint32_t height, 
+		static Ref<Texture2D> Create(int width, int height, void* data,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
 
@@ -36,7 +35,7 @@ namespace li
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
 
-		static Ref<Texture2D> Create(size_t imageSize, uint8_t* rawData,
+		static Ref<Texture2D> Create(size_t imageSize, const uint8_t* rawData,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
 			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
 	};

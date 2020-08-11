@@ -8,25 +8,25 @@ namespace li
 	class OpenGLRendererAPI : public RendererAPI
 	{
 	protected:
-		virtual void InitImpl() override;
-		virtual void SetViewportImpl(int x, int y, int width, int height) override;
+		virtual void ResizeViewImpl(int width, int height) override;
 
 		virtual void SetClearColorImpl(const glm::vec4& color) override;
 		virtual void ClearImpl() override;
 
 		virtual void SetDepthTestImpl(bool enabled) override;
 
-		virtual void DrawArraysImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) override;
+		virtual void DrawArraysImpl(uint32_t vertexCount) override;
 
-		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray) override;
-		virtual void DrawIndexedImpl(const Ref<VertexArray>& vertexArray, uint32_t count, DrawMode mode) override;
-		virtual void DrawIndexedInstancedImpl(
-			const Ref<VertexArray>& vertexArray,
-			uint32_t instanceCount,
-			DrawMode mode) override;
+		virtual void DrawIndexedImpl(uint32_t indexCount) override;
+		virtual void DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount) override;
+
+		virtual void SetDrawModeImpl(DrawMode mode) override { m_DrawMode = mode; }
+
+		virtual void SetContextImpl(GraphicsContext* context) override {};
 
 	private:
 
 		bool m_DepthTest = false;
+		DrawMode m_DrawMode = DrawMode::Triangles;
 	};
 }

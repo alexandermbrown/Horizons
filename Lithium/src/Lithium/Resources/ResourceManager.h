@@ -8,10 +8,9 @@
 #include "Lithium/Audio/Audio.h"
 
 #include <unordered_map>
-#include <atomic>
 
-#include "Loaders/ResourceArgs.h"
-#include "readerwriterqueue/readerwriterqueue.h"
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace li
 {
@@ -19,11 +18,12 @@ namespace li
 	{
 	public:
 
-		static void LoadAsync(const std::string& labFilePath);
 		static void Shutdown();
 
-		static bool DequeueAsset();
-		static inline bool IsLoaded() { return s_Loaded.load(); }
+		static void Load(const std::string& labFilePath);
+
+		static void BeginStaggeredLoad(const std::string& labFilePath);
+		static bool UpdateStaggeredLoad();
 
 		static void PrintInfo();
 
@@ -70,23 +70,33 @@ namespace li
 
 	private:
 
-		static void LoadFile(std::string labFilePath);
+		template<class T>
+		using VecIterator = flatbuffers::VectorIterator<flatbuffers::Offset<T>, const T*>;
+
+		struct StaggeredLoadData
+		{
+			uint8_t* Buffer = nullptr;
+			const Assets::AssetBundle* Bundle = nullptr;
+
+			VecIterator<Assets::Texture2D> TextureIt;
+			VecIterator<Assets::Shader> ShaderIt;
+			VecIterator<Assets::TextureAtlas> TextureAtlasIt;
+			VecIterator<Assets::Font> FontIt;
+			VecIterator<Assets::Audio> AudioIt;
+			VecIterator<Assets::Locale> LocaleIt;
+		};
 
 		struct ResourceData
 		{
-			moodycamel::ReaderWriterQueue<ResourceArgs*> ArgsQueue;
-
 			std::unordered_map<std::string, Ref<Texture2D>> Textures;
 			std::unordered_map<std::string, Ref<Shader>> Shaders;
 			std::unordered_map<std::string, Ref<TextureAtlas>> TextureAtlases;
 			std::unordered_map<std::string, Ref<Font>> Fonts;
 			std::unordered_map<std::string, Ref<Audio>> Audio;
 
-			std::thread LoadThread;
+			StaggeredLoadData LoadData;
 		};
 		
 		static Scope<ResourceData> s_Data;
-		static std::atomic<bool> s_Loaded;
-
 	};
 }

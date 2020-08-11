@@ -110,14 +110,14 @@ namespace li
 	}
 
 
-	Audio::Audio(void* source, uint32_t length)
+	Audio::Audio(const void* source, uint32_t length)
 	{
 		OggVorbis_File file;
 		int eof = 0;
 		int current_section = 0;
 
 		ogg_handle oh;
-		oh.buffer = source;
+		oh.buffer = const_cast<void*>(source);
 		oh.size = length;
 		oh.read_pos = 0;
 

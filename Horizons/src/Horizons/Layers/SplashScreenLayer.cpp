@@ -6,9 +6,7 @@
 
 SplashScreenLayer::SplashScreenLayer()
 {
-	m_Texture = li::Texture2D::Create("data/images/horizons_splash.png", 
-		li::WrapType::ClampToEdge, li::WrapType::ClampToEdge,
-		li::FilterType::Linear, li::FilterType::Linear);
+	m_Texture = li::ResourceManager::Get<li::Texture2D>("texture_horizons_splash");
 
 	CalculateTransform();
 }
@@ -41,7 +39,7 @@ void SplashScreenLayer::OnEvent(SDL_Event* event)
 
 void SplashScreenLayer::CalculateTransform()
 {
-	li::Ref<li::Window>& window = li::Application::Get()->GetWindow();
+	li::Window* window = li::Application::Get()->GetWindow();
 
 	float windowAspect = (float)window->GetWidth() / (float)window->GetHeight();
 	float textureAspect = (float)m_Texture->GetWidth() / (float)m_Texture->GetHeight();

@@ -2,8 +2,8 @@
 
 #include "Lithium/Renderer/Buffer.h"
 
-namespace li {
-
+namespace li
+{
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
@@ -12,12 +12,11 @@ namespace li {
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
-		virtual void Unbind() const override;
 
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ArrayBuffer) override;
+		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ArrayBuffer) override;
 
 	private:
 		uint32_t m_RendererID;
@@ -31,12 +30,11 @@ namespace li {
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer();
 
-		virtual void Bind() const;
-		virtual void Unbind() const;
+		virtual void Bind() const override;
 
-		virtual uint32_t GetCount() const { return m_Count; }
+		virtual uint32_t GetCount() const override { return m_Count; }
 
-		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ElementArrayBuffer) override;
+		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ElementArrayBuffer) override;
 
 	private:
 		uint32_t m_RendererID;

@@ -13,15 +13,13 @@
 #include "SDL.h"
 #include "imgui.h"
 
-#define LI_MIN_MS_PER_FRAME 2
-
 namespace li 
 {
 
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
-		: m_Running(false), m_LayerStack(), m_EventHandled(false), 
+		: m_Running(false), m_LayerStack(), m_EventHandled(false), m_Window(nullptr),
 		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
 	{
 		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
@@ -53,25 +51,26 @@ namespace li
 
 		m_EventCallbackFn = LI_BIND_EVENT_FN(Application::OnEvent);
 
-		m_Window = Window::Create(props.Title, props.Width, props.Height, props.Resizable, props.Shown, props.Borderless, Renderer::GetAPI());
+		RendererAPI::Create(props.API);
+		m_Window = Window::Create(props);
+		RendererAPI::SetContext(m_Window->GetContext());
 
-		m_ImGuiRenderer = CreateScope<ImGuiRenderer>();
-
-		Localization::Init();
-		Renderer::Init();
-		AudioManager::Init();
-		UI::Init();
+		m_ImGuiRenderer = ImGuiRenderer::Create();
 	}
 
 	Application::~Application()
 	{
 		delete m_CurrentScene;
+
 		m_LayerStack.Clear();
+
 		ResourceManager::Shutdown();
 		UI::Shutdown();
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
-		m_Window->Shutdown();
+
+		delete m_Window;
+
 		SDL_Quit();
 	}
 
@@ -239,7 +238,7 @@ namespace li
 
 	void Application::OnWindowEvent(SDL_Event* event)
 	{
-		m_Window->OnWindowEvent(event);
+		
 		switch(event->window.event)
 		{
 		case SDL_WINDOWEVENT_CLOSE:
@@ -250,7 +249,8 @@ namespace li
 			SDL_GL_GetDrawableSize(m_Window->GetWindow(), &w, &h);
 			LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
 
-			RendererAPI::SetViewport(0, 0, w, h);
+			m_Window->OnWindowResize(w, h);
+			RendererAPI::ResizeView(w, h);
 			Renderer::Resize(w, h);
 			m_ImGuiRenderer->Resize(w, h);
 

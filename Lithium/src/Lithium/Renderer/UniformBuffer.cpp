@@ -4,7 +4,13 @@
 #include "RendererAPI.h"
 #include "Buffer.h"
 
-#include "Lithium/Platform/OpenGL/OpenGLUniformBuffer.h"	
+#ifdef LI_INCLUDE_OPENGL
+#include "Lithium/Platform/OpenGL/OpenGLUniformBuffer.h"
+#endif
+
+#ifdef LI_INCLUDE_D3D11
+#include "Lithium/Platform/D3D11/D3D11UniformBuffer.h"
+#endif
 
 namespace li
 {
@@ -103,11 +109,18 @@ namespace li
 		m_Size = componentOffset * 4;
 	}
 
-	Ref<UniformBuffer> li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, const UniformBufferLayout& layout)
+	Ref<UniformBuffer> li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(name, bindingSlot, layout);
+#ifdef LI_INCLUDE_OPENGL
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLUniformBuffer>(name, bindingSlot, layout);
+#endif
+#ifdef LI_INCLUDE_D3D11
+		case RendererAPI::API::D3D11:
+			return CreateRef<D3D11UniformBuffer>(name, bindingSlot, shaderType, layout);
+#endif
 		}
 
 		LI_CORE_ASSERT(false, "Unknown RendererAPI!");

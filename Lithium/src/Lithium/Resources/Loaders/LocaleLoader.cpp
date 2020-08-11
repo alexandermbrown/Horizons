@@ -5,49 +5,17 @@
 
 namespace li
 {
-	LocaleArgs* LocaleArgs::Deserialize(zstr::ifstream* inFile, size_t* pos)
+	Ref<Locale> LocaleLoader::Load(const Assets::Locale* locale)
 	{
-		char name[64];
+		Ref<Locale> localeref = CreateRef<Locale>(locale->name()->str());
+		static_assert(sizeof(wchar_t) == sizeof(int16_t));
 
-		size_t keysLength;
-		size_t valuesLength;
-
-		LI_READ_FILE(*inFile, (char*)&name, sizeof(name), *pos);
-
-		LI_READ_FILE(*inFile, (char*)&keysLength, sizeof(keysLength), *pos);
-		char* keysData = new char[keysLength];
-		LI_READ_FILE(*inFile, keysData, keysLength, *pos);
-
-		LI_READ_FILE(*inFile, (char*)&valuesLength, sizeof(valuesLength), *pos);
-		wchar_t* valuesData = new wchar_t[valuesLength];
-		LI_READ_FILE(*inFile, (char*)valuesData, valuesLength * sizeof(wchar_t), *pos);
-
-		return new LocaleArgs(name, keysLength, keysData, valuesLength, valuesData);
-	}
-
-	LocaleArgs::~LocaleArgs()
-	{
-		delete[] m_KeysData;
-		delete[] m_ValuesData;
-	}
-
-	Ref<Locale> LocaleArgs::Create()
-	{
-		Ref<Locale> locale = CreateRef<Locale>(m_Name);
-
-		size_t keysOffset = 0;
-		size_t valuesOffset = 0;
-
-		while (keysOffset < m_KeysLength && valuesOffset < m_ValuesLength)
+		for (const Assets::LocaleEntry* entry : *locale->entries())
 		{
-			locale->Set(&m_KeysData[keysOffset], &m_ValuesData[valuesOffset]);
-
-			keysOffset += strlen(&m_KeysData[keysOffset]) + 1ULL;
-			valuesOffset += wcslen(&m_ValuesData[valuesOffset]) + 1ULL;
+			std::wstring value = (wchar_t*)entry->value()->data();
+			localeref->Set(entry->key()->str(), value);
 		}
 
-		LI_CORE_ASSERT(keysOffset == m_KeysLength && valuesOffset == m_ValuesLength, "Invalid key/value pair data!");
-
-		return locale;
+		return localeref;
 	}
 }

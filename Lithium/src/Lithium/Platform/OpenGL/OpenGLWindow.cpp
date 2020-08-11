@@ -7,39 +7,35 @@
 
 namespace li
 {
-	OpenGLWindow::OpenGLWindow(const char* title, int width, int height, bool resizable, bool shown, bool borderless)
-		: m_Title(title), m_Width(width), m_Height(height), m_VSync(false), m_Fullscreen(FullscreenType::Windowed), m_Icon(nullptr), m_IconData(nullptr)
+	OpenGLWindow::OpenGLWindow(const WindowProps& props)
+		: m_Title(props.Title), m_Width(props.Width), m_Height(props.Height), m_VSync(false), m_Fullscreen(FullscreenType::Windowed), m_Icon(nullptr), m_IconData(nullptr)
 	{
 		int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
-		if (resizable) flags |= SDL_WINDOW_RESIZABLE;
-		if (shown)
+		if (props.Resizable) flags |= SDL_WINDOW_RESIZABLE;
+		if (props.Shown)
 			flags |= SDL_WINDOW_SHOWN;
 		else
 			flags |= SDL_WINDOW_HIDDEN;
 
-		if (borderless)
+		if (props.Borderless)
 			flags |= SDL_WINDOW_BORDERLESS;
 
-		m_Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+		m_Window = SDL_CreateWindow(props.Title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, flags);
 		LI_CORE_ASSERT(m_Window, "Error creating window.");
 
-		m_Context = CreateRef<OpenGLContext>(m_Window);
-		m_Context->Init();
+		m_Context = new OpenGLContext(m_Window);
 	}
 
 	OpenGLWindow::~OpenGLWindow()
 	{
-	}
+		delete m_Context;
 
-	void OpenGLWindow::Shutdown()
-	{
-		if (m_Icon) 
+		if (m_Icon)
 			SDL_FreeSurface(m_Icon);
-		
+
 		if (m_IconData)
 			stbi_image_free(m_IconData);
 
-		m_Context->Shutdown();
 		SDL_DestroyWindow(m_Window);
 	}
 
@@ -153,12 +149,9 @@ namespace li
 		LI_CORE_INFO("Set icon to {}", path);
 	}
 
-	void OpenGLWindow::OnWindowEvent(SDL_Event* event)
+	void OpenGLWindow::OnWindowResize(int width, int height)
 	{
-		if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-		{
-			m_Width = event->window.data1;
-			m_Height = event->window.data2;
-		}
+		m_Width = width;
+		m_Height = height;
 	}
 }

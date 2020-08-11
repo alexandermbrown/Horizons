@@ -8,6 +8,17 @@
 
 namespace li
 {
+	struct WindowProps
+	{
+		RendererAPI::API API;
+		const char* Title;
+		int Width;
+		int Height;
+		bool Resizable;
+		bool Shown;
+		bool Borderless;
+	};
+
 	enum class FullscreenType
 	{
 		Windowed,
@@ -21,14 +32,13 @@ namespace li
 
 		virtual ~Window() = default;
 
-		virtual void Shutdown() = 0;
-
 		virtual void SwapBuffers() = 0;
 
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
-		virtual Ref<GraphicsContext> GetContext() const = 0;
+		virtual GraphicsContext* GetContext() const = 0;
 		virtual SDL_Window* GetWindow() const = 0;
+
 
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
@@ -46,13 +56,8 @@ namespace li
 
 		virtual void SetIcon(const std::string& path) = 0;
 
-		virtual void OnWindowEvent(SDL_Event* event) = 0;
+		virtual void OnWindowResize(int width, int height) = 0;
 
-		static Ref<Window> Create(
-			const char* title,
-			int width, int height,
-			bool resizable, bool shown, bool borderless,
-			RendererAPI::API api = RendererAPI::API::OpenGL
-		);
+		static Window* Create(const WindowProps& props);
 	};
 }

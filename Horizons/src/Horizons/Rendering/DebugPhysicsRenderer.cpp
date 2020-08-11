@@ -6,11 +6,13 @@
 DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 	: m_ThreadQueue(queue), m_VertexCount(0), m_IndexCount(0)
 {
+	m_Shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
+
 	m_VertexArray = li::VertexArray::Create();
 
 	li::BufferLayout layout = {
-		{ li::ShaderDataType::Float2, "a_Position", 0 },
-		{ li::ShaderDataType::Float4, "a_Color", 1 }
+		{ li::ShaderDataType::Float2, "POSITION", 0 },
+		{ li::ShaderDataType::Float4, "COLOR", 1 }
 	};
 
 	// Ensure the vertex struct is packed so it can be safely sent the GPU.
@@ -23,12 +25,12 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 	m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+	m_VertexArray->Finalize(m_Shader);
 
-	m_Shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
 	m_Shader->AddUniformBuffer(li::Renderer::GetViewProjUniformBuffer());
 }
 
-void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
+void DebugPhysicsRenderer::Render()
 {
 	DebugDrawCommand command;
 	while (m_ThreadQueue->try_dequeue(command)) // TODO: check if there are multiple ENDs in the queue, only render most recent.
@@ -144,8 +146,8 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 			m_CommandQueue.pop();
 		}
 
-		m_VertexBuffer->SetSubData((float*)m_Vertices.data(), m_VertexCount * sizeof(DebugPhysicsVertex), 0);
-		m_IndexBuffer->SetSubData(m_Indices.data(), m_IndexCount * sizeof(uint32_t), 0);
+		m_VertexBuffer->SetSubData((float*)m_Vertices.data(), m_VertexCount * sizeof(DebugPhysicsVertex), 0, true);
+		m_IndexBuffer->SetSubData(m_Indices.data(), m_IndexCount * sizeof(uint32_t), 0, true);
 	}
 
 	// Render the lines.
@@ -155,7 +157,8 @@ void DebugPhysicsRenderer::Render(li::OrthographicCamera* camera, float z)
 		
 		m_Shader->Bind();
 		
-		li::RendererAPI::DrawIndexed(m_VertexArray, m_IndexCount, li::DrawMode::Lines);
+		li::RendererAPI::SetDrawMode(li::DrawMode::Lines);
+		li::RendererAPI::DrawIndexed(m_IndexCount);
 		m_VertexArray->Unbind();
 	}
 }

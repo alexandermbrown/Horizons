@@ -1,0 +1,24 @@
+<resources>
+
+	<shaders>
+    
+		<shader name="shader_splash">
+			<glsl>./res/shaders/Texture.glsl</glsl>
+			<hlsl>./res/shaders/Texture.hlsl</hlsl>
+		</shader>
+    
+	</shaders>
+
+	<textures>
+
+		<texture2d name="texture_horizons_splash">
+			<source>./res/textures/ui/horizons_splash.png</source>
+			<min_filter>LINEAR</min_filter>
+			<mag_filter>LINEAR</mag_filter>
+			<wrap_s>CLAMP_TO_EDGE</wrap_s>
+			<wrap_t>CLAMP_TO_EDGE</wrap_t>
+		</texture2d>
+
+	</textures>
+
+</resources>

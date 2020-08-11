@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "Font.h"
 
+#include "Renderer.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace li
@@ -12,6 +13,11 @@ namespace li
 		{
 			m_Glyphs[glyph.Character] = glyph;
 		}
+	}
+
+	Font::Font(const std::string& name, const FontProperties& props, std::unordered_map<wchar_t, Glyph>&& glyphs, Ref<Texture2D> texture)
+		: m_Name(name), m_Properties(props), m_Glyphs(glyphs), m_Texture(texture)
+	{
 	}
 
 	Label::Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color, uint32_t maxChars)
@@ -52,6 +58,8 @@ namespace li
 
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArray->Finalize(Renderer::GetFontShader());
+
 		m_VertexArray->Unbind();
 	}
 
@@ -113,12 +121,12 @@ namespace li
 		m_VertexArray->GetIndexBuffer()->SetSubData(
 			(uint32_t*)&m_GlyphIndices[0], 
 			static_cast<uint32_t>(m_GlyphIndices.size() * sizeof(uint32_t)), 
-			0
+			0, true
 		);
 		m_VertexBuffer->SetSubData(
 			(float*)&m_GlyphVertices[0], 
 			static_cast<uint32_t>(sizeof(GlyphVertex) * m_GlyphVertices.size()),
-			0
+			0, true
 		);
 	}
 

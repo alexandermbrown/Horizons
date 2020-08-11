@@ -4,6 +4,8 @@
 #include "Lithium/Core/Application.h"
 #include "Lithium/Resources/ResourceManager.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+
 namespace li
 {
 	Scope<Renderer::RendererData> Renderer::s_Data;
@@ -12,48 +14,35 @@ namespace li
 	{
 		s_Data = CreateScope<Renderer::RendererData>();
 
-		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, {
+		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {
 			{ "u_ViewProj", ShaderDataType::Mat4 },
 		});
 		s_Data->ViewProjUB->BindToSlot();
 
-		s_Data->TransformMatrixUB = UniformBuffer::Create("TransformMatrix", 1, {
+		s_Data->TransformMatrixUB = UniformBuffer::Create("TransformMatrix", 1, ShaderType::Vertex, {
 			{ "u_Transform", ShaderDataType::Mat4 },
 		});
 		s_Data->TransformMatrixUB->BindToSlot();
 
-		s_Data->ColorUB = UniformBuffer::Create("Color", 2, {
+		s_Data->ColorUB = UniformBuffer::Create("Color", 2, ShaderType::Fragment, {
 			{ "u_Color", ShaderDataType::Float4 },
 		});
 		s_Data->ColorUB->BindToSlot();
 		
 		s_Data->Camera = nullptr;
 
-		s_Data->TextureShader = Shader::Create("data/shaders/Texture.glsl");
+		s_Data->TextureShader = li::ResourceManager::Get<Shader>("shader_splash");
 		s_Data->TextureShader->AddUniformBuffer(s_Data->ViewProjUB);
 		s_Data->TextureShader->AddUniformBuffer(s_Data->TransformMatrixUB);
 
-		Ref<Window>& window = Application::Get()->GetWindow();
+		Window* window = Application::Get()->GetWindow();
 		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, (float)window->GetWidth(), 0.0f, (float)window->GetHeight());
 
-		RendererAPI::Init();
 		RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-
-		// SETUP WHITE TEXTURE
-		Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1);
-		uint32_t data = 0xffffffff;
-		whiteTexture->SetData(&data, sizeof(data));
-
-		// SETUP SCENE FLAT COLOR TEXTURE ALTAS
-		Ref<TextureAtlas> flatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
-			{ "texture_white", glm::vec4(0.5f) }
-		}));
 
 		s_Data->SceneRenderer = BatchRenderer({ 0.5f, 0.5f });
 		s_Data->UIRenderer = BatchRenderer({ 0.0f, 0.0f });
-		s_Data->SceneRenderer.AddTextureAtlas(flatColorAtlas);
-		s_Data->UIRenderer.AddTextureAtlas(flatColorAtlas);
-
+		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
 		//////////////////////////////////
@@ -73,17 +62,34 @@ namespace li
 		Ref<IndexBuffer> quadIB = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 
 		quadVB->SetLayout({
-			{ ShaderDataType::Float2, "a_Position", 0 },
-			{ ShaderDataType::Float2, "a_TexCoord", 1 }
-			});
+			{ ShaderDataType::Float2, "POSITION", 0 },
+			{ ShaderDataType::Float2, "TEXCOORD", 1 }
+		});
 
 		s_Data->QuadVA->SetIndexBuffer(quadIB);
 		s_Data->QuadVA->AddVertexBuffer(quadVB);
+		s_Data->QuadVA->Finalize(s_Data->TextureShader);
 	}
 
 	void Renderer::InitPostResourceLoad()
 	{
 		s_Data->FontShader = ResourceManager::Get<Shader>("shader_label");
+
+		// SETUP WHITE TEXTURE
+		uint32_t data = 0xffffffff;
+		Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1, &data);
+
+		// SETUP SCENE FLAT COLOR TEXTURE ALTAS
+		Ref<TextureAtlas> flatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
+			{ "texture_white", glm::vec4(0.5f) }
+		}));
+
+		s_Data->SceneRenderer.PostResourceLoad();
+		s_Data->UIRenderer.PostResourceLoad();
+
+		s_Data->SceneRenderer.AddTextureAtlas(flatColorAtlas);
+		s_Data->UIRenderer.AddTextureAtlas(flatColorAtlas);
+
 		s_Data->SceneRenderer.SetUniformBuffer(s_Data->ViewProjUB);
 		s_Data->UIRenderer.SetUniformBuffer(s_Data->ViewProjUB);
 		s_Data->ResourcesLoaded = true;
@@ -107,7 +113,7 @@ namespace li
 		s_Data->ViewProjUB->SetMat4("u_ViewProj", camera->GetViewProjectionMatrix());
 		s_Data->ViewProjUB->UploadData();
 
-		s_Data->SceneRenderer.BeginScene(camera);
+		s_Data->SceneRenderer.BeginScene();
 	}
 
 	void Renderer::EndScene()
@@ -121,7 +127,7 @@ namespace li
 		s_Data->ViewProjUB->SetMat4("u_ViewProj", s_Data->UICamera->GetViewProjectionMatrix());
 		s_Data->ViewProjUB->UploadData();
 
-		s_Data->UIRenderer.BeginScene(s_Data->UICamera.get());
+		s_Data->UIRenderer.BeginScene();
 	}
 
 	void Renderer::EndUI()
@@ -192,7 +198,8 @@ namespace li
 
 		texture->Bind();
 		s_Data->QuadVA->Bind();
-		RendererAPI::DrawIndexed(s_Data->QuadVA);
+		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
+		RendererAPI::DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
 	}
 
 	void Renderer::Resize(int width, int height)
@@ -216,6 +223,7 @@ namespace li
 
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
-		RendererAPI::DrawIndexed(vertexArray);
+		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
+		RendererAPI::DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
 	}
 }

@@ -22,7 +22,7 @@ namespace li
 
 	struct Batch
 	{
-		Batch(Ref<TextureAtlas> atlas, const glm::vec2& quadOrigin);
+		Batch(Ref<TextureAtlas> atlas, const glm::vec2& quadOrigin, const Ref<Shader>& shader);
 
 		Ref<TextureAtlas> Atlas;
 		uint32_t InstanceCount;
@@ -37,10 +37,11 @@ namespace li
 		BatchRenderer(glm::vec2 quadOrigin = glm::vec2(1.0f));
 		virtual ~BatchRenderer() = default;
 
+		void PostResourceLoad();
 		void AddTextureAtlas(Ref<TextureAtlas> atlas);
 		void SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer);
 
-		void BeginScene(OrthographicCamera* camera);
+		void BeginScene();
 		void EndScene();
 		void Submit(
 			const std::string& textureAlias, 

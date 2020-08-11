@@ -1,82 +1,71 @@
 #include "pch.h"
 #include "Texture2DSegment.h"
 
-#include "rapidxml/rapidxml.hpp"
-
 namespace AssetBase
 {
-	li::FilterType ConvertFilterType(const char* type)
+	Assets::FilterType ConvertFilterType(const char* type)
 	{
 		if (!strcmp(type, "NEAREST")) 
-			return li::FilterType::Nearest;
+			return Assets::FilterType_Nearest;
 		else if (!strcmp(type, "LINEAR"))
-			return li::FilterType::Linear;
+			return Assets::FilterType_Linear;
 		else if (!strcmp(type, "NEAREST_MIPMAP_NEAREST"))
-			return li::FilterType::NearestMipmapNearest;
+			return Assets::FilterType_NearestMipmapNearest;
 		else if (!strcmp(type, "LINEAR_MIPMAP_NEAREST"))
-			return li::FilterType::LinearMipmapNearest;
+			return Assets::FilterType_LinearMipmapNearest;
 		else if (!strcmp(type, "NEAREST_MIPMAP_LINEAR"))
-			return li::FilterType::NearestMipmapLinear;
+			return Assets::FilterType_NearestMipmapLinear;
 		throw "Unknown filter type!";
 	}
 
-	li::WrapType ConvertWrapType(const char* type)
+	Assets::WrapType ConvertWrapType(const char* type)
 	{
 		if (!strcmp(type, "REPEAT"))
-			return li::WrapType::Repeat;
+			return Assets::WrapType_Repeat;
 		else if (!strcmp(type, "MIRRORED_REPEAT"))
-			return li::WrapType::MirroredRepeat;
+			return Assets::WrapType_MirroredRepeat;
 		else if (!strcmp(type, "CLAMP_TO_EDGE"))
-			return li::WrapType::ClampToEdge;
+			return Assets::WrapType_ClampToEdge;
 		else if (!strcmp(type, "CLAMP_TO_BORDER"))
-			return li::WrapType::ClampToBorder;
+			return Assets::WrapType_ClampToBorder;
 		throw "Unknown wrap type!";
 	}
-	
-	Texture2DSegment::Texture2DSegment(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath)
-		: Segment(SegmentType::Texture2D), min_filter(li::FilterType::Error), mag_filter(li::FilterType::Error),
-		wrap_s(li::WrapType::Error), wrap_t(li::WrapType::Error)
-	{
-		name[0] = '\0';
-		for (rapidxml::xml_attribute<>* attr = textureNode->first_attribute(); attr; attr = attr->next_attribute())
-		{
-			if (!strcmp(attr->name(), "name")) {
-				strcpy_s(name, attr->value());
-				break;
-			}
-		}
-		if (strlen(name) == 0)
-			throw "Attribute 'name' not found in texture.";
 
-		std::cout << "Loading texture '" << name << "' ... ";
+	flatbuffers::Offset<Assets::Texture2D> Texture2DSegment::Serialize(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
+	{
+		flatbuffers::Offset<flatbuffers::String> name = NULL;
+		if (auto* name_attr = textureNode->first_attribute("name"))
+		{
+			name = builder.CreateString(name_attr->value());
+			std::cout << "Loading texture '" << name_attr->value() << "' ... ";
+		}
+		else throw "Attribute 'name' not found in texture.";
+		
+		Assets::FilterType min_filter = Assets::FilterType_Error;
+		Assets::FilterType mag_filter = Assets::FilterType_Error;
+		Assets::WrapType wrap_s = Assets::WrapType_Error;
+		Assets::WrapType wrap_t = Assets::WrapType_Error;
 
 		std::filesystem::path imagePath;
-		for (rapidxml::xml_node<>* node = textureNode->first_node(); node; node = node->next_sibling())
-		{
-			const char* name = node->name();
-			const char* value = node->value();
-			if (!strcmp(name, "source"))
-				imagePath = value;
-			else if (!strcmp(name, "min_filter"))
-				min_filter = ConvertFilterType(value);
-			else if (!strcmp(name, "mag_filter"))
-				mag_filter = ConvertFilterType(value);
-			else if (!strcmp(name, "wrap_s"))
-				wrap_s = ConvertWrapType(node->value());
-			else if (!strcmp(name, "wrap_t"))
-				wrap_t = ConvertWrapType(node->value());
-		}
+		if (auto* node = textureNode->first_node("source"))
+			imagePath = node->value();
+		else throw "Missing <source> in texture.\n";
 
-		if (imagePath.empty()) 
-			throw "Missing <source> in texture.\n";
-		if (min_filter == li::FilterType::Error)
-			throw "Missing <min_filter> in texture.\n";
-		if (mag_filter == li::FilterType::Error)
-			throw "Missing <mag_filter> in texture.\n";
-		if (wrap_s == li::WrapType::Error)
-			throw "Missing <wrap_s> in texture.\n";
-		if (wrap_t == li::WrapType::Error)
-			throw "Missing <wrap_t> in texture.\n";
+		if (auto* node = textureNode->first_node("min_filter"))
+			min_filter = ConvertFilterType(node->value());
+		else throw "Missing <min_filter> in texture.\n";
+
+		if (auto* node = textureNode->first_node("mag_filter"))
+			mag_filter = ConvertFilterType(node->value());
+		else throw "Missing <mag_filter> in texture.\n";
+
+		if (auto* node = textureNode->first_node("wrap_s"))
+			wrap_s = ConvertWrapType(node->value());
+		else throw "Missing <wrap_s> in texture.\n";
+
+		if (auto* node = textureNode->first_node("wrap_t"))
+			wrap_t = ConvertWrapType(node->value());
+		else throw "Missing <wrap_t> in texture.\n";
 
 		std::ifstream imageFile(basePath.parent_path() / imagePath, std::ios::in | std::ios::binary);
 		if (!imageFile.is_open()) {
@@ -84,39 +73,18 @@ namespace AssetBase
 		}
 
 		imageFile.ignore(std::numeric_limits<std::streamsize>::max());
-		
-		imageSize = imageFile.gcount();
+
+		size_t imageSize = imageFile.gcount();
 		imageFile.clear();
 		imageFile.seekg(0, std::ios_base::beg);
 
-		imageData = new uint8_t[imageSize];
+		uint8_t* imageData;
+		auto data = builder.CreateUninitializedVector(imageSize, &imageData);
 
-		imageFile.read((char *)&imageData[0], imageSize);
+		imageFile.read((char*)&imageData[0], imageSize);
 		imageFile.close();
 
 		std::cout << "done.\n";
-	}
-
-	Texture2DSegment::~Texture2DSegment()
-	{
-		delete[] imageData;
-	}
-	size_t Texture2DSegment::GetSize()
-	{
-		return sizeof(type) + sizeof(name) + sizeof(min_filter) + sizeof(mag_filter) + 
-			sizeof(wrap_s) + sizeof(wrap_t) + sizeof(imageSize) + imageSize;
-	}
-
-	std::ostream& operator<<(std::ostream& os, const Texture2DSegment& t)
-	{
-		os.write((const char*)&t.type, sizeof(t.type));
-		os.write(t.name, sizeof(t.name));
-		os.write((const char*)&t.min_filter, sizeof(t.min_filter));
-		os.write((const char*)&t.mag_filter, sizeof(t.mag_filter));
-		os.write((const char*)&t.wrap_s, sizeof(t.wrap_s));
-		os.write((const char*)&t.wrap_t, sizeof(t.wrap_t));
-		os.write((const char*)&t.imageSize, sizeof(t.imageSize));
-		os.write((const char*)&t.imageData[0], t.imageSize);
-		return os;
+		return Assets::CreateTexture2D(builder, name, min_filter, mag_filter, wrap_s, wrap_t, data);
 	}
 }

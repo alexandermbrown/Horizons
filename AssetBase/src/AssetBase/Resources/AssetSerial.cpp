@@ -10,12 +10,14 @@
 #include "AudioSegment.h"
 #include "LocaleSegment.h"
 
-#define ASSETBASE_PUSH_SEGMENT(type, parentNode, path) for (rapidxml::xml_node<>* node = parentNode->first_node(); node; node = node->next_sibling())\
-	m_Segments.push_back(std::make_shared<type>(node, path))
+#define ASSETBASE_PUSH_SEGMENT(type, parentNode, path, debug) if (parentNode)\
+for (rapidxml::xml_node<>* node = parentNode->first_node(); node; node = node->next_sibling())\
+	m_Segments.push_back(std::make_shared<type>(node, path, debug))
 
 namespace AssetBase
 {
-	AssetSerial::AssetSerial(const std::filesystem::path& path)
+	AssetSerial::AssetSerial(const std::filesystem::path& path, bool debugMode)
+		: m_Builder(1024)
 	{
 		std::cout << "Building from resource definition file " << path.string() << "\n";
 		std::ifstream xmlFile(path.string());
@@ -36,68 +38,54 @@ namespace AssetBase
 
 		rapidxml::xml_node<>* root = doc.first_node();
 
-		FontSegment::Init();
-
-		ASSETBASE_PUSH_SEGMENT(ShaderSegment,		root->first_node("shaders"),			path);
-		ASSETBASE_PUSH_SEGMENT(Texture2DSegment,	root->first_node("textures"),			path);
-		ASSETBASE_PUSH_SEGMENT(TextureAtlasSegment, root->first_node("texture_atlases"),	path);
-		ASSETBASE_PUSH_SEGMENT(FontSegment,			root->first_node("fonts"),				path);
-		ASSETBASE_PUSH_SEGMENT(AudioSegment,		root->first_node("audio"),				path);
-		ASSETBASE_PUSH_SEGMENT(LocaleSegment,		root->first_node("locales"),			path);
-
-		FontSegment::Shutdown();
-
-		m_HeaderSerial.infoTableOffset = HeaderSerial::GetSize();
-		m_SegmentInfoTable = std::make_unique<SegmentInfoTable>(m_Segments);
-		for (auto& segment : m_Segments)
+		std::vector<flatbuffers::Offset<Assets::Texture2D>> textures;
+		if (auto parent = root->first_node("textures"))
 		{
-			m_HeaderSerial.infoTableOffset += segment->GetSize();
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				textures.push_back(Texture2DSegment::Serialize(node, path, m_Builder, debugMode));
 		}
-		m_HeaderSerial.fileSize = m_HeaderSerial.infoTableOffset + sizeof(m_SegmentInfoTable->numEntries) + 
-			m_SegmentInfoTable->numEntries * SegmentInfoTableEntry::GetSize();
+
+		std::vector<flatbuffers::Offset<Assets::Shader>> shaders;
+		if (auto parent = root->first_node("shaders"))
+		{
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				shaders.push_back(ShaderSegment::Serialize(node, path, m_Builder, debugMode));
+		}
+
+		std::vector<flatbuffers::Offset<Assets::TextureAtlas>> atlases;
+		if (auto parent = root->first_node("texture_atlases"))
+		{
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				atlases.push_back(TextureAtlasSegment::Serialize(node, path, m_Builder, debugMode));
+		}
+
+		std::vector<flatbuffers::Offset<Assets::Font>> fonts;
+		if (auto parent = root->first_node("fonts"))
+		{
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				fonts.push_back(FontSegment::Serialize(node, path, m_Builder, debugMode));
+		}
+
+		std::vector<flatbuffers::Offset<Assets::Audio>> audio;
+		if (auto parent = root->first_node("audio"))
+		{
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				audio.push_back(AudioSegment::Serialize(node, path, m_Builder, debugMode));
+		}
+
+		std::vector<flatbuffers::Offset<Assets::Locale>> locales;
+		if (auto parent = root->first_node("locales"))
+		{
+			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
+				locales.push_back(LocaleSegment::Serialize(node, path, m_Builder, debugMode));
+		}
+
+		auto bundle = Assets::CreateAssetBundleDirect(m_Builder, &textures, &shaders, &atlases, &fonts, &audio, &locales);
+		m_Builder.Finish(bundle, "LAB+");
 	}
 
 	std::ostream& operator<<(std::ostream& os, const AssetSerial& as)
 	{
-		os.write((char*)&as.GetHeaderSerial().signature, sizeof(uint32_t));
-		os.write((char*)&as.GetHeaderSerial().fileSize, sizeof(size_t));
-		os.write((char*)&as.GetHeaderSerial().infoTableOffset, sizeof(size_t));
-		std::cout << "-";
-
-		float i = 0.0f;
-		int percentage = 0;
-		for (const std::shared_ptr<Segment>& segment : as.GetSegments())
-		{
-			if (segment->type == SegmentType::Shader)
-				os << *std::dynamic_pointer_cast<ShaderSegment>(segment).get();
-			
-			else if (segment->type == SegmentType::Texture2D)
-				os << *std::dynamic_pointer_cast<Texture2DSegment>(segment).get();
-			
-			else if (segment->type == SegmentType::TextureAtlas)
-				os << *std::dynamic_pointer_cast<TextureAtlasSegment>(segment).get();
-			
-			else if (segment->type == SegmentType::Font)
-				os << *std::dynamic_pointer_cast<FontSegment>(segment).get();
-			
-			else if (segment->type == SegmentType::Audio)
-				os << *std::dynamic_pointer_cast<AudioSegment>(segment).get();
-			
-			else if (segment->type == SegmentType::Locale)
-				os << *std::dynamic_pointer_cast<LocaleSegment>(segment).get();
-			
-			else
-				std::cout << "Unknown segment type " << (uint32_t)segment->type << ".\n";
-			
-
-			while (i / as.GetSegments().size() * 100 > percentage) {
-				std::cout << "|";
-				percentage++;
-			}
-			i++;
-		}
-		os << *as.GetSegmentInfoTable().get();
-		std::cout << "-\n";
-		return os;
+		return os.write((const char*)as.GetBufferPointer(), as.GetBufferSize());
 	}
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Lithium/Renderer/Shader.h"
+
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 namespace li 
 {
@@ -9,14 +11,15 @@ namespace li
 	{
 	public:
 		OpenGLShader(const std::string& filepath);
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		OpenGLShader(const std::string& name, const std::string& source);
+
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
-		virtual void Unbind() const override;
 
-		virtual void AddUniformBuffer(const std::shared_ptr<UniformBuffer>& buffer) override {};
+		virtual void AddUniformBuffer(const Ref<UniformBuffer>& buffer) override {};
 
 		virtual void SetTexture(const std::string& name, int slot) override
 		{
@@ -32,11 +35,12 @@ namespace li
 		void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+
 	private:
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<unsigned int, std::string> PreProcess(const std::string& source);
 		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
-	private:
+
 		uint32_t m_RendererID;
 		std::string m_Name;
 	};

@@ -3,15 +3,18 @@
 	<shaders>
     
 		<shader name="shader_instance">
-			<source>./res/shaders/Instanced.glsl</source>
+			<glsl>./res/shaders/Instanced.glsl</glsl>
+			<hlsl>./res/shaders/Instanced.hlsl</hlsl>
 		</shader>
     
 		<shader name="shader_label">
-			<source>./res/shaders/Label.glsl</source>
+			<glsl>./res/shaders/Label.glsl</glsl>
+			<hlsl>./res/shaders/Label.hlsl</hlsl>
 		</shader>
     
 		<shader name="shader_debug_physics">
-			<source>./res/shaders/DebugPhysics.glsl</source>
+			<glsl>./res/shaders/DebugPhysics.glsl</glsl>
+			<hlsl>./res/shaders/DebugPhysics.hlsl</hlsl>
 		</shader>
     
 	</shaders>

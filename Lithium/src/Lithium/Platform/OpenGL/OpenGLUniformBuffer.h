@@ -4,6 +4,7 @@
 #include "Lithium/Renderer/UniformBuffer.h"
 
 #include <unordered_map>
+#include <string>
 
 namespace li
 {
@@ -24,6 +25,8 @@ namespace li
 		virtual void BindToSlot() const override;
 
 		virtual inline const std::string& GetName() const override { return m_Name; }
+		virtual ShaderType GetShaderType() const override;
+		virtual inline uint32_t GetSlot() const override { return m_Slot; }
 
 	private:
 		std::string m_Name;
@@ -32,7 +35,7 @@ namespace li
 		bool m_Changed = false;
 #endif
 
-		uint8_t* m_Data;
+		uint8_t* m_GlslData;
 		uint32_t m_DataSize;
 
 		std::unordered_map<std::string, UniformBufferElement> m_Elements;

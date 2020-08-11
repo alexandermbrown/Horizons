@@ -1,29 +1,16 @@
 #pragma once
 
-#include "Segment.h"
-
-#include <stdint.h>
 #include <filesystem>
+
 #include "rapidxml/rapidxml.hpp"
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace AssetBase
 {
-	class LocaleSegment : public Segment
+	class LocaleSegment
 	{
 	public:
-		char name[64];
-
-		size_t keysLength;
-		char* keys = nullptr;
-
-		size_t valuesLength;
-		wchar_t* values = nullptr;
-
-		LocaleSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath);
-		virtual ~LocaleSegment();
-
-		virtual size_t GetSize() override;
+		static flatbuffers::Offset<Assets::Locale> Serialize(rapidxml::xml_node<>* localeNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
 	};
-
-	std::ostream& operator<<(std::ostream& os, const LocaleSegment& s);
 }

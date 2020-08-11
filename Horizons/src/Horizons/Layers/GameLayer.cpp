@@ -84,7 +84,7 @@ void GameLayer::OnUpdate(float dt)
 	RenderingSystem::Render(m_Registry);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	m_DebugPhysicsRenderer.Render(camera.camera, 0.45f);
+	m_DebugPhysicsRenderer.Render();
 #endif
 
 	li::Renderer::EndScene();

@@ -55,7 +55,7 @@ void UISystem::OnEvent(entt::registry& registry, SDL_Event* event)
 	{
 		registry.view<cp::ui_context, cp::ui_element>().each([](cp::ui_context& context, cp::ui_element& element)
 			{
-				li::Ref<li::Window>& window = li::Application::Get()->GetWindow();
+				li::Window* window = li::Application::Get()->GetWindow();
 				lay_set_size_xy(&context.context, element.layout_id, (lay_scalar)window->GetWidth(), (lay_scalar)window->GetHeight());
 				context.recalculate = true;
 			});
@@ -142,7 +142,7 @@ void UISystem::Recalculate(entt::registry& registry, cp::ui_context& context)
 			lay_vec4 rect = lay_get_rect(&context.context, ui_element.layout_id);
 
 			transform.transform = glm::translate(glm::mat4(1.0f), { (float)rect[0],
-							(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), transform.z })
+				(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), transform.z })
 				* glm::scale(glm::mat4(1.0f), { (float)rect[2], (float)rect[3], 1.0f });
 		});
 }

@@ -6,10 +6,19 @@
 namespace li
 {
 	TextureAtlas::TextureAtlas(const std::string& textureAlias, const std::initializer_list<std::pair<const std::string, glm::vec4>>& entries)
-		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr) {}
+		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr) 
+	{
+	}
 
 	TextureAtlas::TextureAtlas(const std::string& textureAlias, const std::unordered_map<std::string, glm::vec4>& entries)
-		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr) {}
+		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr)
+	{
+	}
+
+	TextureAtlas::TextureAtlas(const std::string& textureAlias, std::unordered_map<std::string, glm::vec4>&& entries)
+		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr)
+	{
+	}
 
 	TextureAtlas::TextureAtlas(Ref<Texture2D> texture, const std::initializer_list<std::pair<const std::string, glm::vec4>>& entries)
 		: m_TextureAlias(), m_Entries(entries), m_Texture(texture) {}

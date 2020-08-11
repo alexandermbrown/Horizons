@@ -10,13 +10,22 @@
 #include "Lithium/Core/EntryPoint.h"
 
 #ifdef HZ_PLATFORM_WINDOWS
-#include "SDL_syswm.h"
 #include <shlobj.h>
 #endif
 
 Horizons::Horizons()
-	: li::Application({ "Horizons", 768, 384, false, true, true })
+	: li::Application({ li::RendererAPI::API::D3D11, "Horizons", 768, 384, false, true, true })
 {
+#ifdef LI_DEBUG
+	li::ResourceManager::Load("data/preload.lab-debug");
+#else
+	li::ResourceManager::Load("data/preload.lab");
+#endif
+	li::Localization::Init();
+	li::Renderer::Init();
+	li::AudioManager::Init();
+	li::UI::Init();
+
 	LoadConfig();
 
 #ifdef HZ_CONSOLE_ENABLED

@@ -10,7 +10,7 @@ namespace li
 	public:
 
 		Audio(const std::string& filename);
-		Audio(void* source, uint32_t length);
+		Audio(const void* source, uint32_t length);
 		virtual ~Audio();
 
 		inline uint32_t GetBufferID() const { return m_BufferID; }

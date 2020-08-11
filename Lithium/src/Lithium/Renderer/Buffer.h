@@ -126,11 +126,10 @@ namespace li
 		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
+		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
 
 		static Ref<VertexBuffer> Create(uint32_t size, BufferUsage usage);
 		static Ref<VertexBuffer> Create(float* vertices, uint32_t size, BufferUsage usage);
@@ -142,11 +141,10 @@ namespace li
 		virtual ~IndexBuffer() = default;
 
 		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
 
 		virtual uint32_t GetCount() const = 0;
 
-		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, BufferTarget target = BufferTarget::ElementArrayBuffer) = 0;
+		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ElementArrayBuffer) = 0;
 
 		static Ref<IndexBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::DynamicDraw);
 		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);

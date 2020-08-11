@@ -2,24 +2,17 @@
 
 #include "Segment.h"
 
-#include <stdint.h>
-#include <filesystem>
+
 #include "rapidxml/rapidxml.hpp"
+
+#include "flatbuffers/flatbuffers.h"
+#include "lab_serial/assets_generated.h"
 
 namespace AssetBase
 {
-	class ShaderSegment : public Segment
+	class ShaderSegment
 	{
 	public:
-		char name[64];
-		size_t shaderSize;
-		char* shaderData;
-
-		ShaderSegment(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath);
-		virtual ~ShaderSegment();
-
-		virtual size_t GetSize() override;
+		static flatbuffers::Offset<Assets::Shader> Serialize(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
 	};
-
-	std::ostream& operator<<(std::ostream& os, const ShaderSegment& s);
 }

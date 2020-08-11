@@ -54,7 +54,9 @@ namespace li
 		virtual void BindToSlot() const = 0;
 
 		virtual const std::string& GetName() const = 0;
+		virtual ShaderType GetShaderType() const = 0;
+		virtual uint32_t GetSlot() const = 0;
 
-		static Ref<UniformBuffer> Create(const std::string& name, uint32_t bindingSlot, const UniformBufferLayout& layout);
+		static Ref<UniformBuffer> Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout);
 	};
 }

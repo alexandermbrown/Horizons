@@ -3,31 +3,20 @@
 
 namespace AssetBase
 {
-	AudioSegment::AudioSegment(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath)
-		: Segment(SegmentType::Audio)
+	flatbuffers::Offset<Assets::Audio> AudioSegment::Serialize(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
 	{
-		name[0] = '\0';
-		for (rapidxml::xml_attribute<>* attr = audioNode->first_attribute(); attr; attr = attr->next_attribute())
+		flatbuffers::Offset<flatbuffers::String> name = NULL;
+		if (auto* name_attr = audioNode->first_attribute("name"))
 		{
-			if (!strcmp(attr->name(), "name")) {
-				strcpy_s(name, attr->value());
-				break;
-			}
+			name = builder.CreateString(name_attr->value());
+			std::cout << "Loading audio '" << name_attr->value() << "' ... ";
 		}
-		if (strlen(name) == 0)
-			throw "Attribute 'name' not found in audio.\n";
-
-		std::cout << "Loading audio '" << name << "' ... ";
+		else throw "Attribute 'name' not found in audio.";
 
 		std::filesystem::path audioPath;
-		for (rapidxml::xml_node<>* node = audioNode->first_node(); node; node = node->next_sibling())
-		{
-			if (!strcmp(node->name(), "source"))
-				audioPath = node->value();
-		}
-
-		if (audioPath.empty())
-			throw "Missing <source> in audio.\n";
+		if (auto* node = audioNode->first_node("source"))
+			audioPath = node->value();
+		else throw "Missing <source> in audio.\n";
 
 		std::ifstream audioFile(basePath.parent_path() / audioPath, std::ios::in | std::ios::binary);
 		if (!audioFile.is_open()) {
@@ -35,34 +24,17 @@ namespace AssetBase
 		}
 
 		audioFile.ignore(std::numeric_limits<std::streamsize>::max());
-		fileSize = audioFile.gcount();
+		size_t fileSize = audioFile.gcount();
 		audioFile.clear();
 		audioFile.seekg(0, std::ios_base::beg);
 
-		fileData = new char[fileSize];
+		uint8_t* fileData;
+		auto data = builder.CreateUninitializedVector(fileSize, &fileData);
 
-		audioFile.read((char*)&fileData[0], fileSize);
+		audioFile.read((char*)fileData, fileSize);
 		audioFile.close();
 
 		std::cout << "done.\n";
-	}
-
-	AudioSegment::~AudioSegment()
-	{
-		delete[] fileData;
-	}
-
-	size_t AudioSegment::GetSize()
-	{
-		return sizeof(type) + sizeof(name) + sizeof(fileSize) + fileSize;
-	}
-
-	std::ostream& operator<<(std::ostream& os, const AudioSegment& a)
-	{
-		os.write((const char*)&a.type, sizeof(a.type));
-		os.write(a.name, sizeof(a.name));
-		os.write((char*)&a.fileSize, sizeof(a.fileSize));
-		os.write(a.fileData, a.fileSize);
-		return os;
+		return Assets::CreateAudio(builder, name, data);
 	}
 }
