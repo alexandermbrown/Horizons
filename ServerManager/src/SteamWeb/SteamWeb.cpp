@@ -9,7 +9,7 @@ SteamWeb::SteamWeb(const std::string key, const std::string app)
 {
 }
 
-bool SteamWeb::AuthenticateTicket(std::string ticket)
+int SteamWeb::AuthenticateTicket(std::string ticket)
 {
 	std::string query = BuildQuery({
 		Query("key", m_Key),
@@ -22,10 +22,10 @@ bool SteamWeb::AuthenticateTicket(std::string ticket)
 	auto res = m_Client.Get(endpoint.c_str());
 	if (res && res->status == 200) {
 		std::cout << res->body << std::endl;
-		return true;
+		return 222222; // Replace with 64bit SteamID
 	}
 	else {
-		return false;
+		return 111111;
 	}
 }
 

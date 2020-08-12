@@ -5,7 +5,7 @@
 class SteamWeb {
 public:
 	SteamWeb(const std::string key, const std::string app);
-	bool AuthenticateTicket(std::string ticket);
+	int AuthenticateTicket(std::string ticket);
 private:
 	std::string BuildQuery(std::vector<Query> queries);
 	const std::string m_Key;
