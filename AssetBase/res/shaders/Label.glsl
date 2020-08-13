@@ -1,8 +1,8 @@
 #type vertex
-#version 430 core
+#version 420 core
 
-layout(location = 0) in vec2 a_Position;
-layout(location = 1) in vec2 a_TexCoord;
+layout(location = 0) in vec3 POSITION;
+layout(location = 1) in vec2 TEXCOORD;
 
 layout(std140, binding = 0) uniform ViewProjectionMatrix
 {
@@ -18,14 +18,14 @@ out vec2 v_TexCoord;
 
 void main()
 {
-	v_TexCoord = a_TexCoord;
-	gl_Position = u_ViewProj * u_Transform * vec4(a_Position, 0.0, 1.0);
+	v_TexCoord = TEXCOORD;
+	gl_Position = u_ViewProj * u_Transform * vec4(POSITION, 1.0);
 }
 
 
 
 #type fragment
-#version 430 core
+#version 420 core
 layout(location = 0) out vec4 color;
 
 in vec2 v_TexCoord;
@@ -33,6 +33,7 @@ in vec2 v_TexCoord;
 layout(std140, binding = 2) uniform Color
 {
 	vec4 u_Color;
+    float u_DistanceFactor;
 };
 
 uniform sampler2D u_Texture;
@@ -43,13 +44,14 @@ float median(float r, float g, float b) {
 
 void main()
 {
-    vec2 pos = v_TexCoord.xy;
-    vec3 colorsample = texture(u_Texture, v_TexCoord).rgb;
-    ivec2 sz = textureSize(u_Texture, 0).xy;
-    float dx = dFdx(pos.x) * sz.x; 
-    float dy = dFdy(pos.y) * sz.y;
-    float sigDist = median(colorsample.r, colorsample.g, colorsample.b);
-    float w = fwidth(sigDist);
-    float opacity = smoothstep(0.5 - w, 0.5 + w, sigDist);
+    // vec4 msdfsample = texture(u_Texture, v_TexCoord);
+    // float sigDist = median(msdfsample.r, msdfsample.g, msdfsample.b);
+    // float w = fwidth(sigDist);
+    // float opacity = smoothstep(0.5 - w, 0.5 + w, sigDist);
+    // color = vec4(u_Color.rgb, opacity * u_Color.a);
+
+    vec3 msdfsample = texture(u_Texture, v_TexCoord).rgb;
+    float sigDist = u_DistanceFactor * (median(msdfsample.r, msdfsample.g, msdfsample.b) - 0.5);
+    float opacity = clamp(sigDist + 0.5, 0.0, 1.0);
     color = vec4(u_Color.rgb, opacity * u_Color.a);
 }

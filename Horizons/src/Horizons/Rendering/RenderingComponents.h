@@ -16,6 +16,11 @@ namespace cp
 		glm::vec4 color;
 	};
 
+	struct label
+	{
+		li::Ref<li::Label> lilabel;
+	};
+
 	struct camera
 	{
 		li::OrthographicCamera* camera;

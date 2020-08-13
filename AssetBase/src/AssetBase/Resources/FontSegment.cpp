@@ -46,13 +46,30 @@ namespace AssetBase
 		if (auto* node = fontNode->first_node("texture_width"))
 			textureWidth = Helpers::StringToInt(node->value(), "texture_width");
 		else throw "Node <texture_width> not found in font.";
-
-		float emSize, ascenderY, descenderY;
-		float lineHeight, underlineY, underlineThickness;
 		
 		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> image = NULL;
-		
+		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> ttf = NULL;
+
+		{
+			std::ifstream ttfFile(basePath.parent_path() / fontPath, std::ios::in | std::ios::binary);
+			if (!ttfFile.is_open()) {
+				throw "Failed to open ttf file.\n";
+			}
+
+			ttfFile.ignore(std::numeric_limits<std::streamsize>::max());
+			size_t fileSize = ttfFile.gcount();
+			ttfFile.clear();
+			ttfFile.seekg(0, std::ios_base::beg);
+
+			uint8_t* fileData;
+			ttf = builder.CreateUninitializedVector(fileSize, &fileData);
+
+			ttfFile.read((char*)fileData, fileSize);
+			ttfFile.close();
+		}
+
 		flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>>> glyphs_offset = NULL;
+
 
 		bool useCache = false;
 		std::filesystem::path cachePath = "./.lab-cache/fonts/" + std::string(name) + ".cache";
@@ -81,12 +98,6 @@ namespace AssetBase
 				{
 					std::vector<flatbuffers::Offset<Assets::GlyphEntry>> glyphs;
 					useCache = true;
-					emSize = font->em_size();
-					ascenderY = font->ascender_y();
-					descenderY = font->descender_y();
-					lineHeight = font->line_height();
-					underlineY = font->underline_y();
-					underlineThickness = font->underline_thickness();
 
 					auto imageVector = font->image();
 					image = builder.CreateVector(imageVector->data(), imageVector->size());
@@ -94,8 +105,7 @@ namespace AssetBase
 					const auto* glyphsVector = font->glyphs();
 					for (auto cachedGlyph : *glyphsVector)
 					{
-						glyphs.push_back(Assets::CreateGlyphEntry(builder, cachedGlyph->character(), cachedGlyph->texture_offset(), cachedGlyph->width(), 
-							cachedGlyph->height(), cachedGlyph->horizontal_advance(), cachedGlyph->bearing_x(), cachedGlyph->bearing_y()));
+						glyphs.push_back(Assets::CreateGlyphEntry(builder, cachedGlyph->codepoint(), cachedGlyph->texture_offset()));
 					}
 					glyphs_offset = builder.CreateVector(glyphs);
 				}
@@ -114,31 +124,25 @@ namespace AssetBase
 				long maxGliphs = (textureWidth * textureWidth) / (glyphWidth * glyphWidth);
 
 				if (numGlyphs > maxGliphs)
-					throw std::stringstream("The number of glyphs in font ") << numGlyphs << " is greater than the maximum of " << numGlyphs << ".\n";
+					throw "The number of glyphs in font is greater than what can be fit in the image size.";
 
 				unsigned long charcode;
-				uint32_t gindex;
+				uint32_t codepoint;
 				long count = 0;
 				std::cout << "Loading font " << name << " with " << numGlyphs << " glyphs.\n";
 				std::cout << "[" << count << " / " << numGlyphs << "]\r";
 
 				msdfgen::Bitmap<float, 3> atlas(textureWidth, textureWidth);
 
-				msdfgen::FontMetrics metrics;
-				msdfgen::getFontMetrics(metrics, font);
-				emSize = (float)metrics.emSize;
-				ascenderY = (float)metrics.ascenderY;
-				descenderY = (float)metrics.descenderY;
-				lineHeight = (float)metrics.lineHeight;
-				underlineY = (float)metrics.underlineY;
-				underlineThickness = (float)metrics.underlineThickness;
-
 				flatbuffers::FlatBufferBuilder cacheBuidler(1024);
 				auto cache_name = cacheBuidler.CreateString(name);
 				std::vector<flatbuffers::Offset<Assets::GlyphEntry>> glyphs, cache_glyphs;
 
-				charcode = msdfgen::getFirstChar(font, &gindex);
-				while (gindex != 0 && count < maxGliphs)
+				msdfgen::FontMetrics metrics;
+				msdfgen::getFontMetrics(metrics, font);
+
+				charcode = msdfgen::getFirstChar(font, &codepoint);
+				while (codepoint != 0 && count < maxGliphs)
 				{
 					msdfgen::Shape shape;
 					if (msdfgen::loadGlyph(shape, font, charcode))
@@ -147,7 +151,7 @@ namespace AssetBase
 						msdfgen::edgeColoringSimple(shape, 3.0);
 						msdfgen::Bitmap<float, 3> msdf(glyphWidth, glyphWidth);
 
-						msdfgen::generateMSDF(msdf, shape, 12.0, msdfgen::Vector2(glyphWidth * 0.75 / emSize), msdfgen::Vector2(4.0, 10.0));
+						msdfgen::generateMSDF(msdf, shape, 4.0, msdfgen::Vector2(0.6f * (float)glyphWidth / (float)metrics.emSize), msdfgen::Vector2(4.0, 10.0));
 
 						// Combine images.
 						for (int y = 0; y < glyphWidth; y++) {
@@ -159,16 +163,12 @@ namespace AssetBase
 							}
 						}
 
-						msdfgen::GlyphMetrics metrics;
-						msdfgen::getGlyphMetrics(metrics, font);
 						Assets::Vec2 textureOffset = Assets::Vec2(((glyphWidth * count) % textureWidth) / float(textureWidth),
 							(std::floor((float)(glyphWidth * count) / (float)textureWidth) * glyphWidth) / (float)textureWidth);
 
-						glyphs.push_back(Assets::CreateGlyphEntry(builder, (int16_t)charcode, &textureOffset, (float)metrics.width, 
-							(float)metrics.height, (float)metrics.horiAdvance, (float)metrics.horiBearingX, (float)metrics.horiBearingY));
+						glyphs.push_back(Assets::CreateGlyphEntry(builder, codepoint, &textureOffset));
 
-						cache_glyphs.push_back(Assets::CreateGlyphEntry(cacheBuidler, (int16_t)charcode, &textureOffset, (float)metrics.width,
-							(float)metrics.height, (float)metrics.horiAdvance, (float)metrics.horiBearingX, (float)metrics.horiBearingY));
+						cache_glyphs.push_back(Assets::CreateGlyphEntry(cacheBuidler, codepoint, &textureOffset));
 
 						if (count % 10 == 0)
 							std::cout << "[" << count << " / " << numGlyphs << "]\r";
@@ -176,7 +176,7 @@ namespace AssetBase
 					else throw std::stringstream("Failed to load character ") << charcode << " in font " << name << ".\n";
 
 					count++;
-					charcode = msdfgen::getNextChar(font, charcode, &gindex);
+					charcode = msdfgen::getNextChar(font, charcode, &codepoint);
 				}
 
 				std::vector<uint8_t> imageData;
@@ -188,8 +188,7 @@ namespace AssetBase
 				auto cache_glyphs_offset = cacheBuidler.CreateVector(cache_glyphs);
 				auto cache_image_offset = cacheBuidler.CreateVector(imageData);
 				
-				auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyphWidth, textureWidth, emSize,
-					ascenderY, descenderY, lineHeight, underlineY, underlineThickness, cache_glyphs_offset, cache_image_offset);
+				auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyphWidth, textureWidth, cache_glyphs_offset, cache_image_offset);
 				cacheBuidler.Finish(cache_font, "FONT");
 
 				std::ofstream cacheFile(cachePath.string(), std::ios::out | std::ios::trunc | std::ios::binary);
@@ -201,11 +200,10 @@ namespace AssetBase
 				cacheFile.close();
 
 			}
-			else throw std::stringstream("Failed to load font '") << name << "'\n";
+			else throw "Failed to load font.";
 		}
 		std::cout << "[ done! ]         \n";
 
-		return Assets::CreateFont(builder, name_offset, glyphWidth, textureWidth, emSize,
-			ascenderY, descenderY, lineHeight, underlineY, underlineThickness, glyphs_offset, image);
+		return Assets::CreateFont(builder, name_offset, glyphWidth, textureWidth, glyphs_offset, image, ttf);
 	}
 }

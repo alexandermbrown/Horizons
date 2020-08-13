@@ -14,7 +14,7 @@
 #endif
 
 Horizons::Horizons()
-	: li::Application({ li::RendererAPI::API::D3D11, "Horizons", 768, 384, false, true, true })
+	: li::Application({ li::RendererAPI::API::OpenGL, "Horizons", 768, 384, false, true, true })
 {
 #ifdef LI_DEBUG
 	li::ResourceManager::Load("data/preload.lab-debug");

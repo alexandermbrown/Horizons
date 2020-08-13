@@ -56,27 +56,17 @@ table TextureAtlas {
 }
 
 table GlyphEntry {
-	character:short;
+	codepoint:uint;
 	texture_offset:Vec2;
-	width:float;
-	height:float;
-	horizontal_advance:float;
-	bearing_x:float;
-	bearing_y:float;
 }
 
 table Font {
 	name:string;
 	glyph_width:short;
 	texture_width:short;
-	em_size:float;
-	ascender_y:float;
-	descender_y:float;
-	line_height:float;
-	underline_y:float;
-	underline_thickness:float;
 	glyphs:[GlyphEntry];
 	image:[ubyte];
+	ttf:[ubyte];
 }
 
 table Audio {

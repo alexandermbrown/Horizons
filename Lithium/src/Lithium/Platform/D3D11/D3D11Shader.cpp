@@ -10,6 +10,8 @@
 #include <d3dcompiler.h>
 #endif
 
+#include <algorithm>
+
 namespace li
 {
 #ifdef LI_DEBUG
@@ -82,7 +84,7 @@ namespace li
 		m_ContextHandle->VSSetConstantBuffers(0, (UINT)m_VSUniformBuffers.size(), m_VSUniformBuffers.data());
 		m_ContextHandle->VSSetShader(m_VertexShader, NULL, 0);
 
-		m_ContextHandle->PSSetConstantBuffers(0, (UINT)m_PSUniformBuffers.size(), m_PSUniformBuffers.data());
+		m_ContextHandle->PSSetConstantBuffers(m_VSUniformBuffers.size(), (UINT)m_PSUniformBuffers.size(), m_PSUniformBuffers.data());
 		m_ContextHandle->PSSetShader(m_PixelShader, NULL, 0);
 	}
 

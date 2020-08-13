@@ -54,7 +54,6 @@
 			<texture_width>2048</texture_width>
 		</font>
 
-
 		<font name="RobotoMono-Light">
 			<source>./res/fonts/RobotoMono/RobotoMono-Light.ttf</source>
 			<glyph_width>64</glyph_width>
@@ -79,6 +78,24 @@
 			<texture_width>2048</texture_width>
 		</font>
 		
+		<font name="Lato-Regular">
+			<source>./res/fonts/Lato/Lato-Regular.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+
+		<font name="Lora-Regular">
+			<source>./res/fonts/Lora/Lora-Regular.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+
+		<font name="Tomorrow-Regular">
+			<source>./res/fonts/Tomorrow/Tomorrow-Regular.ttf</source>
+			<glyph_width>64</glyph_width>
+			<texture_width>2048</texture_width>
+		</font>
+
 	</fonts>
 
 	<texture_atlases>

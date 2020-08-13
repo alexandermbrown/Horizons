@@ -12,6 +12,7 @@ namespace li
 
 	void Renderer::Init()
 	{
+		RendererAPI::SetDepthTest(true);
 		s_Data = CreateScope<Renderer::RendererData>();
 
 		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {
@@ -24,10 +25,11 @@ namespace li
 		});
 		s_Data->TransformMatrixUB->BindToSlot();
 
-		s_Data->ColorUB = UniformBuffer::Create("Color", 2, ShaderType::Fragment, {
+		s_Data->FontUB = UniformBuffer::Create("Color", 2, ShaderType::Fragment, {
 			{ "u_Color", ShaderDataType::Float4 },
+			{ "u_DistanceFactor", ShaderDataType::Float }
 		});
-		s_Data->ColorUB->BindToSlot();
+		s_Data->FontUB->BindToSlot();
 		
 		s_Data->Camera = nullptr;
 
@@ -74,6 +76,9 @@ namespace li
 	void Renderer::InitPostResourceLoad()
 	{
 		s_Data->FontShader = ResourceManager::Get<Shader>("shader_label");
+		s_Data->FontShader->AddUniformBuffer(s_Data->ViewProjUB);
+		s_Data->FontShader->AddUniformBuffer(s_Data->TransformMatrixUB);
+		s_Data->FontShader->AddUniformBuffer(s_Data->FontUB);
 
 		// SETUP WHITE TEXTURE
 		uint32_t data = 0xffffffff;
@@ -118,7 +123,6 @@ namespace li
 
 	void Renderer::EndScene()
 	{
-		RendererAPI::SetDepthTest(true);
 		s_Data->SceneRenderer.EndScene();
 	}
 
@@ -132,7 +136,6 @@ namespace li
 
 	void Renderer::EndUI()
 	{
-		RendererAPI::SetDepthTest(true);
 		s_Data->UIRenderer.EndScene();
 	}
 
@@ -185,7 +188,6 @@ namespace li
 
 	void Renderer::UISubmit(const Ref<Texture>& texture, const glm::mat4& transform)
 	{
-		RendererAPI::SetDepthTest(true);
 		s_Data->TextureShader->Bind();
 
 		s_Data->TransformMatrixUB->SetMat4("u_Transform", transform);
@@ -209,15 +211,16 @@ namespace li
 
 	void Renderer::RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
 	{
-		RendererAPI::SetDepthTest(false);
 		const Ref<VertexArray>& vertexArray = label->GetVertexArray();
 		s_Data->FontShader->Bind();
 
 		s_Data->TransformMatrixUB->SetMat4("u_Transform", transform);
 		s_Data->TransformMatrixUB->UploadData();
 
-		s_Data->ColorUB->SetFloat4("u_Color", color);
-		s_Data->ColorUB->UploadData();
+		s_Data->FontUB->SetFloat4("u_Color", color);
+		s_Data->FontUB->SetFloat("u_DistanceFactor", 8.0f);
+		//s_Data->FontUB->SetFloat("u_DistanceFactor", (float)(label->GetPointSize() / 2));
+		s_Data->FontUB->UploadData();
 
 		s_Data->FontShader->SetTexture("u_Texture", 0);
 

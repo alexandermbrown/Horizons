@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "HUDLayer.h"
 
 #include "Horizons/Rendering/RenderingComponents.h"
@@ -40,6 +40,24 @@ HUDLayer::HUDLayer()
 		m_Registry.emplace<cp::color>(item_slot, glm::vec4(0.7f, 0.5f, 0.4f, 0.7f));
 
 		UISystem::AddChild(m_Registry, item_bar, item_slot);
+	}
+
+	{
+		li::Ref<li::Label> label = li::CreateRef<li::Label>(std::u16string(u"Press F to enter..."), 30, li::ResourceManager::Get<li::Font>("Lora-Regular"));
+
+		entt::entity label_ent = m_Registry.create();
+		auto& element = m_Registry.emplace<cp::ui_element>(label_ent);
+		element.layout_behave = LAY_TOP | LAY_LEFT;
+		element.layout_contain = LAY_LAYOUT;
+		element.width = 1;
+		element.height = 1;
+		element.margins = lay_vec4_xyzw(60, 260, 60, 60);
+
+		m_Registry.emplace<cp::ui_transform>(label_ent, 0.2015f);
+		auto& cp_label = m_Registry.emplace<cp::label>(label_ent);
+		cp_label.lilabel = label;
+
+		UISystem::AddChild(m_Registry, context_ent, label_ent);
 	}
 
 	cp::ui_context& context = m_Registry.get<cp::ui_context>(context_ent);

@@ -79,9 +79,11 @@ namespace li
 				element.Offset = componentOffset * 4;
 				componentOffset += GetOpenGLBaseAlignment(element.Type);
 			}
+			m_Size = componentOffset * 4;
 
 			break;
 		case RendererAPI::API::D3D11:
+		{
 			// Conform to D3D11's HLSL packing rules.
 			// https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules
 			// - Variables aligned to 4-byte boundaries.
@@ -100,13 +102,17 @@ namespace li
 				element.Offset = componentOffset * 4;
 				componentOffset += size;
 			}
-
+			m_Size = componentOffset * 4;
+			int overflow = m_Size % 16;
+			if (overflow)
+				m_Size += 16 - overflow;
 			break;
+		}
 		default:
 			LI_CORE_ERROR("Unsupported graphics API!");
 		}
 
-		m_Size = componentOffset * 4;
+		
 	}
 
 	Ref<UniformBuffer> li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)

@@ -137,7 +137,7 @@ void UISystem::Recalculate(entt::registry& registry, cp::ui_context& context)
 
 	lay_run_context(&context.context);
 
-	registry.view<cp::ui_transform, cp::ui_element>().each([&](cp::ui_transform& transform, cp::ui_element& ui_element)
+	registry.view<cp::ui_transform, cp::ui_element>().each([&](entt::entity entity, cp::ui_transform& transform, cp::ui_element& ui_element)
 		{
 			lay_vec4 rect = lay_get_rect(&context.context, ui_element.layout_id);
 

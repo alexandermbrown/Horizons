@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[])
 {
-	std::cout << "AssetBase v0.2.0\n";
+	std::cout << "AssetBase v0.2.1\n";
 
 	std::ifstream resfiles("./resfiles.txt");
 	if (!resfiles.is_open())

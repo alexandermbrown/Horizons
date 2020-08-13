@@ -69,7 +69,7 @@ namespace li
 
 			Ref<UniformBuffer> ViewProjUB;
 			Ref<UniformBuffer> TransformMatrixUB;
-			Ref<UniformBuffer> ColorUB;
+			Ref<UniformBuffer> FontUB;
 
 			OrthographicCamera* Camera;
 			Scope<OrthographicCamera> UICamera;

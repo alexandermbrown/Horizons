@@ -5,59 +5,47 @@
 #include "Lithium/Renderer/VertexArray.h"
 
 #include "glm/glm.hpp"
+#include "hb.h"
 
-#include <map>
+#include <unordered_map>
 
 namespace li
 {
-	struct Glyph
-	{
-		wchar_t Character;
-		glm::vec2 TextureOffset;
-
-		float Width;
-		float Height;
-
-		float HorizontalAdvance;
-		float BearingX;
-		float BearingY;
-	};
-
 	struct FontProperties
 	{
 		uint16_t GlyphWidth = 0;
 		uint16_t TextureWidth = 0;
-
-		float EmSize;
-		float AscenderY, DescenderY;
-		float LineHeight;
-		float UnderlineY, UnderlineThickness;
 	};
 
 	class Font
 	{
 	public:
 
-		Font(const std::string& name, const FontProperties& props, const std::vector<Glyph>& glyphs, Ref<Texture2D> texture);
-		Font(const std::string& name, const FontProperties& props, std::unordered_map<wchar_t, Glyph>&& glyphs, Ref<Texture2D> texture);
-		virtual ~Font() = default;
+		Font(const std::string& name, const FontProperties& props, std::unordered_map<uint32_t, glm::vec2>&& textureOffsets, Ref<Texture2D> texture, const char* ttfData, uint32_t ttfSize);
+		virtual ~Font();
 
 		inline Ref<Texture2D> GetTexture() const { return m_Texture; }
 		inline const FontProperties& GetProperties() const { return m_Properties; }
-		inline const Glyph& GetGlyph(wchar_t character) const { return m_Glyphs.at(character); }
+		inline const glm::vec2& GetTextureOffset(int16_t character) const { return m_TextureOffsets.at(character); }
+
+		hb_font_t* GetHBFont(int pointSize);
 
 	private:
 
 		std::string m_Name;
 		FontProperties m_Properties;
 		Ref<Texture2D> m_Texture;
-		std::unordered_map<wchar_t, Glyph> m_Glyphs;
+		std::unordered_map<uint32_t, glm::vec2> m_TextureOffsets;
+
+		std::unordered_map<int, hb_font_t*> m_Fonts;
+
+		hb_face_t* m_Face;
 	};
 
 
 	struct GlyphVertex
 	{
-		glm::vec2 Position;
+		glm::vec3 Position;
 		glm::vec2 TexCoords;
 	};
 
@@ -65,27 +53,20 @@ namespace li
 	{
 	public:
 
-		Label(const std::wstring& text, float pointSize, Ref<Font> font, const glm::vec4 color = glm::vec4(1.0f), uint32_t maxChars = 0);
-		virtual ~Label() = default;
+		Label(const std::u16string& text, int pointSize, Ref<Font> font, uint32_t maxChars = 0);
+		virtual ~Label();
 
-		void Set(const std::wstring& text, float pointSize, const glm::vec3& position, Ref<Font> font);
-		void Set(const std::wstring& text, float pointSize, const glm::mat4& transform, Ref<Font> font);
-
-		void SetText(const std::wstring& text);
-		void SetPointSize(float pointSize);
-		void SetFont(Ref<Font> font);
-
+		inline int GetPointSize() const { return m_PointSize; }
 		inline const Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 		inline const Ref<Font>& GetFont() { return m_Font; }
 
 	private:
 		void Init();
-		void Calculate();
 
 	private:
 
-		std::wstring m_Text;
-		float m_PointSize;
+		std::u16string m_Text;
+		int m_PointSize;
 		Ref<Font> m_Font;
 
 		uint32_t m_MaxChars;
@@ -94,5 +75,7 @@ namespace li
 
 		Ref<VertexArray> m_VertexArray;
 		Ref<VertexBuffer> m_VertexBuffer;
+
+		hb_buffer_t* m_Buffer;
 	};
 }

@@ -28,6 +28,7 @@ IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
 IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
 IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
 IncludeDir["layout"] = "Lithium/vendor/layout/include"
+IncludeDir["harfbuzz"] = "Lithium/vendor/harfbuzz/src"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -51,6 +52,7 @@ include "Lithium/vendor/imgui"
 include "Lithium/vendor/zlib"
 include "Lithium/vendor/libvorbis"
 include "Lithium/vendor/openal-soft"
+include "Lithium/vendor/harfbuzz"
 include "AssetBase/vendor/msdfgen"
 include "GameServer/vendor/yojimbo"
 include "ServerManager/vendor/libb64"
@@ -97,7 +99,8 @@ project "Lithium"
         "%{IncludeDir.readerwriterqueue}",
         "%{IncludeDir.layout}",
         "%{IncludeDir.flatbuffers}",
-        "%{IncludeDir.lab_serial}"
+        "%{IncludeDir.lab_serial}",
+        "%{IncludeDir.harfbuzz}"
     }
 
     links {
@@ -106,7 +109,8 @@ project "Lithium"
         "zlib",
         "libvorbis",
         "openal-soft",
-        "SDL2"
+        "SDL2",
+        "harfbuzz"
     }
 
     filter "system:windows"
@@ -176,7 +180,8 @@ project "Horizons"
         "%{IncludeDir.simpleini}",
         "%{IncludeDir.steam}",
         "%{IncludeDir.flatbuffers}",
-        "%{IncludeDir.lab_serial}"
+        "%{IncludeDir.lab_serial}",
+        "%{IncludeDir.harfbuzz}"
     }
 
     links {
