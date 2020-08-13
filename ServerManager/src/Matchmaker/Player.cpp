@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Player.h"
 
-Player::Player(const std::string& usr)
-	: username(usr), m_Connected(false)
+Player::Player(const int& steamid)
+	: m_SteamID(steamid), m_Connected(false)
 {
 }

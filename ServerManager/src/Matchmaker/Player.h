@@ -5,8 +5,8 @@
 
 class Player {
 public:
-    Player(const std::string& usr);
-    const std::string username;
+    Player(const int& steamid);
+    const int m_SteamID;
 private:
     bool m_Connected;
 };
