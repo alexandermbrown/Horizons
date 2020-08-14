@@ -43,16 +43,7 @@ namespace li
 		: m_Text(text), m_PointSize(pointSize), m_Font(font), m_MaxChars(maxChars)
 	{
 		m_DistanceFactor =  font->GetProperties().DistanceGradient * (float)pointSize + 2.0f;
-		Init();
-	}
 
-	Label::~Label()
-	{
-		hb_buffer_destroy(m_Buffer);
-	}
-
-	void Label::Init()
-	{
 		if (m_MaxChars > 0)
 		{
 			m_GlyphVertices.reserve((size_t)m_MaxChars * 4ULL);
@@ -69,10 +60,10 @@ namespace li
 		BufferLayout charLayout({
 			{ ShaderDataType::Float3, "POSITION", 0 },
 			{ ShaderDataType::Float2, "TEXCOORD", 1 }
-		});
+			});
 
 		m_VertexBuffer = VertexBuffer::Create(
-			static_cast<uint32_t>(m_MaxChars ? m_MaxChars : m_Text.length()) * charLayout.GetStride() * 4U,
+			static_cast<uint32_t>(m_MaxChars ? m_MaxChars : m_Text.length())* charLayout.GetStride() * 4U,
 			m_MaxChars >= 0 ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
 		m_VertexBuffer->SetLayout(charLayout);
 
@@ -151,21 +142,26 @@ namespace li
 			vertex.TexCoords = glm::vec2(textureLeft, textureTop);
 			m_GlyphVertices.push_back(vertex);
 			num_quads++;
-			
+
 			current_x += pos[i].x_advance / 64.;
 			current_y += pos[i].y_advance / 64.;
 		}
 
 		m_VertexArray->GetIndexBuffer()->SetSubData(
-			(uint32_t*)&m_GlyphIndices[0], 
-			static_cast<uint32_t>(m_GlyphIndices.size() * sizeof(uint32_t)), 
+			(uint32_t*)&m_GlyphIndices[0],
+			static_cast<uint32_t>(m_GlyphIndices.size() * sizeof(uint32_t)),
 			0, true
 		);
 		m_VertexBuffer->SetSubData(
-			(float*)&m_GlyphVertices[0], 
+			(float*)&m_GlyphVertices[0],
 			static_cast<uint32_t>(sizeof(GlyphVertex) * m_GlyphVertices.size()),
 			0, true
 		);
 		LI_CORE_TRACE("DONE!");
+	}
+
+	Label::~Label()
+	{
+		hb_buffer_destroy(m_Buffer);
 	}
 }

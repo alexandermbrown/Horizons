@@ -4,6 +4,8 @@
 #include "entt/entt.hpp"
 #include "glm/glm.hpp"
 
+#include <functional>
+
 namespace cp
 {
 	struct ui_transform
@@ -38,9 +40,22 @@ namespace cp
 		uint32_t layout_contain = 0;
 	};
 
-	struct ui_button
+	struct ui_hover
 	{
+		std::function<void(entt::registry&, entt::entity)> OnMouseEnterFn;
+		std::function<void(entt::registry&, entt::entity)> OnMouseLeaveFn;
 
+		bool is_hover = false;
+	};
+
+	struct ui_click
+	{
+		std::function<bool(entt::registry&, entt::entity, int button)> OnMouseDownFn;
+		std::function<bool(entt::registry&, entt::entity, int button)> OnMouseUpFn;
+		std::function<bool(entt::registry&, entt::entity, int button)> OnClickFn;
+
+		bool start_click = false;
+		int mouse_button = -1;
 	};
 }
 

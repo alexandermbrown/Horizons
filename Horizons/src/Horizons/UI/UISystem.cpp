@@ -7,7 +7,7 @@
 
 #include "Lithium.h"
 
-void UISystem::Init(entt::registry& registry)
+void UILayoutSystem::Init(entt::registry& registry)
 {
 	entt::entity ui_context = registry.create();
 	cp::ui_context& context = registry.emplace<cp::ui_context>(ui_context);
@@ -20,7 +20,7 @@ void UISystem::Init(entt::registry& registry)
 	lay_reserve_items_capacity(&context.context, MaxItemCount);
 }
 
-void UISystem::Shutdown(entt::registry& registry)
+void UILayoutSystem::Shutdown(entt::registry& registry)
 {
 	auto& view = registry.view<cp::ui_context>();
 	view.each([](cp::ui_context& context) {
@@ -30,7 +30,7 @@ void UISystem::Shutdown(entt::registry& registry)
 	registry.destroy(view.begin(), view.end());
 }
 
-void UISystem::Update(entt::registry& registry)
+void UILayoutSystem::Update(entt::registry& registry)
 {
 	entt::entity context_ent = registry.view<cp::ui_context>().front();
 	cp::ui_context& context = registry.get<cp::ui_context>(context_ent);
@@ -49,20 +49,17 @@ void UISystem::Update(entt::registry& registry)
 	}
 }
 
-void UISystem::OnEvent(entt::registry& registry, SDL_Event* event)
+void UILayoutSystem::OnWindowResize(entt::registry& registry, int width, int height)
 {
-	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+	registry.view<cp::ui_context, cp::ui_element>().each([width, height](cp::ui_context& context, cp::ui_element& element)
 	{
-		registry.view<cp::ui_context, cp::ui_element>().each([](cp::ui_context& context, cp::ui_element& element)
-			{
-				li::Window* window = li::Application::Get()->GetWindow();
-				lay_set_size_xy(&context.context, element.layout_id, (lay_scalar)window->GetWidth(), (lay_scalar)window->GetHeight());
-				context.recalculate = true;
-			});
-	}
+		li::Window* window = li::Application::Get()->GetWindow();
+		lay_set_size_xy(&context.context, element.layout_id, (lay_scalar)width, (lay_scalar)height);
+		context.recalculate = true;
+	});
 }
 
-void UISystem::AddChild(entt::registry& registry, entt::entity parent, entt::entity child)
+void UILayoutSystem::AddChild(entt::registry& registry, entt::entity parent, entt::entity child)
 {
 	cp::ui_element& parent_ui = registry.get<cp::ui_element>(parent);
 	cp::ui_element& child_ui = registry.get<cp::ui_element>(child);
@@ -79,7 +76,7 @@ void UISystem::AddChild(entt::registry& registry, entt::entity parent, entt::ent
 	child_ui.parent = parent;
 }
 
-void UISystem::AddSibling(entt::registry& registry, entt::entity existing, entt::entity new_ent)
+void UILayoutSystem::AddSibling(entt::registry& registry, entt::entity existing, entt::entity new_ent)
 {
 	cp::ui_element& existing_ui = registry.get<cp::ui_element>(existing);
 
@@ -93,7 +90,7 @@ void UISystem::AddSibling(entt::registry& registry, entt::entity existing, entt:
 	}
 }
 
-void UISystem::Rebuild(entt::registry& registry, entt::entity context_ent)
+void UILayoutSystem::Rebuild(entt::registry& registry, entt::entity context_ent)
 {
 	LI_TRACE("Rebuilding UI...");
 
@@ -107,7 +104,7 @@ void UISystem::Rebuild(entt::registry& registry, entt::entity context_ent)
 	RebuildChildren(registry, context, root);
 }
 
-void UISystem::RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& parent_element)
+void UILayoutSystem::RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& parent_element)
 {
 	for (entt::entity child = parent_element.first_child; registry.valid(child); child = registry.get<cp::ui_element>(child).next_sibling)
 	{
@@ -131,7 +128,7 @@ void UISystem::RebuildChildren(entt::registry& registry, cp::ui_context& context
 	}
 }
 
-void UISystem::Recalculate(entt::registry& registry, cp::ui_context& context)
+void UILayoutSystem::Recalculate(entt::registry& registry, cp::ui_context& context)
 {
 	LI_TRACE("Recalculating UI...");
 

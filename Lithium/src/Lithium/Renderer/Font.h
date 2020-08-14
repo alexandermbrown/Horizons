@@ -64,9 +64,6 @@ namespace li
 		inline const Ref<Font>& GetFont() { return m_Font; }
 
 	private:
-		void Init();
-
-	private:
 
 		std::u16string m_Text;
 		int m_PointSize;

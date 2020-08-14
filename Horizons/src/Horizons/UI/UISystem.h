@@ -4,7 +4,7 @@
 #include "entt/entt.hpp"
 #include "SDL.h"
 
-class UISystem
+class UILayoutSystem
 {
 public:
 	static void Init(entt::registry& registry);
@@ -12,7 +12,7 @@ public:
 
 	static void Update(entt::registry& registry);
 
-	static void OnEvent(entt::registry& registry, SDL_Event* event);
+	static void OnWindowResize(entt::registry& registry, int width, int height);
 
 
 	static void AddChild(entt::registry& registry, entt::entity parent, entt::entity child);
