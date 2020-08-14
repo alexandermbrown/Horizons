@@ -8,6 +8,7 @@ namespace li
 		FontProperties props;
 		props.GlyphWidth = font->glyph_width();
 		props.TextureWidth = font->texture_width();
+		props.DistanceGradient = font->distance_gradient();
 
 		const auto* saved_glyphs = font->glyphs();
 		std::unordered_map<uint32_t, glm::vec2> textureOffsets(saved_glyphs->size());

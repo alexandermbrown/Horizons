@@ -64,6 +64,7 @@ table Font {
 	name:string;
 	glyph_width:short;
 	texture_width:short;
+	distance_gradient:float;
 	glyphs:[GlyphEntry];
 	image:[ubyte];
 	ttf:[ubyte];

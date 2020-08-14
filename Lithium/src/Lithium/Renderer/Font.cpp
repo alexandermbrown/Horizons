@@ -42,6 +42,7 @@ namespace li
 	Label::Label(const std::u16string& text, int pointSize, Ref<Font> font, uint32_t maxChars)
 		: m_Text(text), m_PointSize(pointSize), m_Font(font), m_MaxChars(maxChars)
 	{
+		m_DistanceFactor =  font->GetProperties().DistanceGradient * (float)pointSize + 2.0f;
 		Init();
 	}
 

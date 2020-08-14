@@ -27,7 +27,7 @@ void UIRenderSystem::Render(entt::registry& registry)
 		}
 		else if (has_color && has_label)
 		{
-			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).lilabel, transform.transform, registry.get<cp::color>(entity).color);
+			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, registry.get<cp::color>(entity).color);
 		}
 		else if (has_color)
 		{
@@ -39,7 +39,7 @@ void UIRenderSystem::Render(entt::registry& registry)
 		}
 		else if (has_label)
 		{
-			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).lilabel, transform.transform, { 1.0f, 1.0f, 1.0f, 1.0f });
+			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, { 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 	}
 }

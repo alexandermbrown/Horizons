@@ -218,8 +218,8 @@ namespace li
 		s_Data->TransformMatrixUB->UploadData();
 
 		s_Data->FontUB->SetFloat4("u_Color", color);
-		s_Data->FontUB->SetFloat("u_DistanceFactor", 8.0f);
-		//s_Data->FontUB->SetFloat("u_DistanceFactor", (float)(label->GetPointSize() / 2));
+		//s_Data->FontUB->SetFloat("u_DistanceFactor", 8.0f);
+		s_Data->FontUB->SetFloat("u_DistanceFactor", label->GetDistanceFactor());
 		s_Data->FontUB->UploadData();
 
 		s_Data->FontShader->SetTexture("u_Texture", 0);

@@ -19,6 +19,5 @@ public:
 	virtual void OnEvent(SDL_Event* event) override;
 
 private:
-
 	entt::registry m_Registry;
 };

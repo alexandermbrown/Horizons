@@ -18,7 +18,7 @@ namespace cp
 
 	struct label
 	{
-		li::Ref<li::Label> lilabel;
+		li::Ref<li::Label> label_ref;
 	};
 
 	struct camera

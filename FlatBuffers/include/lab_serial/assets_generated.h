@@ -745,9 +745,10 @@ struct Font FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NAME = 4,
     VT_GLYPH_WIDTH = 6,
     VT_TEXTURE_WIDTH = 8,
-    VT_GLYPHS = 10,
-    VT_IMAGE = 12,
-    VT_TTF = 14
+    VT_DISTANCE_GRADIENT = 10,
+    VT_GLYPHS = 12,
+    VT_IMAGE = 14,
+    VT_TTF = 16
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
@@ -757,6 +758,9 @@ struct Font FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int16_t texture_width() const {
     return GetField<int16_t>(VT_TEXTURE_WIDTH, 0);
+  }
+  float distance_gradient() const {
+    return GetField<float>(VT_DISTANCE_GRADIENT, 0.0f);
   }
   const flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>> *glyphs() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>> *>(VT_GLYPHS);
@@ -773,6 +777,7 @@ struct Font FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(name()) &&
            VerifyField<int16_t>(verifier, VT_GLYPH_WIDTH) &&
            VerifyField<int16_t>(verifier, VT_TEXTURE_WIDTH) &&
+           VerifyField<float>(verifier, VT_DISTANCE_GRADIENT) &&
            VerifyOffset(verifier, VT_GLYPHS) &&
            verifier.VerifyVector(glyphs()) &&
            verifier.VerifyVectorOfTables(glyphs()) &&
@@ -796,6 +801,9 @@ struct FontBuilder {
   }
   void add_texture_width(int16_t texture_width) {
     fbb_.AddElement<int16_t>(Font::VT_TEXTURE_WIDTH, texture_width, 0);
+  }
+  void add_distance_gradient(float distance_gradient) {
+    fbb_.AddElement<float>(Font::VT_DISTANCE_GRADIENT, distance_gradient, 0.0f);
   }
   void add_glyphs(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>>> glyphs) {
     fbb_.AddOffset(Font::VT_GLYPHS, glyphs);
@@ -823,6 +831,7 @@ inline flatbuffers::Offset<Font> CreateFont(
     flatbuffers::Offset<flatbuffers::String> name = 0,
     int16_t glyph_width = 0,
     int16_t texture_width = 0,
+    float distance_gradient = 0.0f,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>>> glyphs = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> image = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> ttf = 0) {
@@ -830,6 +839,7 @@ inline flatbuffers::Offset<Font> CreateFont(
   builder_.add_ttf(ttf);
   builder_.add_image(image);
   builder_.add_glyphs(glyphs);
+  builder_.add_distance_gradient(distance_gradient);
   builder_.add_name(name);
   builder_.add_texture_width(texture_width);
   builder_.add_glyph_width(glyph_width);
@@ -841,6 +851,7 @@ inline flatbuffers::Offset<Font> CreateFontDirect(
     const char *name = nullptr,
     int16_t glyph_width = 0,
     int16_t texture_width = 0,
+    float distance_gradient = 0.0f,
     const std::vector<flatbuffers::Offset<Assets::GlyphEntry>> *glyphs = nullptr,
     const std::vector<uint8_t> *image = nullptr,
     const std::vector<uint8_t> *ttf = nullptr) {
@@ -853,6 +864,7 @@ inline flatbuffers::Offset<Font> CreateFontDirect(
       name__,
       glyph_width,
       texture_width,
+      distance_gradient,
       glyphs__,
       image__,
       ttf__);

@@ -48,7 +48,7 @@
 	</textures>
 	
 	<fonts>
-		<font name="RobotoMono-Regular">
+		<!-- <font name="RobotoMono-Regular">
 			<source>./res/fonts/RobotoMono/RobotoMono-Regular.ttf</source>
 			<glyph_width>64</glyph_width>
 			<texture_width>2048</texture_width>
@@ -76,7 +76,7 @@
 			<source>./res/fonts/RobotoMono/RobotoMono-BoldItalic.ttf</source>
 			<glyph_width>64</glyph_width>
 			<texture_width>2048</texture_width>
-		</font>
+		</font> -->
 		
 		<font name="Lato-Regular">
 			<source>./res/fonts/Lato/Lato-Regular.ttf</source>

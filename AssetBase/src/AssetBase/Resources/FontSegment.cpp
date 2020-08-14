@@ -69,7 +69,7 @@ namespace AssetBase
 		}
 
 		flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::GlyphEntry>>> glyphs_offset = NULL;
-
+		float distance_gradient;
 
 		bool useCache = false;
 		std::filesystem::path cachePath = "./.lab-cache/fonts/" + std::string(name) + ".cache";
@@ -99,6 +99,7 @@ namespace AssetBase
 					std::vector<flatbuffers::Offset<Assets::GlyphEntry>> glyphs;
 					useCache = true;
 
+					distance_gradient = font->distance_gradient();
 					auto imageVector = font->image();
 					image = builder.CreateVector(imageVector->data(), imageVector->size());
 
@@ -140,7 +141,8 @@ namespace AssetBase
 
 				msdfgen::FontMetrics metrics;
 				msdfgen::getFontMetrics(metrics, font);
-
+				distance_gradient = (float)(1.953125 / metrics.emSize);
+				
 				charcode = msdfgen::getFirstChar(font, &codepoint);
 				while (codepoint != 0 && count < maxGliphs)
 				{
@@ -188,7 +190,7 @@ namespace AssetBase
 				auto cache_glyphs_offset = cacheBuidler.CreateVector(cache_glyphs);
 				auto cache_image_offset = cacheBuidler.CreateVector(imageData);
 				
-				auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyphWidth, textureWidth, cache_glyphs_offset, cache_image_offset);
+				auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyphWidth, textureWidth, distance_gradient, cache_glyphs_offset, cache_image_offset);
 				cacheBuidler.Finish(cache_font, "FONT");
 
 				std::ofstream cacheFile(cachePath.string(), std::ios::out | std::ios::trunc | std::ios::binary);
@@ -204,6 +206,6 @@ namespace AssetBase
 		}
 		std::cout << "[ done! ]         \n";
 
-		return Assets::CreateFont(builder, name_offset, glyphWidth, textureWidth, glyphs_offset, image, ttf);
+		return Assets::CreateFont(builder, name_offset, glyphWidth, textureWidth, distance_gradient, glyphs_offset, image, ttf);
 	}
 }

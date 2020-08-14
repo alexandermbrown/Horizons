@@ -13,8 +13,9 @@ namespace li
 {
 	struct FontProperties
 	{
-		uint16_t GlyphWidth = 0;
-		uint16_t TextureWidth = 0;
+		uint16_t GlyphWidth;
+		uint16_t TextureWidth;
+		float DistanceGradient;
 	};
 
 	class Font
@@ -57,6 +58,8 @@ namespace li
 		virtual ~Label();
 
 		inline int GetPointSize() const { return m_PointSize; }
+		inline float GetDistanceFactor() const { return m_DistanceFactor; }
+
 		inline const Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 		inline const Ref<Font>& GetFont() { return m_Font; }
 
@@ -67,6 +70,7 @@ namespace li
 
 		std::u16string m_Text;
 		int m_PointSize;
+		float m_DistanceFactor;
 		Ref<Font> m_Font;
 
 		uint32_t m_MaxChars;

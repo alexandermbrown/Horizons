@@ -44,12 +44,6 @@ float median(float r, float g, float b) {
 
 void main()
 {
-    // vec4 msdfsample = texture(u_Texture, v_TexCoord);
-    // float sigDist = median(msdfsample.r, msdfsample.g, msdfsample.b);
-    // float w = fwidth(sigDist);
-    // float opacity = smoothstep(0.5 - w, 0.5 + w, sigDist);
-    // color = vec4(u_Color.rgb, opacity * u_Color.a);
-
     vec3 msdfsample = texture(u_Texture, v_TexCoord).rgb;
     float sigDist = u_DistanceFactor * (median(msdfsample.r, msdfsample.g, msdfsample.b) - 0.5);
     float opacity = clamp(sigDist + 0.5, 0.0, 1.0);

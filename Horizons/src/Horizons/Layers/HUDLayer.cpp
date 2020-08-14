@@ -6,6 +6,8 @@
 #include "Horizons/UI/UISystem.h"
 #include "Horizons/UI/UIRenderSystem.h"
 
+#include "imgui.h"
+
 HUDLayer::HUDLayer()
 	: m_Registry()
 {
@@ -43,7 +45,7 @@ HUDLayer::HUDLayer()
 	}
 
 	{
-		li::Ref<li::Label> label = li::CreateRef<li::Label>(std::u16string(u"Press F to enter..."), 30, li::ResourceManager::Get<li::Font>("Lora-Regular"));
+		li::Ref<li::Label> label = li::CreateRef<li::Label>(std::u16string(u"The Server is the main part, used to receive and send messages. The ClientServerConfig allows you to configure the server: connection timeout, memory used or the different channels (reliable, unreliable). "), 26, li::ResourceManager::Get<li::Font>("Lora-Regular"));
 
 		entt::entity label_ent = m_Registry.create();
 		auto& element = m_Registry.emplace<cp::ui_element>(label_ent);
@@ -55,7 +57,7 @@ HUDLayer::HUDLayer()
 
 		m_Registry.emplace<cp::ui_transform>(label_ent, 0.2015f);
 		auto& cp_label = m_Registry.emplace<cp::label>(label_ent);
-		cp_label.lilabel = label;
+		cp_label.label_ref = label;
 
 		UISystem::AddChild(m_Registry, context_ent, label_ent);
 	}
@@ -84,7 +86,6 @@ void HUDLayer::OnUpdate(float dt)
 {
 	UISystem::Update(m_Registry);
 
-
 	li::Renderer::BeginUI();
 
 	UIRenderSystem::Render(m_Registry);
@@ -94,7 +95,7 @@ void HUDLayer::OnUpdate(float dt)
 
 void HUDLayer::OnImGuiRender()
 {
-
+	
 }
 
 void HUDLayer::OnEvent(SDL_Event* event)
