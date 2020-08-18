@@ -26,6 +26,14 @@ namespace li
 		hb_face_destroy(m_Face);
 	}
 
+	glm::vec2 Font::GetTextureOffset(int16_t character) const
+	{
+		if (m_TextureOffsets.find(character) != m_TextureOffsets.end())
+			return m_TextureOffsets.at(character);
+		else
+			return { 0.0f, 0.0f };
+	}
+
 	hb_font_t* Font::GetHBFont(int pointSize)
 	{
 		if (m_Fonts.find(pointSize) == m_Fonts.end())
@@ -161,17 +169,30 @@ namespace li
 			{ ShaderDataType::Float2, "TEXCOORD", 1 }
 		});
 
-		m_VertexBuffer = VertexBuffer::Create((float*)m_GlyphVertices.data(),
-			(uint32_t)(sizeof(GlyphVertex) * m_GlyphVertices.size()),
-			dynamic ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
+		if (dynamic)
+		{
+			m_VertexBuffer = VertexBuffer::Create((uint32_t)(sizeof(GlyphVertex) * m_BufferLength * 4), BufferUsage::DynamicDraw);
+			m_VertexBuffer->SetSubData((float*)m_GlyphVertices.data(), (uint32_t)(sizeof(GlyphVertex) * m_GlyphVertices.size()), 0, true);
+
+			Ref<IndexBuffer> indexBuffer = IndexBuffer::Create((uint32_t)(sizeof(uint32_t) * m_BufferLength * 6), BufferUsage::DynamicDraw);
+			indexBuffer->SetSubData(m_GlyphIndices.data(), (uint32_t)(sizeof(uint32_t) * m_GlyphIndices.size()), 0, true);
+
+			m_VertexArray->SetIndexBuffer(indexBuffer);
+		}
+		else
+		{
+			m_VertexBuffer = VertexBuffer::Create((float*)m_GlyphVertices.data(),
+				(uint32_t)(sizeof(GlyphVertex) * m_GlyphVertices.size()),
+				BufferUsage::StaticDraw);
+
+			Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(m_GlyphIndices.data(),
+				(uint32_t)m_GlyphIndices.size(),
+				BufferUsage::StaticDraw);
+
+			m_VertexArray->SetIndexBuffer(indexBuffer);
+		}
 
 		m_VertexBuffer->SetLayout(charLayout);
-
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(m_GlyphIndices.data(),
-			(uint32_t)m_GlyphIndices.size(),
-			dynamic ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
-
-		m_VertexArray->SetIndexBuffer(indexBuffer);
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 		m_VertexArray->Finalize(Renderer::GetFontShader());
 		m_VertexArray->Unbind();
@@ -184,6 +205,6 @@ namespace li
 			0, true);
 
 		m_VertexArray->GetIndexBuffer()->SetSubData(m_GlyphIndices.data(),
-			(uint32_t)m_GlyphIndices.size(), 0, true);
+			(uint32_t)(sizeof(uint32_t) * m_GlyphIndices.size()), 0, true);
 	}
 }

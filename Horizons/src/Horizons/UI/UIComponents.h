@@ -37,6 +37,8 @@ namespace cp
 
 	struct ui_element
 	{
+		std::string name;
+
 		entt::entity first_child{ entt::null };
 		entt::entity next_sibling{ entt::null };
 		entt::entity parent{ entt::null };
@@ -75,9 +77,9 @@ namespace cp
 		std::function<bool(entt::registry&, entt::entity, int button)> OnMouseUpFn;
 		std::function<bool(entt::registry&, entt::entity, int button)> OnClickFn;
 
-		std::function<bool(sol::light<entt::registry>, entt::entity, int button)> OnMouseDownLuaFn;
-		std::function<bool(sol::light<entt::registry>, entt::entity, int button)> OnMouseUpLuaFn;
-		std::function<bool(sol::light<entt::registry>, entt::entity, int button)> OnClickLuaFn;
+		std::function<sol::protected_function_result(sol::light<entt::registry>, entt::entity, int button)> OnMouseDownLuaFn;
+		std::function<sol::protected_function_result(sol::light<entt::registry>, entt::entity, int button)> OnMouseUpLuaFn;
+		std::function<sol::protected_function_result(sol::light<entt::registry>, entt::entity, int button)> OnClickLuaFn;
 
 		// Internal.
 		bool start_click = false;

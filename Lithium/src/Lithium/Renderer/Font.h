@@ -27,7 +27,8 @@ namespace li
 
 		inline Ref<Texture2D> GetTexture() const { return m_Texture; }
 		inline const FontProperties& GetProperties() const { return m_Properties; }
-		inline const glm::vec2& GetTextureOffset(int16_t character) const { return m_TextureOffsets.at(character); }
+		glm::vec2 GetTextureOffset(int16_t character) const;
+		
 
 		hb_font_t* GetHBFont(int pointSize);
 

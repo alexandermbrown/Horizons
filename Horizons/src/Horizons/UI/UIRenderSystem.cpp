@@ -45,7 +45,6 @@ void UIRenderSystem::RenderLabels(entt::registry& registry)
 		else
 		{
 			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, { 1.0f, 1.0f, 1.0f, 1.0f });
-			//LI_TRACE("z: {}", transform.transform[3][2]);
 		}
 	});
 }

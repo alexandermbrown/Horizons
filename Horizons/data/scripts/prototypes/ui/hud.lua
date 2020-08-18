@@ -33,9 +33,19 @@ for i=1,10 do
 		height = 50,
 		margins = { left = 10, right = 10 },
 		color = { 0.3, 1.0, 0.4, 0.6 },
-		texture = "test_small",
+		OnMouseEnter = function(registry, entity)
+			SetColor(registry, entity, { 0.5, 1.0, 0.6, 0.8 })
+		end,
+		OnMouseLeave = function(registry, entity)
+			SetColor(registry, entity, { 0.3, 1.0, 0.4, 0.6 })
+		end,
 		OnClick = function(registry, entity, button)
-			print("Click ", registry, entity, button)
+			if button == 1 then
+				SetTexture(registry, entity, "test_small")
+
+				local label = UIGetElementWithName(registry, "test_label")
+				SetLabel(registry, label, { text = "CHANGED :O" })
+			end
 			return true
 		end
 	}

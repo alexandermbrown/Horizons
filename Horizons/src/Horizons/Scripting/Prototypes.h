@@ -18,6 +18,7 @@ public:
 	static void InstantiateUIPrototype(entt::registry& registry, entt::entity parent, const std::string& name, int recursion_limit = 32);
 
 private:
+	static void LoadFunctions();
 	static void UILoadElement(entt::registry& registry, entt::entity parent, const sol::table& element, const std::string& prototype, int recursion_limit);
 
 	struct PrototypeData

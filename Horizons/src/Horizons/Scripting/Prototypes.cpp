@@ -14,6 +14,8 @@ void Prototypes::Init(const std::string& lua_path)
 	s_Data = li::CreateScope<PrototypeData>();
 
 	s_Data->Lua.open_libraries(sol::lib::base, sol::lib::jit, sol::lib::package, sol::lib::bit32);
+	
+	LoadFunctions();
 
 	try {
 		sol::protected_function_result result = s_Data->Lua.script_file(lua_path);
@@ -54,14 +56,88 @@ void Prototypes::InstantiateUIPrototype(entt::registry& registry, entt::entity p
 	UILoadElement(registry, parent, root.value(), name, recursion_limit);
 }
 
+void Prototypes::LoadFunctions()
+{
+	s_Data->Lua.set_function("SetColor", [](sol::light<entt::registry> registry, entt::entity entity, sol::table color)
+	{
+		sol::optional<float> red = color[1];
+		sol::optional<float> green = color[2];
+		sol::optional<float> blue = color[3];
+		sol::optional<float> alpha = color[4];
+
+		registry.value->emplace_or_replace<cp::color>(entity, glm::vec4(
+			red.value_or(1.0f), green.value_or(1.0f), blue.value_or(1.0f), alpha.value_or(1.0f)));
+	});
+	
+	s_Data->Lua.set_function("SetTexture", [](sol::light<entt::registry> registry, entt::entity entity, std::string texture)
+	{
+		registry.value->emplace_or_replace<cp::texture>(entity, texture);
+	});
+
+	s_Data->Lua.set_function("SetLabel", [](sol::light<entt::registry> registry, entt::entity entity, sol::table label)
+	{
+		if (registry.value->has<cp::label>(entity))
+		{
+			sol::optional<const char*> text = label["text"];
+
+			if (text)
+			{
+				auto& label_cp = registry.value->get<cp::label>(entity);
+				label_cp.label_ref->SetText(text.value());
+			}
+			else LI_ERROR("'text' not found!");
+		}
+		else
+		{
+			auto& label_cp = registry.value->emplace<cp::label>(entity);
+			sol::optional<const char*> text	= label["text"];
+			sol::optional<int> pt_size		= label["pt_size"];
+			sol::optional<std::string> font = label["font"];
+
+			if (text && pt_size && font)
+				label_cp.label_ref = li::CreateRef<li::Label>(text.value(), pt_size.value(), li::ResourceManager::Get<li::Font>(font.value()), false);
+			else
+				LI_ERROR("Invalid font specification.");
+		}
+	});
+
+	s_Data->Lua.set_function("UIGetParent", [](sol::light<entt::registry> registry, entt::entity entity) -> entt::entity
+	{
+		return registry.value->get<cp::ui_element>(entity).parent;
+	});
+
+	s_Data->Lua.set_function("UIGetFirstChild", [](sol::light<entt::registry> registry, entt::entity entity) -> entt::entity
+	{
+		return registry.value->get<cp::ui_element>(entity).first_child;
+	});
+
+	s_Data->Lua.set_function("UIGetNextSibling", [](sol::light<entt::registry> registry, entt::entity entity) -> entt::entity
+	{
+		return registry.value->get<cp::ui_element>(entity).next_sibling;
+	});
+
+	s_Data->Lua.set_function("UIGetElementWithName", [](sol::light<entt::registry> registry, const char* name) -> entt::entity
+	{
+		auto view = registry.value->view<cp::ui_element>();
+		for (entt::entity entity : view)
+		{
+			if (view.get<cp::ui_element>(entity).name == name)
+				return entity;
+		}
+		return entt::null;
+	});
+}
+
 void Prototypes::UILoadElement(entt::registry& registry, entt::entity parent, const sol::table& element, const std::string& prototype, int recursion_limit)
 {
+	// Ensure we dont enter an infinite loop of recursion.
 	if (recursion_limit <= 0)
 	{
 		LI_ERROR("UI recursion limit reached, some elements may not appear.");
 		return;
 	}
 
+	// Load templates.
 	sol::optional<std::string> prototype_template = element["prototype"];
 	if (prototype_template)
 	{
@@ -76,6 +152,10 @@ void Prototypes::UILoadElement(entt::registry& registry, entt::entity parent, co
 	// Layout.
 	{
 		auto& layout = registry.emplace<cp::ui_element>(entity);
+
+		sol::optional<const char*> name = element["name"];
+		if (name)
+			layout.name = name.value();
 
 		sol::optional<int> width = element["width"];
 		if (width)
@@ -136,9 +216,11 @@ void Prototypes::UILoadElement(entt::registry& registry, entt::entity parent, co
 		sol::optional<const char*> text = label_table["text"];
 		sol::optional<int> pt_size		= label_table["pt_size"];
 		sol::optional<std::string> font = label_table["font"];
+		sol::optional<bool> dynamic = label_table["dynamic"];
+		sol::optional<int> excess = label_table["excess"];
 
 		if (text && pt_size && font)
-			label_cp.label_ref = li::CreateRef<li::Label>(text.value(), pt_size.value(), li::ResourceManager::Get<li::Font>(font.value()), false);
+			label_cp.label_ref = li::CreateRef<li::Label>(text.value(), pt_size.value(), li::ResourceManager::Get<li::Font>(font.value()), dynamic.value_or(false), excess.value_or(0));
 		else
 			LI_ERROR("Invalid font in ui prototype {}", prototype);
 	}

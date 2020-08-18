@@ -38,7 +38,12 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 					if (click.OnClickFn)
 						clickHandled = click.OnClickFn(registry, entity, click.mouse_button);
 					else if (click.OnClickLuaFn)
-						clickHandled = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
+					{
+						sol::protected_function_result result = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
+						if (result.valid() && result.get_type() == sol::type::boolean)
+							clickHandled = result.get<bool>();
+						else LI_ERROR("Bad return from OnClick. Expected bool.");
+					}
 				}
 			}
 			click.mouse_button = button;
@@ -52,7 +57,11 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 			}
 			else if (click.OnMouseDownLuaFn)
 			{
-				mouseDownHandled = click.OnMouseDownLuaFn(sol::light(registry), entity, button);
+				sol::protected_function_result result = click.OnMouseDownLuaFn(sol::light(registry), entity, click.mouse_button);
+				if (result.valid() && result.get_type() == sol::type::boolean)
+					mouseDownHandled = result.get<bool>();
+				else LI_ERROR("Bad return from OnMouseDown. Expected bool.");
+
 				if (mouseDownHandled)
 					return true;
 			}
@@ -81,16 +90,26 @@ bool UIClickSystem::OnMouseUp(entt::registry& registry, int x, int y, int button
 				if (click.OnClickFn)
 					clickHandled = click.OnClickFn(registry, entity, button);
 				else if (click.OnClickLuaFn)
-					clickHandled = click.OnClickLuaFn(sol::light(registry), entity, button);
+				{
+					sol::protected_function_result result = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
+					if (result.valid() && result.get_type() == sol::type::boolean)
+						clickHandled = result.get<bool>();
+					else LI_ERROR("Bad return from OnClick. Expected bool.");
+				}
 			}
 
 			// Only run the mouse up event if it has not been handled by an above element.
 			if (!mouseUpHandled)
 			{
-				if (click.OnMouseDownFn)
+				if (click.OnMouseUpFn)
 					mouseUpHandled = click.OnMouseUpFn(registry, entity, button);
-				else if (click.OnMouseDownLuaFn)
-					mouseUpHandled = click.OnMouseDownLuaFn(sol::light(registry), entity, button);
+				else if (click.OnMouseUpLuaFn)
+				{
+					sol::protected_function_result result = click.OnMouseUpLuaFn(sol::light(registry), entity, click.mouse_button);
+					if (result.valid() && result.get_type() == sol::type::boolean)
+						mouseUpHandled = result.get<bool>();
+					else LI_ERROR("Bad return from OnMouseUp. Expected bool.");
+				}
 			}
 		}
 		click.mouse_button = -1;
