@@ -30,7 +30,7 @@ layout(location = 0) out vec4 color;
 
 in vec2 v_TexCoord;
 
-layout(std140, binding = 2) uniform Color
+layout(std140, binding = 2) uniform Font
 {
 	vec4 u_Color;
     float u_DistanceFactor;

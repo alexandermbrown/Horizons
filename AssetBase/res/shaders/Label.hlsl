@@ -33,7 +33,7 @@ PS_IN vs_main(VS_IN input)
 
 
 
-cbuffer Color : register(b2)
+cbuffer Font : register(b2)
 {
 	float4 u_Color;
 	float u_DistanceFactor;

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "UISystem.h"
+#include "UILayoutSystem.h"
 
 #include "Horizons/Gameplay/Components.h"
 
@@ -38,11 +38,11 @@ void UILayoutSystem::Update(entt::registry& registry)
 	if (context.rebuild)
 	{
 		Rebuild(registry, context_ent);
+		Recalculate(registry, context);
 		context.rebuild = false;
-		LI_ASSERT(context.recalculate == true, "You must recalculate when rebuilding UI.");
+		context.recalculate = false;
 	}
-
-	if (context.recalculate)
+	else if (context.recalculate)
 	{
 		Recalculate(registry, context);
 		context.recalculate = false;
@@ -74,6 +74,7 @@ void UILayoutSystem::AddChild(entt::registry& registry, entt::entity parent, ent
 	}
 
 	child_ui.parent = parent;
+	parent_ui.num_children++;
 }
 
 void UILayoutSystem::AddSibling(entt::registry& registry, entt::entity existing, entt::entity new_ent)
@@ -101,15 +102,21 @@ void UILayoutSystem::Rebuild(entt::registry& registry, entt::entity context_ent)
 
 	root.layout_id = lay_item(&context.context);
 
-	RebuildChildren(registry, context, root);
+	RebuildChildren(registry, context, root, context.start_z, context.z_range);
 }
 
-void UILayoutSystem::RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& parent_element)
+void UILayoutSystem::RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& parent_element, float current_z, float current_range)
 {
+	int index = 0;
+	float step = current_range / (float)(parent_element.num_children + 1);
 	for (entt::entity child = parent_element.first_child; registry.valid(child); child = registry.get<cp::ui_element>(child).next_sibling)
 	{
+		current_z += step;
+
 		cp::ui_element& child_element = registry.get<cp::ui_element>(child);
 		child_element.layout_id = lay_item(&context.context);
+		child_element.z = current_z;
+
 		lay_insert(&context.context, parent_element.layout_id, child_element.layout_id);
 
 		if (child_element.width || child_element.height)
@@ -124,8 +131,10 @@ void UILayoutSystem::RebuildChildren(entt::registry& registry, cp::ui_context& c
 		if (child_element.layout_contain)
 			lay_set_contain(&context.context, child_element.layout_id, child_element.layout_contain);
 
-		RebuildChildren(registry, context, child_element);
+		RebuildChildren(registry, context, child_element, current_z, step);
+		index++;
 	}
+	LI_ASSERT(index == parent_element.num_children, "Invalid number of children.");
 }
 
 void UILayoutSystem::Recalculate(entt::registry& registry, cp::ui_context& context)
@@ -139,7 +148,7 @@ void UILayoutSystem::Recalculate(entt::registry& registry, cp::ui_context& conte
 			lay_vec4 rect = lay_get_rect(&context.context, ui_element.layout_id);
 
 			transform.transform = glm::translate(glm::mat4(1.0f), { (float)rect[0],
-				(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), transform.z })
+				(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), ui_element.z })
 				* glm::scale(glm::mat4(1.0f), { (float)rect[2], (float)rect[3], 1.0f });
 		});
 }

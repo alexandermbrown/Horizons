@@ -146,8 +146,8 @@ namespace li
 
 		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ElementArrayBuffer) = 0;
 
-		static Ref<IndexBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::DynamicDraw);
-		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+		static Ref<IndexBuffer> Create(uint32_t size, BufferUsage usage);
+		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count, BufferUsage usage = BufferUsage::StaticDraw);
 	};
 
 }

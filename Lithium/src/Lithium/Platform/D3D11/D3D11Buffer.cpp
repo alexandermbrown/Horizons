@@ -40,7 +40,7 @@ namespace li
 		m_ContextHandle = context->GetDeviceContext();
 
 		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = (D3D11_USAGE)ConvertD3D11::BufferUsage(usage);
+		bufferDesc.Usage = ConvertD3D11::BufferUsage(usage);
 		bufferDesc.ByteWidth = size;
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.CPUAccessFlags = usage == BufferUsage::DynamicDraw ? D3D11_CPU_ACCESS_WRITE : 0;
@@ -99,7 +99,7 @@ namespace li
 		else LI_CORE_ASSERT(false, "Buffer without data must be dynamic.\n");
 	}
 
-	D3D11IndexBuffer::D3D11IndexBuffer(uint32_t* indices, uint32_t count)
+	D3D11IndexBuffer::D3D11IndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage)
 		: m_Size(count * sizeof(uint32_t)), m_Count(count)
 	{
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
@@ -107,10 +107,10 @@ namespace li
 		m_ContextHandle = context->GetDeviceContext();
 
 		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		bufferDesc.Usage = ConvertD3D11::BufferUsage(usage);
 		bufferDesc.ByteWidth = sizeof(uint32_t) * count;
 		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.CPUAccessFlags = (usage == BufferUsage::DynamicDraw) ? D3D11_CPU_ACCESS_WRITE : 0;
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = 0;
 

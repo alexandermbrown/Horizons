@@ -26,5 +26,5 @@ private:
 	static void Recalculate(entt::registry& registry, cp::ui_context& context);
 
 	static void Rebuild(entt::registry& registry, entt::entity context_ent);
-	static void RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& element);
+	static void RebuildChildren(entt::registry& registry, cp::ui_context& context, cp::ui_element& element, float current_z, float current_range);
 };

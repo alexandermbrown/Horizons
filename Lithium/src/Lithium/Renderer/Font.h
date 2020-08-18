@@ -54,7 +54,7 @@ namespace li
 	{
 	public:
 
-		Label(const std::u16string& text, int pointSize, Ref<Font> font, uint32_t maxChars = 0);
+		Label(const char* utf8_text, int point_size, Ref<Font> font, bool dynamic, int excess = 0);
 		virtual ~Label();
 
 		inline int GetPointSize() const { return m_PointSize; }
@@ -63,14 +63,21 @@ namespace li
 		inline const Ref<VertexArray>& GetVertexArray() { return m_VertexArray; }
 		inline const Ref<Font>& GetFont() { return m_Font; }
 
-	private:
+		void SetText(const char* utf8_text);
 
-		std::u16string m_Text;
+	private:
+		bool LoadLayout(const char* utf8_text);
+		void CreateRenderingBuffers(bool dynamic);
+		void UpdateRenderingBuffers();
+
 		int m_PointSize;
 		float m_DistanceFactor;
 		Ref<Font> m_Font;
 
-		uint32_t m_MaxChars;
+		bool m_Dynamic;
+		int m_Excess;
+
+		unsigned int m_BufferLength;
 		std::vector<GlyphVertex> m_GlyphVertices;
 		std::vector<uint32_t> m_GlyphIndices;
 

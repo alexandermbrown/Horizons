@@ -57,12 +57,12 @@ namespace li {
 		GLCall( glBufferData(GL_ARRAY_BUFFER, size, nullptr, ConvertOpenGL::BufferUsage(usage)) );
 	}
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage)
 		: m_Count(count)
 	{
 		GLCall( glCreateBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
-		GLCall( glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW) );
+		GLCall( glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices, ConvertOpenGL::BufferUsage(usage)) );
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()

@@ -2,6 +2,7 @@
 #include "Horizons.h"
 
 #include "Horizons/Scenes/SplashScreenScene.h"
+#include "Horizons/Scripting/Prototypes.h"
 
 #ifdef HZ_CONSOLE_ENABLED
 #include "Horizons/Commands/CVarCommands.h"
@@ -14,7 +15,7 @@
 #endif
 
 Horizons::Horizons()
-	: li::Application({ li::RendererAPI::API::D3D11, "Horizons", 768, 384, false, true, true })
+	: li::Application({ li::RendererAPI::API::OpenGL, "Horizons", 768, 384, false, true, true })
 {
 #ifdef LI_DEBUG
 	li::ResourceManager::Load("data/preload.lab-debug");
@@ -28,6 +29,8 @@ Horizons::Horizons()
 
 	LoadConfig();
 
+	Prototypes::Init("data/scripts/prototypes.lua");
+
 #ifdef HZ_CONSOLE_ENABLED
 	m_Console = new ConsoleLayer();
 	PushOverlay(m_Console);
@@ -35,7 +38,6 @@ Horizons::Horizons()
 	m_Console->AddCommand(CreateCVarSetCommand());
 	m_Console->AddCommand(CreateCVarGetCommand());
 #endif
-
 
 	uint32_t game_to_app = SDL_RegisterEvents(1);
 	uint32_t app_to_game = SDL_RegisterEvents(1);

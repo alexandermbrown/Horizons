@@ -29,6 +29,7 @@ IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
 IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
 IncludeDir["layout"] = "Lithium/vendor/layout/include"
 IncludeDir["harfbuzz"] = "Lithium/vendor/harfbuzz/src"
+IncludeDir["utfcpp"] = "Lithium/vendor/utfcpp/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -45,6 +46,7 @@ IncludeDir["libb64"] = "ServerManager/vendor/libb64/include"
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
 IncludeDir["steam"] = "Horizons/vendor/steam/include"
+IncludeDir["lua"] = "Horizons/vendor/lua/include"
 
 group "vendor"
 include "Lithium/vendor/glad"
@@ -100,7 +102,8 @@ project "Lithium"
         "%{IncludeDir.layout}",
         "%{IncludeDir.flatbuffers}",
         "%{IncludeDir.lab_serial}",
-        "%{IncludeDir.harfbuzz}"
+        "%{IncludeDir.harfbuzz}",
+        "%{IncludeDir.utfcpp}"
     }
 
     links {
@@ -181,12 +184,15 @@ project "Horizons"
         "%{IncludeDir.steam}",
         "%{IncludeDir.flatbuffers}",
         "%{IncludeDir.lab_serial}",
-        "%{IncludeDir.harfbuzz}"
+        "%{IncludeDir.harfbuzz}",
+        "%{IncludeDir.lua}"
     }
 
     links {
         "Lithium",
-        "box2d"
+        "box2d",
+        "lua51",
+        "luajit"
     }
 
     filter "system:windows"
@@ -197,7 +203,10 @@ project "Horizons"
             "HZ_PLATFORM_WINDOWS"
         }
 
-        libdirs { "Horizons/vendor/steam/lib/win64" }
+        libdirs { 
+            "Horizons/vendor/steam/lib/win64",
+            "Horizons/vendor/lua/src/build/win64"
+         }
         links { "steam_api64" }
         
     filter "configurations:Debug"

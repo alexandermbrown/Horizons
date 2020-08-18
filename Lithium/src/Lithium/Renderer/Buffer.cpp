@@ -60,15 +60,15 @@ namespace li
 		return nullptr;
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
+	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count, BufferUsage usage)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count);
+		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count, usage);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(indices, count);
+		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(indices, count, usage);
 #endif
 		}
 

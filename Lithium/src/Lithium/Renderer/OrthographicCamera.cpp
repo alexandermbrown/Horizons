@@ -12,10 +12,10 @@ namespace li
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:
-			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 1.0f);
 			break;
 		case RendererAPI::API::D3D11:
-			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 1.0f, -1.0f);
+			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 100.0f, -1.0f);
 			break;
 		}
 
@@ -27,10 +27,10 @@ namespace li
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:
-			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 1.0f);
 			break;
 		case RendererAPI::API::D3D11:
-			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 1.0f, -1.0f);
+			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 100.0f, -1.0f);
 			break;
 		}
 

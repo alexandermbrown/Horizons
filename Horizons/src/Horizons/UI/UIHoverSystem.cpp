@@ -16,6 +16,8 @@ void UIHoverSystem::OnMouseMove(entt::registry& registry, int x, int y)
 				hover.is_hover = false;
 				if (hover.OnMouseLeaveFn)
 					hover.OnMouseLeaveFn(registry, entity);
+				if (hover.OnMouseLeaveLuaFn)
+					hover.OnMouseLeaveLuaFn(sol::light(registry), entity);
 			}
 		}
 		else
@@ -26,6 +28,8 @@ void UIHoverSystem::OnMouseMove(entt::registry& registry, int x, int y)
 				hover.is_hover = true;
 				if (hover.OnMouseEnterFn)
 					hover.OnMouseEnterFn(registry, entity);
+				if (hover.OnMouseEnterLuaFn)
+					hover.OnMouseEnterLuaFn(sol::light(registry), entity);
 			}
 		}
 	});

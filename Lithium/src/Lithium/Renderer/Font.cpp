@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include <hb-ot.h>
+#include "hb-ot.h"
 
 namespace li
 {
@@ -39,85 +39,89 @@ namespace li
 		return m_Fonts.at(pointSize);
 	}
 
-	Label::Label(const std::u16string& text, int pointSize, Ref<Font> font, uint32_t maxChars)
-		: m_Text(text), m_PointSize(pointSize), m_Font(font), m_MaxChars(maxChars)
+	Label::Label(const char* utf8_text, int pointSize, Ref<Font> font, bool dynamic, int excess)
+		: m_PointSize(pointSize), m_Font(font), m_BufferLength(0u), m_Dynamic(dynamic), m_Excess(excess)
 	{
-		m_DistanceFactor =  font->GetProperties().DistanceGradient * (float)pointSize + 2.0f;
+		m_DistanceFactor = font->GetProperties().DistanceGradient * (float)m_PointSize + 2.0f;
+		m_Buffer = hb_buffer_create();
 
-		if (m_MaxChars > 0)
+		LoadLayout(utf8_text);
+		CreateRenderingBuffers(dynamic);
+	}
+
+	Label::~Label()
+	{
+		hb_buffer_destroy(m_Buffer);
+	}
+
+	void Label::SetText(const char* utf8_text)
+	{
+		if (!m_Dynamic)
 		{
-			m_GlyphVertices.reserve((size_t)m_MaxChars * 4ULL);
-			m_GlyphIndices.reserve((size_t)m_MaxChars * 6ULL);
+			LI_CORE_ERROR("Label must be dynamic to set text!");
+			return;
+		}
+
+		hb_buffer_clear_contents(m_Buffer);
+		m_GlyphVertices.clear();
+		m_GlyphIndices.clear();
+
+		bool resize = LoadLayout(utf8_text);
+		if (resize)
+		{
+			LI_CORE_WARN("Increasing text buffer size.");
+			CreateRenderingBuffers(true);
 		}
 		else
 		{
-			m_GlyphVertices.reserve(m_Text.length() * 4ULL);
-			m_GlyphIndices.reserve(m_Text.length() * 6ULL);
+			UpdateRenderingBuffers();
+		}
+	}
+
+	bool Label::LoadLayout(const char* utf8_text)
+	{
+		bool resize = false;
+
+		hb_buffer_add_utf8(m_Buffer, utf8_text, -1, 0, -1);
+		hb_buffer_guess_segment_properties(m_Buffer);
+
+		hb_shape(m_Font->GetHBFont(m_PointSize), m_Buffer, NULL, 0);
+
+		unsigned int buffer_length = hb_buffer_get_length(m_Buffer);
+
+		if (buffer_length > m_BufferLength)
+		{
+			// Reserve extra length if specified.
+			m_BufferLength = buffer_length + m_Excess;
+			m_GlyphVertices.reserve((size_t)m_BufferLength * 4);
+			m_GlyphIndices.reserve((size_t)m_BufferLength * 6);
+			resize = true;
 		}
 
-		m_VertexArray = VertexArray::Create();
-
-		BufferLayout charLayout({
-			{ ShaderDataType::Float3, "POSITION", 0 },
-			{ ShaderDataType::Float2, "TEXCOORD", 1 }
-			});
-
-		m_VertexBuffer = VertexBuffer::Create(
-			static_cast<uint32_t>(m_MaxChars ? m_MaxChars : m_Text.length())* charLayout.GetStride() * 4U,
-			m_MaxChars >= 0 ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
-		m_VertexBuffer->SetLayout(charLayout);
-
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(
-			static_cast<uint32_t>((m_MaxChars ? m_MaxChars : m_Text.length()) * 6ULL * sizeof(uint32_t)),
-			m_MaxChars >= 0 ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
-
-		m_VertexArray->SetIndexBuffer(indexBuffer);
-		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
-		m_VertexArray->Finalize(Renderer::GetFontShader());
-
-		m_VertexArray->Unbind();
-
-		m_Buffer = hb_buffer_create();
-		hb_buffer_add_utf16(m_Buffer, (const uint16_t*)m_Text.c_str(), -1, 0, -1);
-		hb_segment_properties_t props;
-		props.direction = HB_DIRECTION_LTR; // TODO: for other languages, set correct properties.
-		props.language = hb_language_from_string("en", -1);
-		props.script = HB_SCRIPT_LATIN;
-		hb_buffer_set_segment_properties(m_Buffer, &props);
-
-		hb_font_t* hb_font = m_Font->GetHBFont(m_PointSize);
-		hb_shape(hb_font, m_Buffer, NULL, 0);
-
-		unsigned int len = hb_buffer_get_length(m_Buffer);
-		hb_glyph_info_t* info = hb_buffer_get_glyph_infos(m_Buffer, NULL);
-		hb_glyph_position_t* pos = hb_buffer_get_glyph_positions(m_Buffer, NULL);
+		hb_glyph_info_t* glyph_info = hb_buffer_get_glyph_infos(m_Buffer, NULL);
+		hb_glyph_position_t* glyph_position = hb_buffer_get_glyph_positions(m_Buffer, NULL);
 
 		const FontProperties& fontInfo = m_Font->GetProperties();
 		double current_x = 0;
 		double current_y = 0;
 
-		int num_quads = 0;
-		for (unsigned int i = 0; i < len; i++)
+		for (unsigned int i = 0; i < buffer_length; i++)
 		{
-			hb_codepoint_t gid = info[i].codepoint;
-			double x_position = current_x + pos[i].x_offset / 64.;
-			double y_position = current_y + pos[i].y_offset / 64.;
-
-			char glyphname[32];
-			hb_font_get_glyph_name(hb_font, gid, glyphname, sizeof(glyphname));
+			double x_position = current_x + glyph_position[i].x_offset / 64.0;
+			double y_position = current_y + glyph_position[i].y_offset / 64.0;
 
 			float left = (float)x_position - (4.0f * (float)m_PointSize / (float)fontInfo.GlyphWidth);
 			float right = left + (float)m_PointSize * 1.33f;
 			float bottom = (float)y_position - (4.0f * (float)m_PointSize / (float)fontInfo.GlyphWidth);
 			float top = bottom + (float)m_PointSize * 1.33f;
 
-			const glm::vec2& textureOffset = m_Font->GetTextureOffset(gid);
+			const glm::vec2& textureOffset = m_Font->GetTextureOffset(glyph_info[i].codepoint);
 			float textureLeft = textureOffset.x + 0.002f;
 			float textureBottom = textureOffset.y + 0.002f;
 			float textureRight = textureOffset.x + fontInfo.GlyphWidth / (float)fontInfo.TextureWidth - 0.002f;
 			float textureTop = textureOffset.y + fontInfo.GlyphWidth / (float)fontInfo.TextureWidth - 0.002f;
 
-			int indexOffset = num_quads * 4;
+			int indexOffset = i * 4;
 			m_GlyphIndices.push_back(indexOffset);
 			m_GlyphIndices.push_back(indexOffset + 1);
 			m_GlyphIndices.push_back(indexOffset + 2);
@@ -126,42 +130,60 @@ namespace li
 			m_GlyphIndices.push_back(indexOffset + 3);
 
 			GlyphVertex vertex;
-			vertex.Position = glm::vec3(left, bottom, (float)i / (float)len * 0.01);
+			vertex.Position = glm::vec3(left, bottom, (float)i / (float)buffer_length * 0.001f);
 			vertex.TexCoords = glm::vec2(textureLeft, textureBottom);
 			m_GlyphVertices.push_back(vertex);
 
-			vertex.Position = glm::vec3(right, bottom, (float)i / (float)len * 0.01);
+			vertex.Position = glm::vec3(right, bottom, (float)i / (float)buffer_length * 0.001f);
 			vertex.TexCoords = glm::vec2(textureRight, textureBottom);
 			m_GlyphVertices.push_back(vertex);
 
-			vertex.Position = glm::vec3(right, top, (float)i / (float)len * 0.01);
+			vertex.Position = glm::vec3(right, top, (float)i / (float)buffer_length * 0.001f);
 			vertex.TexCoords = glm::vec2(textureRight, textureTop);
 			m_GlyphVertices.push_back(vertex);
 
-			vertex.Position = glm::vec3(left, top, (float)i / (float)len * 0.01);
+			vertex.Position = glm::vec3(left, top, (float)i / (float)buffer_length * 0.001f);
 			vertex.TexCoords = glm::vec2(textureLeft, textureTop);
 			m_GlyphVertices.push_back(vertex);
-			num_quads++;
 
-			current_x += pos[i].x_advance / 64.;
-			current_y += pos[i].y_advance / 64.;
+			current_x += glyph_position[i].x_advance / 64.0;
+			current_y += glyph_position[i].y_advance / 64.0;
 		}
-
-		m_VertexArray->GetIndexBuffer()->SetSubData(
-			(uint32_t*)&m_GlyphIndices[0],
-			static_cast<uint32_t>(m_GlyphIndices.size() * sizeof(uint32_t)),
-			0, true
-		);
-		m_VertexBuffer->SetSubData(
-			(float*)&m_GlyphVertices[0],
-			static_cast<uint32_t>(sizeof(GlyphVertex) * m_GlyphVertices.size()),
-			0, true
-		);
-		LI_CORE_TRACE("DONE!");
+		return resize;
 	}
 
-	Label::~Label()
+	void Label::CreateRenderingBuffers(bool dynamic)
 	{
-		hb_buffer_destroy(m_Buffer);
+		m_VertexArray = VertexArray::Create();
+
+		BufferLayout charLayout({
+			{ ShaderDataType::Float3, "POSITION", 0 },
+			{ ShaderDataType::Float2, "TEXCOORD", 1 }
+		});
+
+		m_VertexBuffer = VertexBuffer::Create((float*)m_GlyphVertices.data(),
+			(uint32_t)(sizeof(GlyphVertex) * m_GlyphVertices.size()),
+			dynamic ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
+
+		m_VertexBuffer->SetLayout(charLayout);
+
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(m_GlyphIndices.data(),
+			(uint32_t)m_GlyphIndices.size(),
+			dynamic ? BufferUsage::DynamicDraw : BufferUsage::StaticDraw);
+
+		m_VertexArray->SetIndexBuffer(indexBuffer);
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArray->Finalize(Renderer::GetFontShader());
+		m_VertexArray->Unbind();
+	}
+
+	void Label::UpdateRenderingBuffers()
+	{
+		m_VertexBuffer->SetSubData((float*)m_GlyphVertices.data(),
+			(uint32_t)(sizeof(GlyphVertex) * m_GlyphVertices.size()),
+			0, true);
+
+		m_VertexArray->GetIndexBuffer()->SetSubData(m_GlyphIndices.data(),
+			(uint32_t)m_GlyphIndices.size(), 0, true);
 	}
 }

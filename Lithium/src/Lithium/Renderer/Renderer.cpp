@@ -25,7 +25,7 @@ namespace li
 		});
 		s_Data->TransformMatrixUB->BindToSlot();
 
-		s_Data->FontUB = UniformBuffer::Create("Color", 2, ShaderType::Fragment, {
+		s_Data->FontUB = UniformBuffer::Create("Font", 2, ShaderType::Fragment, {
 			{ "u_Color", ShaderDataType::Float4 },
 			{ "u_DistanceFactor", ShaderDataType::Float }
 		});
@@ -218,7 +218,6 @@ namespace li
 		s_Data->TransformMatrixUB->UploadData();
 
 		s_Data->FontUB->SetFloat4("u_Color", color);
-		//s_Data->FontUB->SetFloat("u_DistanceFactor", 8.0f);
 		s_Data->FontUB->SetFloat("u_DistanceFactor", label->GetDistanceFactor());
 		s_Data->FontUB->UploadData();
 
@@ -228,5 +227,6 @@ namespace li
 		vertexArray->Bind();
 		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
 		RendererAPI::DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
+		vertexArray->Unbind();
 	}
 }

@@ -35,7 +35,7 @@ namespace li
 	{
 	public:
 		D3D11IndexBuffer(uint32_t size, BufferUsage usage);
-		D3D11IndexBuffer(uint32_t* indices, uint32_t count);
+		D3D11IndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage);
 		virtual ~D3D11IndexBuffer();
 
 		virtual void Bind() const;

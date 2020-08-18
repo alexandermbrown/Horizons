@@ -5,6 +5,7 @@
 #include "Horizons/Core/Math.h"
 
 #include "Lithium.h"
+#include <limits>
 
 bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int button)
 {
@@ -13,19 +14,32 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 	bool clickHandled = false;
 	bool mouseDownHandled = false;
 
-	// Iterate in reverse order, highest z-position to lowest.
+#ifdef LI_ENABLE_ASSERTS
+	float prev = std::numeric_limits<float>::max();
+#endif
+
 	for (entt::entity entity : view)
 	{
-		auto& click = view.get<cp::ui_click>(entity);
 		auto& transform = view.get<cp::ui_transform>(entity);
+		auto& click = view.get<cp::ui_click>(entity);
+
+#ifdef LI_ENABLE_ASSERTS
+		LI_ASSERT(prev >= transform.transform[3][2], "Must iterate from highest to lowest!");
+		prev = transform.transform[3][2];
+#endif
 		
 		if (Math::TransformContainsPoint(transform.transform, x, y))
 		{
 			// If the user clicks two buttons at once.
 			if (click.mouse_button != button && click.mouse_button > 0)
 			{
-				if (click.start_click && click.OnClickFn && !clickHandled)
-					clickHandled = click.OnClickFn(registry, entity, click.mouse_button);
+				if (click.start_click && !clickHandled)
+				{
+					if (click.OnClickFn)
+						clickHandled = click.OnClickFn(registry, entity, click.mouse_button);
+					else if (click.OnClickLuaFn)
+						clickHandled = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
+				}
 			}
 			click.mouse_button = button;
 			click.start_click = true;
@@ -33,6 +47,12 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 			if (click.OnMouseDownFn)
 			{
 				mouseDownHandled = click.OnMouseDownFn(registry, entity, button);
+				if (mouseDownHandled)
+					return true;
+			}
+			else if (click.OnMouseDownLuaFn)
+			{
+				mouseDownHandled = click.OnMouseDownLuaFn(sol::light(registry), entity, button);
 				if (mouseDownHandled)
 					return true;
 			}
@@ -47,7 +67,7 @@ bool UIClickSystem::OnMouseUp(entt::registry& registry, int x, int y, int button
 
 	bool clickHandled = false;
 	bool mouseUpHandled = false;
-	// Iterate in reverse order, highest z-position to lowest.
+
 	for (entt::entity entity : view)
 	{
 		auto& click = view.get<cp::ui_click>(entity);
@@ -56,12 +76,22 @@ bool UIClickSystem::OnMouseUp(entt::registry& registry, int x, int y, int button
 		if ((!clickHandled || !mouseUpHandled) && Math::TransformContainsPoint(transform.transform, x, y))
 		{
 			// Only run the click event if it has not been handled by an above element.
-			if (click.start_click && (click.mouse_button == button || click.mouse_button == -1) && !clickHandled && click.OnClickFn)
-				clickHandled = click.OnClickFn(registry, entity, button);
+			if (click.start_click && (click.mouse_button == button || click.mouse_button == -1) && !clickHandled)
+			{
+				if (click.OnClickFn)
+					clickHandled = click.OnClickFn(registry, entity, button);
+				else if (click.OnClickLuaFn)
+					clickHandled = click.OnClickLuaFn(sol::light(registry), entity, button);
+			}
 
 			// Only run the mouse up event if it has not been handled by an above element.
-			if (!mouseUpHandled && click.OnMouseDownFn)
-				mouseUpHandled = click.OnMouseUpFn(registry, entity, button);
+			if (!mouseUpHandled)
+			{
+				if (click.OnMouseDownFn)
+					mouseUpHandled = click.OnMouseUpFn(registry, entity, button);
+				else if (click.OnMouseDownLuaFn)
+					mouseUpHandled = click.OnMouseDownLuaFn(sol::light(registry), entity, button);
+			}
 		}
 		click.mouse_button = -1;
 		click.start_click = false;
