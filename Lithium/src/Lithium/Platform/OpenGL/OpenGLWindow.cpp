@@ -10,7 +10,7 @@ namespace li
 	OpenGLWindow::OpenGLWindow(const WindowProps& props)
 		: m_Title(props.Title), m_Width(props.Width), m_Height(props.Height), m_VSync(false), m_Fullscreen(FullscreenType::Windowed), m_Icon(nullptr), m_IconData(nullptr)
 	{
-		int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
+		int flags = SDL_WINDOW_OPENGL;
 		if (props.Resizable) flags |= SDL_WINDOW_RESIZABLE;
 		if (props.Shown)
 			flags |= SDL_WINDOW_SHOWN;

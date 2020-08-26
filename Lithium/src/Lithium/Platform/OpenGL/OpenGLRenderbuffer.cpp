@@ -8,9 +8,11 @@
 
 namespace li
 {
-	OpenGLRenderbuffer::OpenGLRenderbuffer()
+	OpenGLRenderbuffer::OpenGLRenderbuffer(uint32_t width, uint32_t height)
 	{
 		GLCall( glCreateRenderbuffers(1, &m_RendererID) );
+		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID) );
+		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 	}
 
 	OpenGLRenderbuffer::~OpenGLRenderbuffer()
@@ -28,27 +30,17 @@ namespace li
 		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, 0) );
 	}
 
-	void OpenGLRenderbuffer::SetStorage(uint32_t width, uint32_t height, ImageFormat internalFormat)
-	{
-		m_InternalFormat = ConvertOpenGL::ImageFormat(internalFormat);
-		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID) );
-		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, m_InternalFormat, width, height) );
-	}
-
 	void OpenGLRenderbuffer::Resize(uint32_t width, uint32_t height)
 	{
 		GLCall( glDeleteRenderbuffers(1, &m_RendererID) );
 		GLCall( glCreateRenderbuffers(1, &m_RendererID) );
 		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID) );
-		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, m_InternalFormat, width, height) );
+		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 	}
 
-	void OpenGLRenderbuffer::AttachToFramebuffer(FramebufferAttachment attachment, FramebufferTarget target) const
+	void OpenGLRenderbuffer::AttachToFramebuffer() const
 	{
-		GLCall( glFramebufferRenderbuffer(
-			ConvertOpenGL::FramebufferTarget(target),
-			ConvertOpenGL::FramebufferAttachment(attachment),
-			GL_RENDERBUFFER, m_RendererID
-		) );
+		GLCall( glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+			GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RendererID) );
 	}
 }

@@ -42,6 +42,8 @@ namespace li
 		std::vector<ID3D11Buffer*> m_VSUniformBuffers;
 		std::vector<ID3D11Buffer*> m_PSUniformBuffers;
 
+		int m_PSStartSlot;
+
 		ID3D11Device* m_DeviceHandle;
 		ID3D11DeviceContext* m_ContextHandle;
 	};

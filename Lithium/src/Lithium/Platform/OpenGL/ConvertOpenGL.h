@@ -13,8 +13,9 @@ namespace li
 		static uint32_t DrawMode(DrawMode mode);
 		static uint32_t WrapType(WrapType type);
 		static uint32_t FilterType(FilterType type);
-		static uint32_t FramebufferTarget(FramebufferTarget target);
-		static uint32_t FramebufferAttachment(FramebufferAttachment attachment);
-		static uint32_t ImageFormat(ImageFormat format);
+		//static uint32_t FramebufferTarget(FramebufferTarget target);
+		//static uint32_t FramebufferAttachment(FramebufferAttachment attachment);
+		//static uint32_t ImageFormat(ImageFormat format);
+		//static uint32_t InternalImageFormat(InternalImageFormat format);
 	};
 }

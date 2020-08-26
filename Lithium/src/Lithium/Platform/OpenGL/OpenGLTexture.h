@@ -25,10 +25,7 @@ namespace li
 		virtual int GetHeight() const override { return m_Height; }
 		
 		virtual void Resize(int width, int height) override;
-		virtual void AttachToFramebuffer(
-			FramebufferAttachment attachment,
-			FramebufferTarget target = FramebufferTarget::Framebuffer
-		) const override;
+		virtual void AttachToFramebuffer() const override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 	private:

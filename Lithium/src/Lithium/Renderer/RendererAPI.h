@@ -54,6 +54,11 @@ namespace li
 			s_RendererAPI->DrawIndexedInstancedImpl(indexCount, instanceCount);
 		}
 
+		inline static void BindDefaultRenderTarget()
+		{
+			s_RendererAPI->BindDefaultRenderTargetImpl();
+		}
+
 		inline static void SetDepthTest(bool enabled)
 		{
 			s_RendererAPI->SetDepthTestImpl(enabled);
@@ -82,6 +87,8 @@ namespace li
 
 		virtual void DrawIndexedImpl(uint32_t indexCount) = 0;
 		virtual void DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount) = 0;
+
+		virtual void BindDefaultRenderTargetImpl() = 0;
 
 		virtual void SetDrawModeImpl(DrawMode mode) = 0;
 

@@ -1,18 +1,24 @@
 ﻿#include "pch.h"
 #include "GameLayer.h"
 
-#include "glm/gtc/type_ptr.hpp"
-#include "imgui.h"
-
 #include "Horizons.h"
 #include "Horizons/Core/TickThread.h"
 #include "Horizons/Gameplay/Components.h"
+#include "Horizons/Terrain/TerrainManager.h"
 #include "Horizons/Rendering/RenderingSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/TransformUpdateSystem.h"
 #include "Horizons/Gameplay/CameraControllerSystem.h"
 #include "Horizons/Gameplay/Sync/SyncEventReceiveSystem.h"
 #include "Horizons/Gameplay/Sync/SyncTransformReceiveSystem.h"
+
+#include "Horizons/Gameplay/Player/PlayerComponents.h"
+#include "Horizons/Gameplay/Sync/SyncTransform.h"
+#include "Horizons/Gameplay/Components.h"
+
+#include "entt/entt.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "imgui.h"
 
 #include <thread>
 
@@ -49,6 +55,8 @@ GameLayer::GameLayer()
 	SyncEventReceiveSystem::Init(m_Registry);
 	SyncTransformReceiveSystem::Init(m_Registry);
 	CameraControllerSystem::Init(m_Registry);
+
+	TerrainManager::LoadWorld("data/worlds/random.terrain", { 0, 0 });
 }
 
 GameLayer::~GameLayer()
@@ -65,7 +73,10 @@ void GameLayer::OnAttach()
 
 void GameLayer::OnDetach()
 {
+	TerrainManager::UnloadWorld();
 	m_TickThread.join();
+	// Clear queue to free pointers.
+	SyncEventReceiveSystem::Update(m_Registry, &m_SyncQueue);
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -73,18 +84,36 @@ void GameLayer::OnUpdate(float dt)
 	SyncEventReceiveSystem::Update(m_Registry, &m_SyncQueue);
 	SyncTransformReceiveSystem::Update(m_Registry, &m_TransformQueue, dt);
 
+	auto player_view = m_Registry.view<cp::sync_transform, cp::player>();
+	for (entt::entity player : player_view)
+	{
+		cp::sync_transform& player_transform = player_view.get<cp::sync_transform>(player);
+
+		TerrainManager::UpdateCenter({
+			(int)std::floor(player_transform.position.x / TerrainManager::MetersPerChunk),
+			(int)std::floor(player_transform.position.y / TerrainManager::MetersPerChunk)
+		});
+		break;
+	}
+
 	CameraControllerSystem::Update(m_Registry, dt);
 
 	TransformUpdateSystem::Update(m_Registry);
 
+
 	cp::camera& camera = m_Registry.ctx<cp::camera>();
 
+	TerrainManager::RenderFramebuffer();
+
+	li::RendererAPI::BindDefaultRenderTarget();
+	li::RendererAPI::Clear();
 	li::Renderer::BeginScene(camera.camera);
 
+	TerrainManager::RenderQuad();
 	RenderingSystem::Render(m_Registry);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	m_DebugPhysicsRenderer.Render();
+	//m_DebugPhysicsRenderer.Render();
 #endif
 
 	li::Renderer::EndScene();

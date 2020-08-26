@@ -21,6 +21,7 @@ void SplashScreenLayer::OnDetach()
 
 void SplashScreenLayer::OnUpdate(float dt)
 {
+	li::RendererAPI::BindDefaultRenderTarget();
 	li::RendererAPI::Clear();
 	li::Renderer::UISubmit(m_Texture, m_Transform);
 }
@@ -46,32 +47,26 @@ void SplashScreenLayer::CalculateTransform()
 
 	if (windowAspect >= textureAspect)
 	{
-		m_Transform = glm::translate(glm::mat4(1.0f), 
-			{ 
+		m_Transform = glm::translate(glm::mat4(1.0f), { 
 				0.0f,
 				0.5f * (window->GetHeight() - window->GetWidth() / textureAspect),
 				0.0f
-			})
-			* glm::scale(glm::mat4(1.0f),
-				{
-					window->GetWidth(),
-					window->GetWidth() / textureAspect,
-					1.0f
-				});
+			}) * glm::scale(glm::mat4(1.0f), {
+				window->GetWidth(),
+				window->GetWidth() / textureAspect,
+				1.0f
+			});
 	}
 	else
 	{
-		m_Transform = glm::translate(glm::mat4(1.0f), 
-			{
+		m_Transform = glm::translate(glm::mat4(1.0f), {
 				0.5f * (window->GetWidth() - window->GetHeight() * textureAspect),
 				0.0f,
 				0.0f
-			})
-			* glm::scale(glm::mat4(1.0f),
-				{
-					window->GetHeight() * textureAspect,
-					window->GetHeight(),
-					1.0f
-				});
+			}) * glm::scale(glm::mat4(1.0f), {
+				window->GetHeight() * textureAspect,
+				window->GetHeight(),
+				1.0f
+			});
 	}
 }

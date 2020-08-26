@@ -52,6 +52,7 @@ namespace li
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> inputDesc = std::vector<D3D11_INPUT_ELEMENT_DESC>();
 
+		int slot = 0;
 		for (const Ref<VertexBuffer>& vertexBuf : m_VertexBuffers)
 		{
 			D3D11VertexBuffer* vb = (D3D11VertexBuffer*)vertexBuf.get();
@@ -70,7 +71,7 @@ namespace li
 						desc.SemanticName = element.Name.c_str();
 						desc.SemanticIndex = row;
 						desc.Format = ShaderDataTypeToD3D11(element.Type);
-						desc.InputSlot = element.Divisor;
+						desc.InputSlot = slot;
 						desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 						desc.InputSlotClass = element.Divisor > 0 ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
 						desc.InstanceDataStepRate = element.Divisor;
@@ -83,13 +84,14 @@ namespace li
 					desc.SemanticName = element.Name.c_str();
 					desc.SemanticIndex = 0;
 					desc.Format = ShaderDataTypeToD3D11(element.Type);
-					desc.InputSlot = element.Divisor;
+					desc.InputSlot = slot;
 					desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 					desc.InputSlotClass = element.Divisor > 0 ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
 					desc.InstanceDataStepRate = element.Divisor;
 					inputDesc.push_back(desc);
 				}
 			}
+			slot++;
 		}
 
 		LI_CORE_ASSERT(inputDesc.size() < 32, "Layout too large!");

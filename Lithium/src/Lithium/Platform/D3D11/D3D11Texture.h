@@ -11,7 +11,7 @@ namespace li
 	public:
 		D3D11Texture2D(int width, int height, void* data,
 			WrapType wrapS, WrapType wrapT,
-			FilterType minFilter, FilterType magFilter);;
+			FilterType minFilter, FilterType magFilter, bool renderTarget = false);
 		D3D11Texture2D(const std::string& path,
 			WrapType wrapS, WrapType wrapT,
 			FilterType minFilter, FilterType magFilter);
@@ -25,18 +25,19 @@ namespace li
 		virtual int GetHeight() const override { return m_Height; }
 
 		virtual void Resize(int width, int height) override;
-		virtual void AttachToFramebuffer(
-			FramebufferAttachment attachment,
-			FramebufferTarget target = FramebufferTarget::Framebuffer
-		) const override;
+		virtual void AttachToFramebuffer() const override {};
 
 		virtual void Bind(uint32_t slot = 0) const override;
+
+		ID3D11Texture2D* GetTexture() { return m_Texture; }
 
 	private:
 		D3D11_FILTER CalculateFilter(FilterType minFilter, FilterType magFilter);
 
 		int m_Width;
 		int m_Height;
+
+		bool m_IsRenderTarget;
 
 		ID3D11SamplerState* m_SamplerState;
 		ID3D11Texture2D* m_Texture;

@@ -39,6 +39,8 @@ namespace li
 
 		static void SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 
+		static void Submit(const Ref<Texture>& texture, const glm::mat4& transform = glm::mat4(1.0f));
+
 		static void UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform = glm::mat4(1.0f));
 
 		static void UISubmitColored(const glm::vec4& color, const glm::mat4& transform = glm::mat4(1.0f));
@@ -53,9 +55,12 @@ namespace li
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 		inline static Ref<UniformBuffer> GetViewProjUniformBuffer() { return s_Data->ViewProjUB; }
+		inline static Ref<UniformBuffer> GetTransformUniformBuffer() { return s_Data->TransformMatrixUB; }
 		inline static Ref<Shader> GetFontShader() { return s_Data->FontShader; }
 
 	private:
+		static void RenderQuad(const Ref<Texture>& texture, const glm::mat4& transform, const glm::mat4& view_projection);
+		static void RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 
 		struct RendererData
 		{
@@ -80,6 +85,5 @@ namespace li
 		static Scope<RendererData> s_Data;
 
 
-		static void RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 	};
 }

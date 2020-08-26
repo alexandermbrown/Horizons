@@ -4,29 +4,41 @@
 #include "D3D11Core.h"
 #include "glm/gtc/type_ptr.hpp"
 
+#include <d3d11_2.h>
+#include <VersionHelpers.h>
+
 namespace li
 {
 	D3D11Context::D3D11Context(HWND hwnd, int width, int height)
 	{
-		const D3D_FEATURE_LEVEL levels[7] = {
-		D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
-		D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
-		};
-
 		UINT createDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #ifdef LI_DEBUG
 		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-		D3D11Call(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags,
-			levels, sizeof(levels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &m_Device, NULL, &m_DeviceContext));
+		constexpr D3D_FEATURE_LEVEL levels_11_1[] = { D3D_FEATURE_LEVEL_11_1 };
+		HRESULT result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags,
+			levels_11_1, sizeof(levels_11_1) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &m_Device, NULL, &m_DeviceContext);
 
-		InitSwapChain(hwnd, width, height);
+		if (SUCCEEDED(result))
+		{
+			InitSwapChain1(hwnd, width, height);
+		}
+		else
+		{
+			constexpr D3D_FEATURE_LEVEL levels[] = {
+				D3D_FEATURE_LEVEL_11_0,
+				D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
+				D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
+			};
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags,
+				levels, sizeof(levels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &m_Device, NULL, &m_DeviceContext);
+			InitSwapChain(hwnd, width, height);
+		}
+		
 		InitDepthStencil();
 		InitBlendState();
 		InitRasterState();
-		Resize(width, height);
 	}
 
 	D3D11Context::~D3D11Context()
@@ -48,7 +60,7 @@ namespace li
 
 	void D3D11Context::SwapBuffers()
 	{
-		m_SwapChain->Present(1, 0);
+		m_SwapChain->Present(0, 0);
 	}
 
 	void D3D11Context::Resize(int width, int height)
@@ -59,7 +71,7 @@ namespace li
 		LI_D3D_RELEASE(m_DepthStencilView);
 		LI_D3D_RELEASE(m_DepthStencilBuffer);
 
-		D3D11Call(m_SwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+		D3D11Call(m_SwapChain->ResizeBuffers(NumSwapChainBuffers, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 
 		ID3D11Texture2D* buffer;
 		D3D11Call(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer));
@@ -68,7 +80,7 @@ namespace li
 		buffer->Release();
 
 
-		// Set up the description of the depth buffer.
+		// Set up the depth buffer.
 		D3D11_TEXTURE2D_DESC depthBufferDesc;
 		ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
@@ -97,14 +109,13 @@ namespace li
 
 		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)width;
-		viewport.Height = (float)height;
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		m_DeviceContext->RSSetViewports(1, &viewport);
+		m_Viewport.Width = (float)width;
+		m_Viewport.Height = (float)height;
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
 	void D3D11Context::Clear()
@@ -113,14 +124,15 @@ namespace li
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
+	void D3D11Context::BindDefaultRenderTarget()
+	{
+		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
+		m_DeviceContext->RSSetViewports(1, &m_Viewport);
+	}
+
 	void D3D11Context::InitSwapChain(HWND hwnd, int width, int height)
 	{
-		DXGI_SWAP_CHAIN_DESC swapChainDesc;
-		ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-
-		// Single back buffer.
-		swapChainDesc.BufferCount = 1;
-
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 		swapChainDesc.BufferDesc.Width = width;
 		swapChainDesc.BufferDesc.Height = height;
 		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -128,16 +140,20 @@ namespace li
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-
-		// Turn off multisampling.
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
-
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-
+		swapChainDesc.BufferCount = 1;
 		swapChainDesc.OutputWindow = hwnd;
 		swapChainDesc.Windowed = true;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+		if (IsWindows10OrGreater())
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		else if (IsWindows8OrGreater())
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+		else
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
 		swapChainDesc.Flags = 0;
 
 		IDXGIDevice* dxgiDevice = nullptr;
@@ -148,6 +164,47 @@ namespace li
 		D3D11Call(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
 		D3D11Call(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 		D3D11Call(dxgiFactory->CreateSwapChain(m_Device, &swapChainDesc, &m_SwapChain));
+	}
+
+	void D3D11Context::InitSwapChain1(HWND hwnd, int width, int height)
+	{
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+		ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+		swapChainDesc.Width = width;
+		swapChainDesc.Height = height;
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.Stereo = false;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = NumSwapChainBuffers;
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+
+		if (IsWindows10OrGreater())
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		else if (IsWindows8OrGreater())
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+		else
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		
+		swapChainDesc.Flags = 0;
+
+		// Set for fullscreen mode.
+		//DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullscreenDesc;
+		//ZeroMemory(&fullscreenDesc, sizeof(fullscreenDesc));
+		//fullscreenDesc.RefreshRate.Numerator = 0;
+		//fullscreenDesc.RefreshRate.Denominator = 1;
+		//fullscreenDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+		//fullscreenDesc.Windowed = true;
+
+		IDXGIDevice2* dxgiDevice = nullptr;
+		IDXGIAdapter* dxgiAdapter = nullptr;
+		IDXGIFactory2* dxgiFactory = nullptr;
+
+		D3D11Call(m_Device->QueryInterface(__uuidof(IDXGIDevice2), (void**)&dxgiDevice));
+		D3D11Call(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
+		D3D11Call(dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory));
+		D3D11Call(dxgiFactory->CreateSwapChainForHwnd(m_Device, hwnd, &swapChainDesc, NULL, NULL, (IDXGISwapChain1**)&m_SwapChain));
 	}
 
 	void D3D11Context::InitDepthStencil()
@@ -214,7 +271,7 @@ namespace li
 		// Setup the raster description which will determine how and what polygons will be drawn.
 		D3D11_RASTERIZER_DESC rasterDesc;
 		rasterDesc.FillMode = D3D11_FILL_SOLID;
-		rasterDesc.CullMode = D3D11_CULL_BACK;
+		rasterDesc.CullMode = D3D11_CULL_NONE;
 		rasterDesc.FrontCounterClockwise = true;
 		rasterDesc.DepthBias = 0;
 		rasterDesc.DepthBiasClamp = 0.0f;

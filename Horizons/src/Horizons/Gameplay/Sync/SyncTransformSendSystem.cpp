@@ -9,7 +9,7 @@ void SyncTransformSendSystem::Update(entt::registry& registry, SyncTransformQueu
 	{
 		cp::sync_transform transform;
 
-		transform.position = { body.body->GetPosition().x, body.body->GetPosition().y };
+		transform.position = { body.body->GetPosition().x, body.body->GetPosition().y, sync_transform.position.z };
 		transform.velocity = { body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y };
 
 		transform.rotation = body.body->GetAngle();

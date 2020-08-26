@@ -58,32 +58,39 @@ namespace li
 		NearestMipmapLinear
 	};
 
-	enum class FramebufferTarget
-	{
-		Framebuffer = 0,
-		ReadFramebuffer,
-		DrawFramebuffer
-	};
+	//enum class FramebufferTarget
+	//{
+	//	Framebuffer = 0,
+	//	ReadFramebuffer,
+	//	DrawFramebuffer
+	//};
 
-	enum class FramebufferAttachment
-	{
-		ColorAttachment0 = 0,
-		ColorAttachment1,
-		ColorAttachment2,
-		ColorAttachment3,
-		ColorAttachment4,
-		ColorAttachment5,
-		ColorAttachment6,
-		ColorAttachment7,
-		DepthAttachment,
-		StencilAttachment,
-		DepthStencilAttachment
-	};
+	//enum class FramebufferAttachment
+	//{
+	//	ColorAttachment0 = 0,
+	//	ColorAttachment1,
+	//	ColorAttachment2,
+	//	ColorAttachment3,
+	//	ColorAttachment4,
+	//	ColorAttachment5,
+	//	ColorAttachment6,
+	//	ColorAttachment7,
+	//	DepthAttachment,
+	//	StencilAttachment,
+	//	DepthStencilAttachment
+	//};
 
-	enum class ImageFormat
-	{
-		RGB8 = 0,
-		RGBA8,
-		Depth24Stencil8
-	};
+	//enum class ImageFormat
+	//{
+	//	RGB = 0,
+	//	RGBA,
+	//	DepthStencil
+	//};
+
+	//enum class InternalImageFormat
+	//{
+	//	RGB8 = 0,
+	//	RGBA8,
+	//	Depth24Stencil8
+	//};
 }

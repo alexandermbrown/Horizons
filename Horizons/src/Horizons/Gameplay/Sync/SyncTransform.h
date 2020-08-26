@@ -9,7 +9,7 @@ namespace cp
 	{
 		uint64_t sync_id = 0;
 
-		glm::vec2 position{ 0.0f, 0.0f };
+		glm::vec3 position{ 0.0f, 0.0f, 0.0f };
 		glm::vec2 velocity{ 0.0f, 0.0f };
 
 		float rotation = 0.0f;

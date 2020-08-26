@@ -16,10 +16,7 @@ namespace li
 		virtual int GetHeight() const = 0;
 
 		virtual void Resize(int width, int height) = 0;
-		virtual void AttachToFramebuffer(
-			FramebufferAttachment attachment = FramebufferAttachment::DepthStencilAttachment,
-			FramebufferTarget target = FramebufferTarget::Framebuffer
-		) const = 0;
+		virtual void AttachToFramebuffer() const = 0;
 
 		virtual void Bind(uint32_t slot = 0) const = 0;
 	};

@@ -16,6 +16,11 @@
 			<glsl>./res/shaders/DebugPhysics.glsl</glsl>
 			<hlsl>./res/shaders/DebugPhysics.hlsl</hlsl>
 		</shader>
+
+		<shader name="shader_terrain">
+			<glsl>./res/shaders/Terrain.glsl</glsl>
+			<hlsl>./res/shaders/Terrain.hlsl</hlsl>
+		</shader>
     
 	</shaders>
 
@@ -45,39 +50,17 @@
 			<wrap_t>CLAMP_TO_EDGE</wrap_t>
 		</texture2d>
 
+		<texture2d name="texture_terrain_test">
+			<source>./res/textures/terrain_test.png</source>
+			<min_filter>NEAREST</min_filter>
+			<mag_filter>NEAREST</mag_filter>
+			<wrap_s>REPEAT</wrap_s>
+			<wrap_t>REPEAT</wrap_t>
+		</texture2d>
+
 	</textures>
 	
 	<fonts>
-		<!-- <font name="RobotoMono-Regular">
-			<source>./res/fonts/RobotoMono/RobotoMono-Regular.ttf</source>
-			<glyph_width>64</glyph_width>
-			<texture_width>2048</texture_width>
-		</font>
-
-		<font name="RobotoMono-Light">
-			<source>./res/fonts/RobotoMono/RobotoMono-Light.ttf</source>
-			<glyph_width>64</glyph_width>
-			<texture_width>2048</texture_width>
-		</font>
-
-		<font name="RobotoMono-Italic">
-			<source>./res/fonts/RobotoMono/RobotoMono-Italic.ttf</source>
-			<glyph_width>64</glyph_width>
-			<texture_width>2048</texture_width>
-		</font>
-
-		<font name="RobotoMono-Bold">
-			<source>./res/fonts/RobotoMono/RobotoMono-Bold.ttf</source>
-			<glyph_width>64</glyph_width>
-			<texture_width>2048</texture_width>
-		</font>
-
-		<font name="RobotoMono-BoldItalic">
-			<source>./res/fonts/RobotoMono/RobotoMono-BoldItalic.ttf</source>
-			<glyph_width>64</glyph_width>
-			<texture_width>2048</texture_width>
-		</font> -->
-		
 		<font name="Lato-Regular">
 			<source>./res/fonts/Lato/Lato-Regular.ttf</source>
 			<glyph_width>64</glyph_width>
@@ -95,7 +78,6 @@
 			<glyph_width>64</glyph_width>
 			<texture_width>2048</texture_width>
 		</font>
-
 	</fonts>
 
 	<texture_atlases>
@@ -126,7 +108,6 @@
 
 		<locale name="en-us"><source>./res/locales/en-us/en-us.ini</source></locale>
 		<locale name="test"><source>./res/locales/test/test.ini</source></locale>
-
 
 	</locales>
 

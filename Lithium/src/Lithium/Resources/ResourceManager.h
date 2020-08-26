@@ -30,6 +30,7 @@ namespace li
 		template<typename T>
 		static Ref<T> Get(const std::string& name)
 		{
+			LI_CORE_ASSERT(false, "Invalid resource.");
 			return nullptr;
 		}
 

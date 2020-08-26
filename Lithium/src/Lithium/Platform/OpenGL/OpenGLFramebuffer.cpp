@@ -8,10 +8,21 @@
 
 namespace li
 {
-	OpenGLFramebuffer::OpenGLFramebuffer(FramebufferTarget target)
-		: m_Target(target), m_GLTarget(ConvertOpenGL::FramebufferTarget(m_Target))
+	OpenGLFramebuffer::OpenGLFramebuffer(int width, int height)
+		: m_Width(width), m_Height(height)
 	{
 		GLCall( glCreateFramebuffers(1, &m_RendererID) );
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
+
+		m_Texture = Texture2D::Create(width, height, nullptr,
+			WrapType::ClampToEdge, WrapType::ClampToEdge,
+			FilterType::Linear, FilterType::Nearest);
+		m_Texture->AttachToFramebuffer();
+
+		m_Renderbuffer = CreateScope<OpenGLRenderbuffer>(width, height);
+		m_Renderbuffer->AttachToFramebuffer();
+
+		LI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer not complete!");
 	}
 
 	OpenGLFramebuffer::~OpenGLFramebuffer()
@@ -21,52 +32,31 @@ namespace li
 
 	void OpenGLFramebuffer::Bind() const
 	{
-		GLCall( glBindFramebuffer(m_GLTarget, m_RendererID) );
+		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
+		GLCall( glViewport(0, 0, m_Width, m_Height) );
 	}
 
-	void OpenGLFramebuffer::Unbind() const
+	void OpenGLFramebuffer::SetClearColor(const glm::vec4& color)
 	{
-		GLCall( glBindFramebuffer(m_GLTarget, 0) );
+		GLCall( glClearColor(color.r, color.g, color.b, color.a) );
 	}
 
-	void OpenGLFramebuffer::AttachTexture(Ref<Texture2D> texture, FramebufferAttachment attachment)
+	void OpenGLFramebuffer::Clear() const
 	{
-		m_Texture = texture;
-		m_TextureAttachment = attachment;
-
-		m_Texture->AttachToFramebuffer(attachment, m_Target);
+		GLCall( glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) );
 	}
 
-	void OpenGLFramebuffer::AttachRenderbuffer(Ref<Renderbuffer> renderBuffer, FramebufferAttachment attachment)
-	{
-		m_Renderbuffer = renderBuffer;
-		m_RenderbufferAttachment = attachment;
-
-		m_Renderbuffer->AttachToFramebuffer(attachment, m_Target);
-	}
-
-	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
+	void OpenGLFramebuffer::Resize(int width, int height)
 	{
 		GLCall( glDeleteFramebuffers(1, &m_RendererID) );
 		GLCall( glCreateFramebuffers(1, &m_RendererID) );
 		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
 
-		if (m_Texture) 
-		{
-			m_Texture->Bind();
-			m_Texture->Resize(width, height);
-			m_Texture->AttachToFramebuffer(m_TextureAttachment, m_Target);
-		}
+		m_Texture->Bind();
+		m_Texture->Resize(width, height);
+		m_Texture->AttachToFramebuffer();
 
-		if (m_Renderbuffer) 
-		{
-			m_Renderbuffer->Resize(width, height);
-			m_Renderbuffer->AttachToFramebuffer(m_RenderbufferAttachment, m_Target);
-		}
-	}
-
-	bool OpenGLFramebuffer::IsComplete() const
-	{
-		return glCheckFramebufferStatus(m_GLTarget);
+		m_Renderbuffer->Resize(width, height);
+		m_Renderbuffer->AttachToFramebuffer();
 	}
 }

@@ -84,7 +84,11 @@ namespace li
 		m_ContextHandle->VSSetConstantBuffers(0, (UINT)m_VSUniformBuffers.size(), m_VSUniformBuffers.data());
 		m_ContextHandle->VSSetShader(m_VertexShader, NULL, 0);
 
-		m_ContextHandle->PSSetConstantBuffers(m_VSUniformBuffers.size(), (UINT)m_PSUniformBuffers.size(), m_PSUniformBuffers.data());
+		if (m_PSUniformBuffers.size() > 0)
+		{
+			m_ContextHandle->PSSetConstantBuffers(m_PSStartSlot, (UINT)m_PSUniformBuffers.size(), m_PSUniformBuffers.data());
+		}
+		
 		m_ContextHandle->PSSetShader(m_PixelShader, NULL, 0);
 	}
 
@@ -96,6 +100,10 @@ namespace li
 			m_VSUniformBuffers.push_back(((D3D11UniformBuffer*)buffer.get())->GetInternalBuffer());
 			break;
 		case ShaderType::Fragment:
+			if (m_PSUniformBuffers.size() == 0)
+			{
+				m_PSStartSlot = buffer->GetSlot();
+			}
 			m_PSUniformBuffers.push_back(((D3D11UniformBuffer*)buffer.get())->GetInternalBuffer());
 			break;
 		default:

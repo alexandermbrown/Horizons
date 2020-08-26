@@ -10,7 +10,9 @@ namespace li
 {
 	void OpenGLRendererAPI::ResizeViewImpl(int width, int height)
 	{
-		GLCall( glViewport(0, 0, width, height) );
+		m_Width = width;
+		m_Height = height;
+		GLCall( glViewport(0, 0, m_Width, m_Height) );
 	}
 
 	void OpenGLRendererAPI::SetClearColorImpl(const glm::vec4& color)
@@ -52,5 +54,11 @@ namespace li
 	{
 		GLCall( glDrawElementsInstanced(ConvertOpenGL::DrawMode(m_DrawMode), 
 			indexCount, GL_UNSIGNED_INT, nullptr, instanceCount) );
+	}
+	
+	void OpenGLRendererAPI::BindDefaultRenderTargetImpl()
+	{
+		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+		GLCall( glViewport(0, 0, m_Width, m_Height) );
 	}
 }

@@ -10,7 +10,7 @@ namespace li
 	D3D11Window::D3D11Window(const WindowProps& props)
 		: m_Title(props.Title), m_Width(props.Width), m_Height(props.Height), m_Fullscreen(FullscreenType::Windowed), m_Icon(nullptr), m_IconData(nullptr)
 	{
-		int flags = SDL_WINDOW_ALLOW_HIGHDPI;
+		int flags = 0;
 		if (props.Resizable) flags |= SDL_WINDOW_RESIZABLE;
 		if (props.Shown)
 			flags |= SDL_WINDOW_SHOWN;

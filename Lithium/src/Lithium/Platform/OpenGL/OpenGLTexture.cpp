@@ -126,9 +126,9 @@ namespace li
 		m_Height = height;
 	}
 
-	void OpenGLTexture2D::AttachToFramebuffer(FramebufferAttachment attachment, FramebufferTarget target) const
+	void OpenGLTexture2D::AttachToFramebuffer() const
 	{
-		GLCall( glFramebufferTexture2D(ConvertOpenGL::FramebufferTarget(target), ConvertOpenGL::FramebufferAttachment(attachment), GL_TEXTURE_2D, m_RendererID, 0) );
+		GLCall( glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RendererID, 0) );
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const

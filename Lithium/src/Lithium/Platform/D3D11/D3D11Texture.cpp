@@ -11,8 +11,8 @@
 
 namespace li
 {
-	D3D11Texture2D::D3D11Texture2D(int width, int height, void* data, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
-		: m_Width(width), m_Height(height)
+	D3D11Texture2D::D3D11Texture2D(int width, int height, void* data, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter, bool renderTarget)
+		: m_Width(width), m_Height(height), m_IsRenderTarget(renderTarget)
 	{
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
 		m_DeviceHandle = context->GetDevice();
@@ -28,6 +28,7 @@ namespace li
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
 		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		if (renderTarget) textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 		textureDesc.CPUAccessFlags = 0;
 		textureDesc.MiscFlags = 0;
 
@@ -70,6 +71,7 @@ namespace li
 	}
 
 	D3D11Texture2D::D3D11Texture2D(const std::string& path, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
+		: m_IsRenderTarget(false)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -130,6 +132,7 @@ namespace li
 	}
 
 	D3D11Texture2D::D3D11Texture2D(size_t imageSize, const uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
+		: m_IsRenderTarget(false)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -198,12 +201,33 @@ namespace li
 
 	void D3D11Texture2D::Resize(int width, int height)
 	{
-		LI_CORE_ASSERT(false, "Not implemented.");
-	}
+		m_Texture->Release();
+		m_ResourceView->Release();
 
-	void D3D11Texture2D::AttachToFramebuffer(FramebufferAttachment attachment, FramebufferTarget target) const
-	{
-		LI_CORE_ASSERT(false, "Not implemented.");
+		D3D11_TEXTURE2D_DESC textureDesc;
+		textureDesc.Width = width;
+		textureDesc.Height = height;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		if (m_IsRenderTarget) textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.MiscFlags = 0;
+
+		D3D11Call(m_DeviceHandle->CreateTexture2D(&textureDesc, NULL, &m_Texture));
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+		ZeroMemory(&viewDesc, sizeof(viewDesc));
+		viewDesc.Format = textureDesc.Format;
+		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MostDetailedMip = 0;
+		viewDesc.Texture2D.MipLevels = textureDesc.MipLevels;
+
+		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture, &viewDesc, &m_ResourceView));
 	}
 
 	void D3D11Texture2D::Bind(uint32_t slot) const

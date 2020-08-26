@@ -90,67 +90,83 @@ namespace li
 			return 0;
 		}
 	}
-	uint32_t ConvertOpenGL::FramebufferTarget(li::FramebufferTarget target)
-	{
-		switch (target)
-		{
-		case FramebufferTarget::Framebuffer:
-			return GL_FRAMEBUFFER;
-		case FramebufferTarget::ReadFramebuffer:
-			return GL_READ_FRAMEBUFFER;
-		case FramebufferTarget::DrawFramebuffer:
-			return GL_DRAW_FRAMEBUFFER;
-		default:
-			LI_CORE_ERROR("Unknown framebuffer target {}.", target);
-			return 0;
-		}
-	}
 
-	uint32_t ConvertOpenGL::FramebufferAttachment(li::FramebufferAttachment attachment)
-	{
-		switch (attachment)
-		{
-		case FramebufferAttachment::ColorAttachment0:
-			return GL_COLOR_ATTACHMENT0;
-		case FramebufferAttachment::ColorAttachment1:
-			return GL_COLOR_ATTACHMENT1;
-		case FramebufferAttachment::ColorAttachment2:
-			return GL_COLOR_ATTACHMENT2;
-		case FramebufferAttachment::ColorAttachment3:
-			return GL_COLOR_ATTACHMENT3;
-		case FramebufferAttachment::ColorAttachment4:
-			return GL_COLOR_ATTACHMENT4;
-		case FramebufferAttachment::ColorAttachment5:
-			return GL_COLOR_ATTACHMENT5;
-		case FramebufferAttachment::ColorAttachment6:
-			return GL_COLOR_ATTACHMENT6;
-		case FramebufferAttachment::ColorAttachment7:
-			return GL_COLOR_ATTACHMENT7;
-		case FramebufferAttachment::DepthAttachment:
-			return GL_DEPTH_ATTACHMENT;
-		case FramebufferAttachment::StencilAttachment:
-			return GL_STENCIL_ATTACHMENT;
-		case FramebufferAttachment::DepthStencilAttachment:
-			return GL_DEPTH_STENCIL_ATTACHMENT;
-		default:
-			LI_CORE_ERROR("Unknown framebuffer attachment {}.", attachment);
-			return 0;
-		}
-	}
+	//uint32_t ConvertOpenGL::FramebufferTarget(li::FramebufferTarget target)
+	//{
+	//	switch (target)
+	//	{
+	//	case FramebufferTarget::Framebuffer:
+	//		return GL_FRAMEBUFFER;
+	//	case FramebufferTarget::ReadFramebuffer:
+	//		return GL_READ_FRAMEBUFFER;
+	//	case FramebufferTarget::DrawFramebuffer:
+	//		return GL_DRAW_FRAMEBUFFER;
+	//	default:
+	//		LI_CORE_ERROR("Unknown framebuffer target {}.", target);
+	//		return 0;
+	//	}
+	//}
 
-	uint32_t ConvertOpenGL::ImageFormat(li::ImageFormat format)
-	{
-		switch (format)
-		{
-		case ImageFormat::RGB8:
-			return GL_RGB8;
-		case ImageFormat::RGBA8:
-			return GL_RGBA8;
-		case ImageFormat::Depth24Stencil8:
-			return GL_DEPTH24_STENCIL8;
-		default:
-			LI_CORE_ERROR("Unknown image format {}.", format);
-			return 0;
-		}
-	}
+	//uint32_t ConvertOpenGL::FramebufferAttachment(li::FramebufferAttachment attachment)
+	//{
+	//	switch (attachment)
+	//	{
+	//	case FramebufferAttachment::ColorAttachment0:
+	//		return GL_COLOR_ATTACHMENT0;
+	//	case FramebufferAttachment::ColorAttachment1:
+	//		return GL_COLOR_ATTACHMENT1;
+	//	case FramebufferAttachment::ColorAttachment2:
+	//		return GL_COLOR_ATTACHMENT2;
+	//	case FramebufferAttachment::ColorAttachment3:
+	//		return GL_COLOR_ATTACHMENT3;
+	//	case FramebufferAttachment::ColorAttachment4:
+	//		return GL_COLOR_ATTACHMENT4;
+	//	case FramebufferAttachment::ColorAttachment5:
+	//		return GL_COLOR_ATTACHMENT5;
+	//	case FramebufferAttachment::ColorAttachment6:
+	//		return GL_COLOR_ATTACHMENT6;
+	//	case FramebufferAttachment::ColorAttachment7:
+	//		return GL_COLOR_ATTACHMENT7;
+	//	case FramebufferAttachment::DepthAttachment:
+	//		return GL_DEPTH_ATTACHMENT;
+	//	case FramebufferAttachment::StencilAttachment:
+	//		return GL_STENCIL_ATTACHMENT;
+	//	case FramebufferAttachment::DepthStencilAttachment:
+	//		return GL_DEPTH_STENCIL_ATTACHMENT;
+	//	default:
+	//		LI_CORE_ERROR("Unknown framebuffer attachment {}.", attachment);
+	//		return 0;
+	//	}
+	//}
+
+	//uint32_t ConvertOpenGL::ImageFormat(li::ImageFormat format)
+	//{
+	//	switch (format)
+	//	{
+	//	case ImageFormat::RGB:
+	//		return GL_RGB;
+	//	case ImageFormat::RGBA:
+	//		return GL_RGBA;
+	//	case ImageFormat::DepthStencil:
+	//		return GL_DEPTH_STENCIL;
+	//	default:
+	//		LI_CORE_ERROR("Unknown image format {}.", format);
+	//		return 0;
+	//	}
+	//}
+	//uint32_t ConvertOpenGL::InternalImageFormat(InternalImageFormat format)
+	//{
+	//	switch (format)
+	//	{
+	//	case InternalImageFormat::RGB8:
+	//		return GL_RGB8;
+	//	case InternalImageFormat::RGBA8:
+	//		return GL_RGBA8;
+	//	case InternalImageFormat::Depth24Stencil8:
+	//		return GL_DEPTH24_STENCIL8;
+	//	default:
+	//		LI_CORE_ERROR("Unknown image format {}.", format);
+	//		return 0;
+	//	}
+	//}
 }

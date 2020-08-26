@@ -11,7 +11,7 @@ namespace cp
 		bool up = false;
 		bool down = false;
 
-		float move_speed = 3.0f;
+		float move_speed = 5.0f;
 		glm::vec2 move_direction = { 0.0f, 0.0f };
 	};
 }

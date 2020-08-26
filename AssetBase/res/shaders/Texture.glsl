@@ -1,5 +1,5 @@
 #type vertex
-#version 430 core
+#version 420 core
 
 layout(location = 0) in vec2 POSITION;
 layout(location = 1) in vec2 TEXCOORD;
@@ -25,7 +25,7 @@ void main()
 
 
 #type fragment
-#version 430 core
+#version 420 core
 layout(location = 0) out vec4 color;
 
 in vec2 v_TexCoord;

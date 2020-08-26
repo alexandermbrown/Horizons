@@ -18,6 +18,7 @@
 #include "Lithium/Renderer/RendererAPI.h"
 #include "Lithium/Renderer/OrthographicCamera.h"
 #include "Lithium/Renderer/Font.h"
+#include "Lithium/Renderer/Framebuffer.h"
 
 #include "Lithium/Audio/AudioManager.h"
 #include "Lithium/Audio/Audio.h"

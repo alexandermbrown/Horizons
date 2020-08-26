@@ -54,16 +54,13 @@ namespace li
 		RendererAPI::Create(props.API);
 		m_Window = Window::Create(props);
 		RendererAPI::SetContext(m_Window->GetContext());
+		RendererAPI::ResizeView(props.Width, props.Height);
 
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 	}
 
 	Application::~Application()
 	{
-		delete m_CurrentScene;
-
-		m_LayerStack.Clear();
-
 		ResourceManager::Shutdown();
 		UI::Shutdown();
 		AudioManager::Shutdown();
@@ -167,6 +164,9 @@ namespace li
 
 			m_Window->SwapBuffers();
 		}
+
+		delete m_CurrentScene;
+		m_LayerStack.Clear();
 	}
 
 	void Application::OnEvent(SDL_Event* event)
@@ -238,7 +238,6 @@ namespace li
 
 	void Application::OnWindowEvent(SDL_Event* event)
 	{
-		
 		switch(event->window.event)
 		{
 		case SDL_WINDOWEVENT_CLOSE:
@@ -246,7 +245,7 @@ namespace li
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			int w, h;
-			SDL_GL_GetDrawableSize(m_Window->GetWindow(), &w, &h);
+			SDL_GetWindowSize(m_Window->GetWindow(), &w, &h);
 			LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
 
 			m_Window->OnWindowResize(w, h);

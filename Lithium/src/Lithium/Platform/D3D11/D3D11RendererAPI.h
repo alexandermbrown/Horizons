@@ -28,6 +28,8 @@ namespace li
 		virtual void DrawIndexedImpl(uint32_t indexCount) override;
 		virtual void DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount) override;
 
+		virtual void BindDefaultRenderTargetImpl() override;
+
 		virtual void SetDrawModeImpl(DrawMode mode) override;
 
 		virtual void SetContextImpl(GraphicsContext* context)

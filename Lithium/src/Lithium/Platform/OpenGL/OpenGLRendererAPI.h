@@ -20,6 +20,8 @@ namespace li
 		virtual void DrawIndexedImpl(uint32_t indexCount) override;
 		virtual void DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount) override;
 
+		virtual void BindDefaultRenderTargetImpl() override;
+
 		virtual void SetDrawModeImpl(DrawMode mode) override { m_DrawMode = mode; }
 
 		virtual void SetContextImpl(GraphicsContext* context) override {};
@@ -28,5 +30,8 @@ namespace li
 
 		bool m_DepthTest = false;
 		DrawMode m_DrawMode = DrawMode::Triangles;
+
+		int m_Width;
+		int m_Height;
 	};
 }

@@ -1,29 +1,24 @@
 #pragma once
 
 #include "Lithium/Core/Core.h"
-#include "Lithium/Renderer/Renderbuffer.h"
+#include "Lithium/Renderer/RendererEnums.h"
 
 namespace li
 {
-	class OpenGLRenderbuffer : public Renderbuffer
+	class OpenGLRenderbuffer
 	{
 	public:
 
-		OpenGLRenderbuffer();
+		OpenGLRenderbuffer(uint32_t width, uint32_t height);
 		virtual ~OpenGLRenderbuffer();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() const;
+		virtual void Unbind() const;
 
-		virtual void SetStorage(uint32_t width, uint32_t height, ImageFormat internalFormat) override;
-		virtual void Resize(uint32_t width, uint32_t height) override;
-		virtual void AttachToFramebuffer(
-			FramebufferAttachment attachment,
-			FramebufferTarget target = FramebufferTarget::Framebuffer
-		) const override;
+		virtual void Resize(uint32_t width, uint32_t height);
+		virtual void AttachToFramebuffer() const;
 
 	private:
 		uint32_t m_RendererID;
-		uint32_t m_InternalFormat;
 	};
 }

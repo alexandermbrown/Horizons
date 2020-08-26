@@ -216,8 +216,8 @@ void Prototypes::UILoadElement(entt::registry& registry, entt::entity parent, co
 		sol::optional<const char*> text = label_table["text"];
 		sol::optional<int> pt_size		= label_table["pt_size"];
 		sol::optional<std::string> font = label_table["font"];
-		sol::optional<bool> dynamic = label_table["dynamic"];
-		sol::optional<int> excess = label_table["excess"];
+		sol::optional<bool> dynamic		= label_table["dynamic"];
+		sol::optional<int> excess		= label_table["excess"];
 
 		if (text && pt_size && font)
 			label_cp.label_ref = li::CreateRef<li::Label>(text.value(), pt_size.value(), li::ResourceManager::Get<li::Font>(font.value()), dynamic.value_or(false), excess.value_or(0));

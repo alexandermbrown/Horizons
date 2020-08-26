@@ -22,6 +22,7 @@ namespace li
 	void D3D11RendererAPI::SetDepthTestImpl(bool enabled)
 	{
 		// TODO.
+		// LI_CORE_ASSERT(false, "Not implemented!");
 	}
 
 	void D3D11RendererAPI::DrawArraysImpl(uint32_t vertexCount)
@@ -37,6 +38,11 @@ namespace li
 	void D3D11RendererAPI::DrawIndexedInstancedImpl(uint32_t indexCount, uint32_t instanceCount)
 	{
 		m_DeviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
+	}
+
+	void D3D11RendererAPI::BindDefaultRenderTargetImpl()
+	{
+		m_Context->BindDefaultRenderTarget();
 	}
 
 	void D3D11RendererAPI::SetDrawModeImpl(DrawMode mode)

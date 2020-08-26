@@ -22,5 +22,5 @@ void GameScene::TransitionOut()
 
 void GameScene::OnUpdate(float dt)
 {
-	li::RendererAPI::Clear();
+	
 }

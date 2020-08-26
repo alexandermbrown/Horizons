@@ -38,7 +38,9 @@ namespace li
 		s_Data->TextureShader->AddUniformBuffer(s_Data->TransformMatrixUB);
 
 		Window* window = Application::Get()->GetWindow();
-		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, (float)window->GetWidth(), 0.0f, (float)window->GetHeight());
+		float width = (float)window->GetWidth();
+		float height = (float)window->GetHeight();
+		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
 
 		RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
@@ -162,6 +164,11 @@ namespace li
 		RenderLabel(label, transform, color);
 	}
 
+	void Renderer::Submit(const Ref<Texture>& texture, const glm::mat4& transform)
+	{
+		RenderQuad(texture, transform, s_Data->Camera->GetViewProjectionMatrix());
+	}
+
 	void Renderer::UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
@@ -188,25 +195,30 @@ namespace li
 
 	void Renderer::UISubmit(const Ref<Texture>& texture, const glm::mat4& transform)
 	{
+		RenderQuad(texture, transform, s_Data->UICamera->GetViewProjectionMatrix());
+	}
+
+	void Renderer::Resize(int width, int height)
+	{
+		s_Data->UICamera->SetProjection(0, (float)width, 0, (float)height);
+	}
+
+	void Renderer::RenderQuad(const Ref<Texture>& texture, const glm::mat4& transform, const glm::mat4& view_projection)
+	{
 		s_Data->TextureShader->Bind();
 
 		s_Data->TransformMatrixUB->SetMat4("u_Transform", transform);
 		s_Data->TransformMatrixUB->UploadData();
 
-		s_Data->ViewProjUB->SetMat4("u_ViewProj", s_Data->UICamera->GetViewProjectionMatrix());
+		s_Data->ViewProjUB->SetMat4("u_ViewProj", view_projection);
 		s_Data->ViewProjUB->UploadData();
 
 		s_Data->TextureShader->SetTexture("u_Texture", 0);
 
 		texture->Bind();
 		s_Data->QuadVA->Bind();
-		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
+		RendererAPI::SetDrawMode(DrawMode::Triangles);
 		RendererAPI::DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
-	}
-
-	void Renderer::Resize(int width, int height)
-	{
-		s_Data->UICamera->SetProjection(0, (float)width, 0, (float)height);
 	}
 
 	void Renderer::RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
@@ -225,7 +237,7 @@ namespace li
 
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
-		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
+		RendererAPI::SetDrawMode(DrawMode::Triangles);
 		RendererAPI::DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
 		vertexArray->Unbind();
 	}
