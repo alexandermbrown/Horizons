@@ -11,8 +11,8 @@ namespace li
 	OpenGLFramebuffer::OpenGLFramebuffer(int width, int height)
 		: m_Width(width), m_Height(height)
 	{
-		GLCall( glCreateFramebuffers(1, &m_RendererID) );
-		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
+		GLCall( glGenFramebuffers(1, &m_RendererID) );
+		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
 
 		m_Texture = Texture2D::Create(width, height, nullptr,
 			WrapType::ClampToEdge, WrapType::ClampToEdge,
@@ -49,7 +49,7 @@ namespace li
 	void OpenGLFramebuffer::Resize(int width, int height)
 	{
 		GLCall( glDeleteFramebuffers(1, &m_RendererID) );
-		GLCall( glCreateFramebuffers(1, &m_RendererID) );
+		GLCall( glGenFramebuffers(1, &m_RendererID) );
 		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
 
 		m_Texture->Bind();

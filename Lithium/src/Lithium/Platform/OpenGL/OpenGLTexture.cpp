@@ -10,25 +10,39 @@ namespace li
 {
 	OpenGLTexture2D::OpenGLTexture2D(int width, int height, void* data,
 		WrapType wrapS, WrapType wrapT,
-		FilterType minFilter, FilterType magFilter)
+		FilterType minFilter, FilterType magFilter, int channels)
 		: m_Width(width), m_Height(height)
 	{
-		m_InternalFormat = GL_RGBA8;
-		m_DataFormat = GL_RGBA;
-
-		GLCall( glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID) );
-		GLCall( glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height) );
-
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)) );
-
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)) );
-
-		if (data)
+		switch (channels)
 		{
-			GLCall(glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data));
+		case 1:
+			m_InternalFormat = GL_R8;
+			m_DataFormat = GL_RED;
+			break;
+		case 2:
+			m_InternalFormat = GL_RG8;
+			m_DataFormat = GL_RG;
+			break;
+		case 3:
+			m_InternalFormat = GL_RGB8;
+			m_DataFormat = GL_RGB;
+			break;
+		case 4:
+			m_InternalFormat = GL_RGBA8;
+			m_DataFormat = GL_RGBA;
+			break;
 		}
+		
+
+		GLCall(glGenTextures(1, &m_RendererID));
+		GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, data));
+
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)));
+
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)));
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path,
@@ -57,16 +71,15 @@ namespace li
 		}
 		else LI_CORE_ASSERT(false, "Format not supported!");
 
-		GLCall( glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID) );
-		GLCall( glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height) );
+		GLCall( glGenTextures(1, &m_RendererID) );
+		GLCall( glBindTexture(GL_TEXTURE_2D, m_RendererID) );
+		GLCall( glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, data) );
 
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)) );
+		GLCall( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)) );
+		GLCall( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)) );
 
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)) );
-
-		GLCall( glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data) );
+		GLCall( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)) );
+		GLCall( glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)) );
 
 		stbi_image_free(data);
 	}
@@ -82,34 +95,28 @@ namespace li
 		LI_CORE_ASSERT(data, "Failed to load image!");
 		m_Width = width;
 		m_Height = height;
-
-		GLenum internalFormat = 0, dataFormat = 0;
+		
 		if (channels == 4)
 		{
-			internalFormat = GL_RGBA8;
-			dataFormat = GL_RGBA;
+			m_InternalFormat = GL_RGBA8;
+			m_DataFormat = GL_RGBA;
 		}
 		else if (channels == 3)
 		{
-			internalFormat = GL_RGB8;
-			dataFormat = GL_RGB;
+			m_InternalFormat = GL_RGB8;
+			m_DataFormat = GL_RGB;
 		}
+		else LI_CORE_ASSERT(false, "Format not supported!");
 
-		m_InternalFormat = internalFormat;
-		m_DataFormat = dataFormat;
+		GLCall(glGenTextures(1, &m_RendererID));
+		GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, data));
 
-		LI_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)));
 
-		GLCall( glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID) );
-		GLCall( glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height) );
-
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, ConvertOpenGL::FilterType(minFilter)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, ConvertOpenGL::FilterType(magFilter)) );
-
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)) );
-		GLCall( glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)) );
-
-		GLCall( glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data) );
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ConvertOpenGL::WrapType(wrapS)));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ConvertOpenGL::WrapType(wrapT)));
 
 		stbi_image_free(data);
 	}

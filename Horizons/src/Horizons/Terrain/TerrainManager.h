@@ -26,7 +26,7 @@ public:
 
 	static constexpr float MetersPerChunk = 16.0f;
 
-	static constexpr int ChunkWidth = 16;
+	static constexpr int ChunkWidth = 8;
 	static constexpr int ChunkHeight = 8;
 
 	static constexpr int StoreWidth = 11;
@@ -44,6 +44,7 @@ private:
 		glm::ivec2 Coord;
 		glm::ivec2 CenterOffset;
 
+		uint16_t Tiles[NumTilesPerChunk];
 		float AlphaValues[ChunkHeight + 1][ChunkWidth + 1][NumTilesPerChunk - 1];
 
 		std::mutex Mutex;
@@ -53,6 +54,8 @@ private:
 	{
 		glm::ivec2 Coord;
 		glm::ivec2 CenterOffset;
+
+		uint16_t Tiles[NumTilesPerChunk];
 
 		glm::mat4 Transform;
 

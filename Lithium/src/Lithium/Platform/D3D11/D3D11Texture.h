@@ -11,7 +11,7 @@ namespace li
 	public:
 		D3D11Texture2D(int width, int height, void* data,
 			WrapType wrapS, WrapType wrapT,
-			FilterType minFilter, FilterType magFilter, bool renderTarget = false);
+			FilterType minFilter, FilterType magFilter, int channels = 4, bool renderTarget = false);
 		D3D11Texture2D(const std::string& path,
 			WrapType wrapS, WrapType wrapT,
 			FilterType minFilter, FilterType magFilter);

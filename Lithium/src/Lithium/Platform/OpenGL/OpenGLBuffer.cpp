@@ -14,7 +14,7 @@ namespace li {
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size, BufferUsage usage)
 	{
-		GLCall( glCreateBuffers(1, &m_RendererID) );
+		GLCall( glGenBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
 
 		GLCall( glBufferData(GL_ARRAY_BUFFER, size, nullptr, ConvertOpenGL::BufferUsage(usage)) );
@@ -22,7 +22,7 @@ namespace li {
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size, BufferUsage usage)
 	{
-		GLCall( glCreateBuffers(1, &m_RendererID) );
+		GLCall( glGenBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
 
 		GLCall( glBufferData(GL_ARRAY_BUFFER, size, vertices, ConvertOpenGL::BufferUsage(usage)) );
@@ -51,7 +51,7 @@ namespace li {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t size, BufferUsage usage)
 		: m_Count(0)
 	{
-		GLCall( glCreateBuffers(1, &m_RendererID) );
+		GLCall( glGenBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
 
 		GLCall( glBufferData(GL_ARRAY_BUFFER, size, nullptr, ConvertOpenGL::BufferUsage(usage)) );
@@ -60,7 +60,7 @@ namespace li {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage)
 		: m_Count(count)
 	{
-		GLCall( glCreateBuffers(1, &m_RendererID) );
+		GLCall( glGenBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
 		GLCall( glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices, ConvertOpenGL::BufferUsage(usage)) );
 	}
@@ -81,5 +81,4 @@ namespace li {
 		GLCall( glBindBuffer(ConvertOpenGL::BufferTarget(target), m_RendererID) );
 		GLCall( glBufferSubData(ConvertOpenGL::BufferTarget(target), offset, static_cast<GLsizeiptr>(size), data) );
 	}
-
 }

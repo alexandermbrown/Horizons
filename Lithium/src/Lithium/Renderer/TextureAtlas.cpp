@@ -26,12 +26,12 @@ namespace li
 	TextureAtlas::TextureAtlas(Ref<Texture2D> texture, const std::unordered_map<std::string, glm::vec4>& entries)
 		: m_TextureAlias(), m_Entries(entries), m_Texture(texture) {}
 
-	void TextureAtlas::Bind()
+	void TextureAtlas::Bind(uint32_t slot)
 	{
 		if (m_Texture == nullptr)
 		{
 			m_Texture = ResourceManager::Get<Texture2D>(m_TextureAlias);
 		}
-		m_Texture->Bind();
+		m_Texture->Bind(slot);
 	}
 }

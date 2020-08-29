@@ -2,6 +2,7 @@
 #include "TerrainManager.h"
 
 #include "glm/gtc/matrix_transform.hpp"
+#include "Horizons/Scripting/TerrainPrototypes.h"
 
 li::Scope<TerrainManager::TerrainData> TerrainManager::s_Data;
 
@@ -17,12 +18,14 @@ void TerrainManager::Init()
 
 	s_Data->Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * RenderWidth, ChunkHeightInPixels * RenderWidth);
 
-	s_Data->AtlasBoundsUB = li::UniformBuffer::Create("AtlasBounds", 3, li::ShaderType::Fragment, {
+	s_Data->AtlasBoundsUB = li::UniformBuffer::Create("Terrain", 3, li::ShaderType::Fragment, {
 		{ "u_AtlasBounds0", li::ShaderDataType::Float4 },
 		{ "u_AtlasBounds1", li::ShaderDataType::Float4 },
 		{ "u_AtlasBounds2", li::ShaderDataType::Float4 },
-		{ "u_AtlasBounds3", li::ShaderDataType::Float4 }
-		});
+		{ "u_AtlasBounds3", li::ShaderDataType::Float4 },
+		{ "u_NoiseWeights", li::ShaderDataType::Float3 },
+		{ "u_BlendWidths", li::ShaderDataType::Float3 }
+	});
 	s_Data->AtlasBoundsUB->BindToSlot();
 
 	s_Data->TerrainShader = li::ResourceManager::Get<li::Shader>("shader_terrain");
@@ -93,6 +96,8 @@ void TerrainManager::Init()
 		s_Data->TerrainCamera = li::CreateScope<li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth);
 		break;
 	}
+
+	TerrainPrototypes::InstantiatePrototypes();
 }
 
 void TerrainManager::Shutdown()
@@ -246,20 +251,28 @@ void TerrainManager::RenderFramebuffer()
 
 	// Render terrain to framebuffer to get per pixel interpolation.
 	s_Data->Framebuffer->Bind();
-	s_Data->Framebuffer->SetClearColor({ 0.1f, 0.0f, 0.1f, 1.0f });
 	s_Data->Framebuffer->Clear();
-	li::RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-
-	// TODO: setup textures.
-	li::Ref<li::Texture> texture = li::ResourceManager::Get<li::Texture2D>("texture_terrain_test");
-	s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds0", { 0.0f, 0.0f, 0.5f, 0.25f });
-	s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds1", { 0.5f, 0.0f, 0.5f, 0.25f });
-	s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds2", { 0.0f, 0.25f, 0.5f, 0.25f });
-	s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds3", { 0.5f, 0.25f, 0.5f, 0.25f });
-	s_Data->AtlasBoundsUB->UploadData();
 
 	for (auto& chunk : s_Data->RenderChunks)
 	{
+		const TerrainPrototype& terrain0 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[0]);
+		const TerrainPrototype& terrain1 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[1]);
+		const TerrainPrototype& terrain2 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[2]);
+		const TerrainPrototype& terrain3 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[3]);
+		li::Ref<li::TextureAtlas> atlas = li::ResourceManager::Get<li::TextureAtlas>(terrain0.Atlas);
+
+		s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds0", atlas->GetBounds(terrain0.Name));
+		s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds1", atlas->GetBounds(terrain1.Name));
+		s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds2", atlas->GetBounds(terrain2.Name));
+		s_Data->AtlasBoundsUB->SetFloat4("u_AtlasBounds3", atlas->GetBounds(terrain3.Name));
+		s_Data->AtlasBoundsUB->SetFloat3("u_NoiseWeights", {
+			terrain1.NoiseWeight, terrain2.NoiseWeight, terrain3.NoiseWeight
+		});
+		s_Data->AtlasBoundsUB->SetFloat3("u_BlendWidths", {
+			terrain1.BlendWidth,terrain2.BlendWidth,terrain3.BlendWidth
+		});
+		s_Data->AtlasBoundsUB->UploadData();
+
 		s_Data->TerrainShader->Bind();
 
 		auto& transform_ub = li::Renderer::GetTransformUniformBuffer();
@@ -270,8 +283,17 @@ void TerrainManager::RenderFramebuffer()
 		viewproj_ub->SetMat4("u_ViewProj", s_Data->TerrainCamera->GetViewProjectionMatrix());
 		viewproj_ub->UploadData();
 
+		// Bind textures.
+		atlas->Bind(0);
+		terrain1.NoiseTexture->Bind(1);
+		terrain2.NoiseTexture->Bind(2);
+		terrain3.NoiseTexture->Bind(3);
+
 		s_Data->TerrainShader->SetTexture("u_Texture", 0);
-		texture->Bind();
+		s_Data->TerrainShader->SetTexture("u_Noise1", 1);
+		s_Data->TerrainShader->SetTexture("u_Noise2", 2);
+		s_Data->TerrainShader->SetTexture("u_Noise3", 3);
+
 		chunk.VertexArray->Bind();
 		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
 		li::RendererAPI::DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());
@@ -380,10 +402,10 @@ void TerrainManager::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destination
 		+ (size_t)coord.x * sizeof(TerrainFileChunk) 
 		+ (size_t)coord.y * (size_t)s_Data->Width * sizeof(TerrainFileChunk), s_Data->TerrainFile.beg);
 
-	TerrainFileChunk temp_chunk;
-	s_Data->TerrainFile.read((char*)temp_chunk.Tiles, sizeof(temp_chunk.Tiles));
+	s_Data->TerrainFile.read((char*)destination->Tiles, sizeof(destination->Tiles));
 
 	// Load data in main (bottom left) chunk.
+	TerrainFileChunk temp_chunk;
 	s_Data->TerrainFile.read((char*)temp_chunk.AlphaValues, sizeof(temp_chunk.AlphaValues));
 
 	for (int y = 0; y < ChunkHeight; y++)
@@ -467,6 +489,7 @@ void TerrainManager::LoadChunkFromStore(glm::ivec2 store_coord, RenderChunk* des
 			std::lock_guard<std::mutex> lock(store_chunk.Mutex, std::adopt_lock);
 			if (store_chunk.Coord == store_coord)
 			{
+				memcpy(destination->Tiles, store_chunk.Tiles, sizeof(destination->Tiles));
 				destination->AlphaVB->SetSubData((float*)store_chunk.AlphaValues, sizeof(store_chunk.AlphaValues), 0, true);
 				return;
 			}

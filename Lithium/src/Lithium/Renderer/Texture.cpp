@@ -16,17 +16,17 @@ namespace li
 {
 	Ref<Texture2D> Texture2D::Create(int width, int height, void* data,
 		WrapType wrapS, WrapType wrapT,
-		FilterType minFilter, FilterType magFilter)
+		FilterType minFilter, FilterType magFilter, int channels)
 	{
 		switch (Renderer::GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTexture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter);
+			return CreateRef<OpenGLTexture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter, channels);
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::API::D3D11:
-			return CreateRef<D3D11Texture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter);
+			return CreateRef<D3D11Texture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter, channels);
 #endif
 		}
 

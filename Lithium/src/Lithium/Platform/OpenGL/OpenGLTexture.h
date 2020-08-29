@@ -11,7 +11,7 @@ namespace li
 	public:
 		OpenGLTexture2D(int width, int height, void* data,
 			WrapType wrapS, WrapType wrapT,
-			FilterType minFilter, FilterType magFilter);
+			FilterType minFilter, FilterType magFilter, int channels = 4);
 		OpenGLTexture2D(const std::string& path,
 			WrapType wrapS, WrapType wrapT,
 			FilterType minFilter, FilterType magFilter);

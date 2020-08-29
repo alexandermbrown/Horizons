@@ -26,7 +26,7 @@ namespace li
 	public:
 		static Ref<Texture2D> Create(int width, int height, void* data,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
-			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest);
+			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Nearest, int channels = 4);
 
 		static Ref<Texture2D> Create(const std::string& path,
 			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,

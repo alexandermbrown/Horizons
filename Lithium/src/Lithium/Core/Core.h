@@ -20,7 +20,7 @@
 #endif
 
 #define BIT(x) (1 << x)
-#define LI_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+#define LI_BIND_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 #ifdef LI_PLATFORM_WINDOWS
 #	define LI_INCLUDE_OPENGL

@@ -9,7 +9,7 @@
 #include "Horizons/UI/UIHoverSystem.h"
 #include "Horizons/UI/UIClickSystem.h"
 
-#include "Horizons/Scripting/Prototypes.h"
+#include "Horizons/Scripting/UIPrototypes.h"
 
 HUDLayer::HUDLayer()
 	: m_Registry()
@@ -17,8 +17,8 @@ HUDLayer::HUDLayer()
 	UILayoutSystem::Init(m_Registry);
 
 	entt::entity context_ent = m_Registry.view<cp::ui_context>().front();
-	Prototypes::InstantiateUIPrototype(m_Registry, context_ent, "hud");
-
+	UIPrototypes::InstantiateUIPrototype(m_Registry, context_ent, "hud");
+	
 	cp::ui_context& context = m_Registry.get<cp::ui_context>(context_ent);
 	context.rebuild = true;
 }

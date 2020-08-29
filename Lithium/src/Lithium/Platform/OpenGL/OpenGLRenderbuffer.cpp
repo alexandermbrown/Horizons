@@ -10,7 +10,7 @@ namespace li
 {
 	OpenGLRenderbuffer::OpenGLRenderbuffer(uint32_t width, uint32_t height)
 	{
-		GLCall( glCreateRenderbuffers(1, &m_RendererID) );
+		GLCall( glGenRenderbuffers(1, &m_RendererID) );
 		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID) );
 		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 	}
@@ -33,7 +33,7 @@ namespace li
 	void OpenGLRenderbuffer::Resize(uint32_t width, uint32_t height)
 	{
 		GLCall( glDeleteRenderbuffers(1, &m_RendererID) );
-		GLCall( glCreateRenderbuffers(1, &m_RendererID) );
+		GLCall( glGenRenderbuffers(1, &m_RendererID) );
 		GLCall( glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID) );
 		GLCall( glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 	}

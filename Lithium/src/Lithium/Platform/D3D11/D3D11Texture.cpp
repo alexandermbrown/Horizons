@@ -11,7 +11,7 @@
 
 namespace li
 {
-	D3D11Texture2D::D3D11Texture2D(int width, int height, void* data, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter, bool renderTarget)
+	D3D11Texture2D::D3D11Texture2D(int width, int height, void* data, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter, int channels, bool renderTarget)
 		: m_Width(width), m_Height(height), m_IsRenderTarget(renderTarget)
 	{
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
@@ -23,7 +23,6 @@ namespace li
 		textureDesc.Height = height;
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -32,12 +31,28 @@ namespace li
 		textureDesc.CPUAccessFlags = 0;
 		textureDesc.MiscFlags = 0;
 
+		switch (channels)
+		{
+		case 1:
+			textureDesc.Format = DXGI_FORMAT_R8_UNORM;
+			break;
+		case 2:
+			textureDesc.Format = DXGI_FORMAT_R8G8_UNORM;
+			break;
+		case 4:
+			textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			break;
+		default:
+			LI_CORE_ERROR("{} channels not supported!", channels);
+			return;
+		}
+
 		if (data)
 		{
 			D3D11_SUBRESOURCE_DATA bufferData;
 			bufferData.pSysMem = data;
-			bufferData.SysMemPitch = 4 * width;
-			bufferData.SysMemSlicePitch = 4 * width * height;
+			bufferData.SysMemPitch = channels * width;
+			bufferData.SysMemSlicePitch = channels * width * height;
 
 			D3D11Call( m_DeviceHandle->CreateTexture2D(&textureDesc, &bufferData, &m_Texture) );
 		}

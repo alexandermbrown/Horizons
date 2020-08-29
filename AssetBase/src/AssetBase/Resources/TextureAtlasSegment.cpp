@@ -39,7 +39,7 @@ namespace AssetBase
 					x = Helpers::StringToFloat(attr->value(), "entry.x");
 				else throw "Attribute 'x' not found in texture atlas entry.";
 
-				if (auto* attr = entryNode->first_attribute("x"))
+				if (auto* attr = entryNode->first_attribute("y"))
 					y = Helpers::StringToFloat(attr->value(), "entry.y");
 				else throw "Attribute 'y' not found in texture atlas entry.";
 

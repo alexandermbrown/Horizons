@@ -29,7 +29,7 @@ namespace li
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		GLCall( glCreateVertexArrays(1, &m_RendererID) );
+		GLCall( glGenVertexArrays(1, &m_RendererID) );
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()

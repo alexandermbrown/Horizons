@@ -17,7 +17,7 @@ namespace li
 		TextureAtlas(Ref<Texture2D> texture, const std::initializer_list<std::pair<const std::string, glm::vec4>>& entries);
 		TextureAtlas(Ref<Texture2D> texture, const std::unordered_map<std::string, glm::vec4>& entries);
 
-		void Bind();
+		void Bind(uint32_t slot = 0);
 		inline const glm::vec4& GetBounds(const std::string& textureAlias) const { return m_Entries.at(textureAlias); }
 		inline const std::unordered_map<std::string, glm::vec4>& GetEntries() const { return m_Entries; }
 

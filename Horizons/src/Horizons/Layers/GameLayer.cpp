@@ -16,6 +16,8 @@
 #include "Horizons/Gameplay/Sync/SyncTransform.h"
 #include "Horizons/Gameplay/Components.h"
 
+#include "Horizons/Terrain/SimplexNoise.h"
+
 #include "entt/entt.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
@@ -47,7 +49,7 @@ GameLayer::GameLayer()
 	m_Registry.emplace<cp::texture>(test, "test_small");
 	cp::transform& transform = m_Registry.emplace<cp::transform>(test);
 
-	transform.position = { 1.0f, -1.0f, 0.0f };
+	transform.position = { 1.0f, -1.0f, 0.4f };
 	transform.rotation = 1.0f;
 	transform.scale = { 1.0f, 2.0f, 1.0f };
 	transform.old = true;
@@ -56,7 +58,7 @@ GameLayer::GameLayer()
 	SyncTransformReceiveSystem::Init(m_Registry);
 	CameraControllerSystem::Init(m_Registry);
 
-	TerrainManager::LoadWorld("data/worlds/random.terrain", { 0, 0 });
+	TerrainManager::LoadWorld("data/worlds/test.terrain", { 0, 0 });
 }
 
 GameLayer::~GameLayer()

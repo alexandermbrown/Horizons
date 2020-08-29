@@ -18,7 +18,7 @@ namespace li
 			m_Elements[element.Name] = element;
 		}
 
-		GLCall( glCreateBuffers(1, &m_RendererID) );
+		GLCall( glGenBuffers(1, &m_RendererID) );
 		GLCall( glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID) );
 
 		GLCall( glBufferData(GL_UNIFORM_BUFFER, m_DataSize, nullptr, GL_DYNAMIC_DRAW) );

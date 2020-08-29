@@ -49,7 +49,7 @@ namespace li
 		);
 #endif
 
-		m_EventCallbackFn = LI_BIND_EVENT_FN(Application::OnEvent);
+		m_EventCallbackFn = LI_BIND_FN(Application::OnEvent);
 
 		RendererAPI::Create(props.API);
 		m_Window = Window::Create(props);
@@ -174,7 +174,7 @@ namespace li
 		m_Input.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_EVENT_FN(Application::OnWindowEvent));
+		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_FN(Application::OnWindowEvent));
 
 		m_ImGuiRenderer->OnEvent(event);
 

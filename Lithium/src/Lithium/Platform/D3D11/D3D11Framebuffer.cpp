@@ -17,7 +17,7 @@ namespace li
 
 		m_Texture = CreateRef<D3D11Texture2D>(width, height, nullptr,
 			WrapType::ClampToEdge, WrapType::ClampToEdge,
-			FilterType::Linear, FilterType::Nearest, true);
+			FilterType::Linear, FilterType::Nearest, 4, true);
 
 		CreateBuffers(width, height);
 	}

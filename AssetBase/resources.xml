@@ -87,6 +87,16 @@
 				<entry alias="test_small" x="0.1" y="0.0" width="0.7" height="1.0" />
 			</entries>
 		</texture_atlas>
+
+		<texture_atlas name="atlas_terrain_earth">
+			<texture>texture_terrain_test</texture>
+			<entries>
+				<entry alias="terrain_dirt" x="0.0" y="0.5" width="0.5" height="0.25" />
+				<entry alias="terrain_grass" x="0.5" y="0.0" width="0.5" height="0.25" />
+				<entry alias="terrain_stone" x="0.0" y="0.0" width="0.5" height="0.25" />
+				<entry alias="terrain_sand" x="0.5" y="0.5" width="0.5" height="0.25" />
+			</entries>
+		</texture_atlas>
 	</texture_atlases>
 	
 
