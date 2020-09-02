@@ -3,13 +3,12 @@
 #include "entt/entt.hpp"
 #include "SDL.h"
 
-class CameraControllerSystem
+namespace CameraControllerSystem
 {
-public:
-	static void Init(entt::registry& registry);
-	static void Shutdown(entt::registry& registry);
+	void Init(entt::registry& registry);
+	void Shutdown(entt::registry& registry);
 
-	static void Update(entt::registry& registry, float dt);
+	void Update(entt::registry& registry, float dt);
 
-	static void OnEvent(entt::registry& registry, SDL_Event* event);
+	void OnEvent(entt::registry& registry, SDL_Event* event);
 };

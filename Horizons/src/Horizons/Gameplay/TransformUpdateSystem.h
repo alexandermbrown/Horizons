@@ -3,9 +3,7 @@
 #include "Components.h"
 #include "entt/entt.hpp"
 
-class TransformUpdateSystem
+namespace TransformUpdateSystem
 {
-public:
-
-	static void Update(entt::registry& registry);
+	void Update(entt::registry& registry);
 };

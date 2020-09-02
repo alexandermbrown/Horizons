@@ -42,20 +42,20 @@
 			<wrap_t>CLAMP_TO_EDGE</wrap_t>
 		</texture2d>
 
-		<texture2d name="texture_loading_spinner">
-			<source>./res/textures/ui/loading_spinner.png</source>
-			<min_filter>NEAREST</min_filter>
-			<mag_filter>NEAREST</mag_filter>
-			<wrap_s>CLAMP_TO_EDGE</wrap_s>
-			<wrap_t>CLAMP_TO_EDGE</wrap_t>
-		</texture2d>
-
 		<texture2d name="texture_terrain_test">
 			<source>./res/textures/terrain_test.png</source>
 			<min_filter>NEAREST</min_filter>
 			<mag_filter>NEAREST</mag_filter>
 			<wrap_s>REPEAT</wrap_s>
 			<wrap_t>REPEAT</wrap_t>
+		</texture2d>
+
+		<texture2d name="texture_space_scene_1">
+			<source>./res/textures/ui/space_scene_1.png</source>
+			<min_filter>LINEAR</min_filter>
+			<mag_filter>NEAREST</mag_filter>
+			<wrap_s>CLAMP_TO_EDGE</wrap_s>
+			<wrap_t>CLAMP_TO_EDGE</wrap_t>
 		</texture2d>
 
 	</textures>
@@ -97,8 +97,16 @@
 				<entry alias="terrain_sand" x="0.5" y="0.5" width="0.5" height="0.25" />
 			</entries>
 		</texture_atlas>
+
+		<texture_atlas name="space_scene_1">
+			<texture>texture_space_scene_1</texture>
+			<entries>
+				<entry alias="space_scene_1_star_glow" x="0.0" y="0.75" width="0.5" height="0.25" />
+				<entry alias="space_scene_1_stars" x="0.5" y="0.75" width="0.5" height="0.25" />
+				<entry alias="space_scene_1_nebula" x="0.0" y="0.5" width="0.5" height="0.25" />
+			</entries>
+		</texture_atlas>
 	</texture_atlases>
-	
 
 	<audio>
 		<audio_file name="audio_wind">

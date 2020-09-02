@@ -2,9 +2,7 @@
 
 #include "entt/entt.hpp"
 
-class RenderingSystem
+namespace RenderingSystem
 {
-public:
-
-	static void Render(entt::registry& registry);
-};
+	void Render(entt::registry& registry);
+}

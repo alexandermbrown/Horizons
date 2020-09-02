@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ConfigReceiveSystem.h"
 
+#include "Horizons/Core/Game.h"
 #include "Horizons/Core/UserEvents.h"
 
 bool ConfigReceiveSystem::OnEvent(SDL_Event* event)

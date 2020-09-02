@@ -2,8 +2,7 @@
 
 #include "entt/entt.hpp"
 
-class UITransformSortSystem
+namespace UITransformSortSystem
 {
-public:
-	static void SortTransforms(entt::registry& registry);
-};
+	void SortTransforms(entt::registry& registry);
+}

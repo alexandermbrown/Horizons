@@ -5,11 +5,10 @@
 
 #include "Horizons/Gameplay/Sync/Sync.h"
 
-class PlayerSystem
+namespace PlayerSystem
 {
-public:
-	static void Init(entt::registry& registry, SyncEventQueue* queue);
+	void Init(entt::registry& registry, SyncEventQueue* queue);
 
-	static void Update(entt::registry& registry, float dt);
-	static void OnEvent(entt::registry& registry, SDL_Event* event);
+	void Update(entt::registry& registry, float dt);
+	void OnEvent(entt::registry& registry, SDL_Event* event);
 };

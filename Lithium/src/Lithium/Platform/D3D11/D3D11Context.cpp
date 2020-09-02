@@ -39,6 +39,9 @@ namespace li
 		InitDepthStencil();
 		InitBlendState();
 		InitRasterState();
+#ifdef LI_DEBUG
+		InitDebug();
+#endif
 	}
 
 	D3D11Context::~D3D11Context()
@@ -49,13 +52,13 @@ namespace li
 		}
 
 		LI_D3D_RELEASE(m_RasterState);
+		LI_D3D_RELEASE(m_RenderTargetView);
 		LI_D3D_RELEASE(m_DepthStencilView);
 		LI_D3D_RELEASE(m_DepthStencilState);
 		LI_D3D_RELEASE(m_DepthStencilBuffer);
-		LI_D3D_RELEASE(m_RenderTargetView);
+		LI_D3D_RELEASE(m_SwapChain);
 		LI_D3D_RELEASE(m_DeviceContext);
 		LI_D3D_RELEASE(m_Device);
-		LI_D3D_RELEASE(m_SwapChain);
 	}
 
 	void D3D11Context::SwapBuffers()
@@ -78,7 +81,6 @@ namespace li
 
 		D3D11Call(m_Device->CreateRenderTargetView(buffer, NULL, &m_RenderTargetView));
 		buffer->Release();
-
 
 		// Set up the depth buffer.
 		D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -164,6 +166,10 @@ namespace li
 		D3D11Call(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
 		D3D11Call(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 		D3D11Call(dxgiFactory->CreateSwapChain(m_Device, &swapChainDesc, &m_SwapChain));
+
+		dxgiFactory->Release();
+		dxgiAdapter->Release();
+		dxgiDevice->Release();
 	}
 
 	void D3D11Context::InitSwapChain1(HWND hwnd, int width, int height)
@@ -205,6 +211,10 @@ namespace li
 		D3D11Call(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
 		D3D11Call(dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory));
 		D3D11Call(dxgiFactory->CreateSwapChainForHwnd(m_Device, hwnd, &swapChainDesc, NULL, NULL, (IDXGISwapChain1**)&m_SwapChain));
+
+		dxgiFactory->Release();
+		dxgiAdapter->Release();
+		dxgiDevice->Release();
 	}
 
 	void D3D11Context::InitDepthStencil()
@@ -284,5 +294,25 @@ namespace li
 		D3D11Call(m_Device->CreateRasterizerState(&rasterDesc, &m_RasterState));
 		m_DeviceContext->RSSetState(m_RasterState);
 	}
+#ifdef LI_DEBUG
+	void D3D11Context::InitDebug()
+	{
+		ID3D11Debug* debug;
+		ID3D11InfoQueue* infoQueue;
+
+		D3D11Call(m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug));
+		D3D11Call(debug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&infoQueue));
+
+		D3D11_MESSAGE_ID hide[] = { D3D11_MESSAGE_ID_DEVICE_DRAW_SAMPLER_NOT_SET };
+		D3D11_INFO_QUEUE_FILTER filter;
+		memset(&filter, 0, sizeof(filter));
+		filter.DenyList.NumIDs = _countof(hide);
+		filter.DenyList.pIDList = hide;
+		D3D11Call(infoQueue->AddStorageFilterEntries(&filter));
+
+		infoQueue->Release();
+		debug->Release();
+	}
+#endif
 }
 

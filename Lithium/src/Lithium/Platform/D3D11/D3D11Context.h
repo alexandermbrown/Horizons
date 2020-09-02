@@ -38,6 +38,9 @@ namespace li
 		void InitDepthStencil();
 		void InitBlendState();
 		void InitRasterState();
+#ifdef LI_DEBUG
+		void InitDebug();
+#endif
 
 		IDXGISwapChain* m_SwapChain = nullptr;
 

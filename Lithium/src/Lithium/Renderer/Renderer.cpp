@@ -43,9 +43,6 @@ namespace li
 		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
 
 		RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-
-		s_Data->SceneRenderer = BatchRenderer({ 0.5f, 0.5f });
-		s_Data->UIRenderer = BatchRenderer({ 0.0f, 0.0f });
 		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
@@ -91,14 +88,14 @@ namespace li
 			{ "texture_white", glm::vec4(0.5f) }
 		}));
 
-		s_Data->SceneRenderer.PostResourceLoad();
-		s_Data->UIRenderer.PostResourceLoad();
+		s_Data->SceneRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.5f, 0.5f });
+		s_Data->UIRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.0f, 0.0f });
 
-		s_Data->SceneRenderer.AddTextureAtlas(flatColorAtlas);
-		s_Data->UIRenderer.AddTextureAtlas(flatColorAtlas);
+		s_Data->SceneRenderer->AddTextureAtlas(flatColorAtlas);
+		s_Data->UIRenderer->AddTextureAtlas(flatColorAtlas);
 
-		s_Data->SceneRenderer.SetUniformBuffer(s_Data->ViewProjUB);
-		s_Data->UIRenderer.SetUniformBuffer(s_Data->ViewProjUB);
+		s_Data->SceneRenderer->SetUniformBuffer(s_Data->ViewProjUB);
+		s_Data->UIRenderer->SetUniformBuffer(s_Data->ViewProjUB);
 		s_Data->ResourcesLoaded = true;
 	}
 
@@ -109,8 +106,8 @@ namespace li
 
 	void Renderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
 	{
-		s_Data->SceneRenderer.AddTextureAtlas(atlas);
-		s_Data->UIRenderer.AddTextureAtlas(atlas);
+		s_Data->SceneRenderer->AddTextureAtlas(atlas);
+		s_Data->UIRenderer->AddTextureAtlas(atlas);
 	}
 
 	void Renderer::BeginScene(OrthographicCamera* camera)
@@ -120,12 +117,12 @@ namespace li
 		s_Data->ViewProjUB->SetMat4("u_ViewProj", camera->GetViewProjectionMatrix());
 		s_Data->ViewProjUB->UploadData();
 
-		s_Data->SceneRenderer.BeginScene();
+		s_Data->SceneRenderer->BeginScene();
 	}
 
 	void Renderer::EndScene()
 	{
-		s_Data->SceneRenderer.EndScene();
+		s_Data->SceneRenderer->EndScene();
 	}
 
 	void Renderer::BeginUI()
@@ -133,30 +130,30 @@ namespace li
 		s_Data->ViewProjUB->SetMat4("u_ViewProj", s_Data->UICamera->GetViewProjectionMatrix());
 		s_Data->ViewProjUB->UploadData();
 
-		s_Data->UIRenderer.BeginScene();
+		s_Data->UIRenderer->BeginScene();
 	}
 
 	void Renderer::EndUI()
 	{
-		s_Data->UIRenderer.EndScene();
+		s_Data->UIRenderer->EndScene();
 	}
 
-	void Renderer::SubmitTextured(const std::string& textureAlias, const glm::mat4& transform)
+	void Renderer::SubmitTextured(const std::string& textureAlias, const glm::mat4& transform, bool crop)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->SceneRenderer.Submit(textureAlias, glm::vec4(1.0f), transform);
+		s_Data->SceneRenderer->Submit(textureAlias, glm::vec4(1.0f), transform, crop);
 	}
 
 	void Renderer::SubmitColored(const glm::vec4& color, const glm::mat4& transform)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->SceneRenderer.Submit("texture_white", color, transform);
+		s_Data->SceneRenderer->Submit("texture_white", color, transform, false);
 	}
 
-	void Renderer::SubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform)
+	void Renderer::SubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform, bool crop)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->SceneRenderer.Submit(textureAlias, color, transform);
+		s_Data->SceneRenderer->Submit(textureAlias, color, transform, crop);
 	}
 
 	void Renderer::SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
@@ -169,22 +166,22 @@ namespace li
 		RenderQuad(texture, transform, s_Data->Camera->GetViewProjectionMatrix());
 	}
 
-	void Renderer::UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform)
+	void Renderer::UISubmitTextured(const std::string& textureAlias, const glm::mat4& transform, bool crop)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->UIRenderer.Submit(textureAlias, glm::vec4(1.0f), transform);
+		s_Data->UIRenderer->Submit(textureAlias, glm::vec4(1.0f), transform, crop);
 	}
 
 	void Renderer::UISubmitColored(const glm::vec4& color, const glm::mat4& transform)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->UIRenderer.Submit("texture_white", color, transform);
+		s_Data->UIRenderer->Submit("texture_white", color, transform, false);
 	}
 
-	void Renderer::UISubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform)
+	void Renderer::UISubmitColoredTexture(const std::string& textureAlias, const glm::vec4& color, const glm::mat4& transform, bool crop)
 	{
 		LI_CORE_ASSERT(s_Data->ResourcesLoaded, "Resources not loaded!");
-		s_Data->UIRenderer.Submit(textureAlias, color, transform);
+		s_Data->UIRenderer->Submit(textureAlias, color, transform, crop);
 	}
 
 	void Renderer::UISubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)

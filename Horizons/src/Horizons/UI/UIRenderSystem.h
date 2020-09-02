@@ -2,9 +2,8 @@
 
 #include "entt/entt.hpp"
 
-class UIRenderSystem
+namespace UIRenderSystem
 {
-public:
-	static void Render(entt::registry& registry);
-	static void RenderLabels(entt::registry& registry);
-};
+	void Render(entt::registry& registry);
+	void RenderLabels(entt::registry& registry);
+}

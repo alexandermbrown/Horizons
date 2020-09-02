@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Horizons/Core/Game.h"
+#include "SDL.h"
 
-class ConfigReceiveSystem
+namespace ConfigReceiveSystem
 {
-public:
-	static bool OnEvent(SDL_Event* event);
+	bool OnEvent(SDL_Event* event);
 };

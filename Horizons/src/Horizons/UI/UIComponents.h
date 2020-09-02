@@ -31,7 +31,7 @@ namespace cp
 		bool recalculate;
 
 		// The lowest z coordinate.
-		float start_z = 0.1f;
+		float start_z = 0.0f;
 		float z_range = 1.0f;
 	};
 
@@ -85,5 +85,7 @@ namespace cp
 		bool start_click = false;
 		int mouse_button = -1;
 	};
+
+	struct ui_texture_crop {};
 }
 

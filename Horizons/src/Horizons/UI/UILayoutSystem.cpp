@@ -25,7 +25,7 @@ void UILayoutSystem::Shutdown(entt::registry& registry)
 	auto& view = registry.view<cp::ui_context>();
 	view.each([](cp::ui_context& context) {
 		lay_destroy_context(&context.context);
-		});
+	});
 
 	registry.destroy(view.begin(), view.end());
 }
@@ -144,11 +144,11 @@ void UILayoutSystem::Recalculate(entt::registry& registry, cp::ui_context& conte
 	lay_run_context(&context.context);
 
 	registry.view<cp::ui_transform, cp::ui_element>().each([&](entt::entity entity, cp::ui_transform& transform, cp::ui_element& ui_element)
-		{
-			lay_vec4 rect = lay_get_rect(&context.context, ui_element.layout_id);
+	{
+		lay_vec4 rect = lay_get_rect(&context.context, ui_element.layout_id);
 
-			transform.transform = glm::translate(glm::mat4(1.0f), { (float)rect[0],
-				(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), ui_element.z })
-				* glm::scale(glm::mat4(1.0f), { (float)rect[2], (float)rect[3], 1.0f });
-		});
+		transform.transform = glm::translate(glm::mat4(1.0f), { (float)rect[0],
+			(float)(li::Application::Get()->GetWindow()->GetHeight() - rect[1] - rect[3]), ui_element.z })
+			* glm::scale(glm::mat4(1.0f), { (float)rect[2], (float)rect[3], 1.0f });
+	});
 }

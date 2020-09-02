@@ -15,21 +15,19 @@ void UIRenderSystem::Render(entt::registry& registry)
 		bool has_color = registry.has<cp::color>(entity);
 		bool has_texture = registry.has<cp::texture>(entity);
 
-		bool has_label = registry.has<cp::label>(entity);
-		LI_ASSERT(!has_label, "Entity must not have label!");
-
 		if (has_color && has_texture)
 		{
-			LI_ASSERT(!has_label, "Cannot render both texture and label!");
-			li::Renderer::UISubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color, transform.transform);
+			li::Renderer::UISubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color, 
+				transform.transform, registry.has<cp::ui_texture_crop>(entity));
+		}
+		else if (has_texture)
+		{
+			li::Renderer::UISubmitTextured(registry.get<cp::texture>(entity).alias,
+				transform.transform, registry.has<cp::ui_texture_crop>(entity));
 		}
 		else if (has_color)
 		{
 			li::Renderer::UISubmitColored(registry.get<cp::color>(entity).color, transform.transform);
-		}
-		else if (has_texture)
-		{
-			li::Renderer::UISubmitTextured(registry.get<cp::texture>(entity).alias, transform.transform);
 		}
 	}
 }

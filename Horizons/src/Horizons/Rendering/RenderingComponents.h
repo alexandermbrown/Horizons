@@ -35,4 +35,12 @@ namespace cp
 
 		bool finished_zoom = false;
 	};
+
+	struct flicker
+	{
+		float magnitude = 0.1f;
+		li::Timer<float> timer;
+		float current;
+		float target;
+	};
 }

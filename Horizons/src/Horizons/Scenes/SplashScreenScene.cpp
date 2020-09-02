@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SplashScreenScene.h"
 
+#include "MainMenuScene.h"
 #include "GameScene.h"
 #include "Horizons.h"
 
@@ -14,7 +15,7 @@ SplashScreenScene::SplashScreenScene()
 
 void SplashScreenScene::TransitionIn()
 {
-	Horizons* app = li::Application::Get()->Get<Horizons>();
+	Horizons* app = li::Application::Get<Horizons>();
 
 	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::SplashScreen);
 
@@ -66,6 +67,6 @@ void SplashScreenScene::OnUpdate(float dt)
 		// TODO: Get locale from config.
 		li::Localization::SetLocale("en-us");
 		
-		li::Application::Get()->Transition(new GameScene());
+		li::Application::Get()->Transition(new MainMenuScene());
 	}
 }

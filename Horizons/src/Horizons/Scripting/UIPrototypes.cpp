@@ -65,6 +65,11 @@ void UIPrototypes::LoadFunctions()
 		}
 		return entt::null;
 	});
+
+	s_Data->Lua.set_function("UIGetZ", [](sol::light<entt::registry> registry, entt::entity entity) -> float
+	{
+		return registry.value->get<cp::ui_transform>(entity).transform[3][2];
+	});
 }
 
 void UIPrototypes::UILoadElement(entt::registry& registry, entt::entity parent, const sol::table& element, const std::string& prototype, int recursion_limit)
@@ -187,6 +192,24 @@ void UIPrototypes::UILoadElement(entt::registry& registry, entt::entity parent, 
 			click.OnMouseUpLuaFn = OnMouseUp.value();
 		if (OnClick)
 			click.OnClickLuaFn = OnClick.value();
+	}
+
+	// Texture cropping
+	sol::optional<bool> texture_crop = element["texture_crop"];
+	if (texture_crop.value_or(false))
+	{
+		registry.emplace<cp::ui_texture_crop>(entity);
+	}
+
+	// Flicker
+	sol::optional<sol::table> flicker_optional = element["flicker"];
+	if (flicker_optional)
+	{
+		auto& flicker_table = flicker_optional.value();
+		sol::optional<float> magnitude = flicker_table["magnitude"];
+		sol::optional<float> delay = flicker_table["delay"];
+		registry.emplace<cp::flicker>(entity, magnitude.value_or(0.1f), li::Timer<float>(delay.value_or(0.1f), false, true));
+		registry.emplace_or_replace<cp::color>(entity, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
 	UILayoutSystem::AddChild(registry, parent, entity);
