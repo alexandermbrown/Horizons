@@ -37,8 +37,6 @@ namespace cp
 
 	struct ui_element
 	{
-		std::string name;
-
 		entt::entity first_child{ entt::null };
 		entt::entity next_sibling{ entt::null };
 		entt::entity parent{ entt::null };
@@ -58,6 +56,11 @@ namespace cp
 
 		// Internal.
 		float z = 0.0f;
+	};
+
+	struct ui_name
+	{
+		std::string name;
 	};
 
 	struct ui_hover

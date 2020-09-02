@@ -53,7 +53,6 @@ void UILayoutSystem::OnWindowResize(entt::registry& registry, int width, int hei
 {
 	registry.view<cp::ui_context, cp::ui_element>().each([width, height](cp::ui_context& context, cp::ui_element& element)
 	{
-		li::Window* window = li::Application::Get()->GetWindow();
 		lay_set_size_xy(&context.context, element.layout_id, (lay_scalar)width, (lay_scalar)height);
 		context.recalculate = true;
 	});
@@ -101,6 +100,9 @@ void UILayoutSystem::Rebuild(entt::registry& registry, entt::entity context_ent)
 	lay_reset_context(&context.context);
 
 	root.layout_id = lay_item(&context.context);
+
+	li::Window* window = li::Application::Get()->GetWindow();
+	lay_set_size_xy(&context.context, root.layout_id, (lay_scalar)window->GetWidth(), (lay_scalar)window->GetHeight());
 
 	RebuildChildren(registry, context, root, context.start_z, context.z_range);
 }

@@ -20,4 +20,9 @@ void MainMenuScene::TransitionOut()
 
 void MainMenuScene::OnUpdate(float dt)
 {
+	li::Scene* scene = m_MainMenuLayer->GetTransitionScene();
+	if (scene)
+	{
+		li::Application::Get()->Transition(scene);
+	}
 }

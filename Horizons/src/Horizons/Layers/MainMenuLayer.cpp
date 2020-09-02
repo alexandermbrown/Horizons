@@ -9,6 +9,7 @@
 #include "Horizons/UI/UIHoverSystem.h"
 #include "Horizons/UI/UIClickSystem.h"
 
+#include "Horizons/Scenes/GameScene.h"
 #include "Horizons/Gameplay/RNGSystem.h"
 #include "Horizons/Rendering/FlickerSystem.h"
 
@@ -30,6 +31,25 @@ MainMenuLayer::MainMenuLayer()
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("space_scene_1"));
 
 	RNGSystem::Init(m_Registry);
+
+	m_Registry.view<cp::ui_name>().each([this](entt::entity entity, cp::ui_name& name)
+	{
+		if (name.name == "button_play")
+		{
+			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
+			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
+				if (button == 1)
+				{
+					m_TransitionScene = new GameScene();
+				}
+				return true;
+			};
+		}
+		else if (name.name == "button_level_editor")
+		{
+
+		}
+	});
 }
 
 MainMenuLayer::~MainMenuLayer()

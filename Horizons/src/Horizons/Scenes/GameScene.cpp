@@ -4,18 +4,19 @@
 #include "Horizons.h"
 #include "Horizons/Core/AppState.h"
 
-#include "Horizons/Layers/GameLayer.h"
-#include "Horizons/Layers/HUDLayer.h"
-
 void GameScene::TransitionIn()
 {
-	li::Application::Get()->Get<Horizons>()->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::InGame);
-	li::Application::Get()->PushLayer(new GameLayer());
-	li::Application::Get()->PushLayer(new HUDLayer());
+	Horizons* app = li::Application::Get<Horizons>();
+	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::InGame);
+	app->PushLayer(new GameLayer());
+	app->PushLayer(new HUDLayer());
 }
 
 void GameScene::TransitionOut()
 {
+	Horizons* app = li::Application::Get<Horizons>();
+	app->PopLayer(m_GameLayer);
+	app->PopLayer(m_HUDLayer);
 }
 
 void GameScene::OnUpdate(float dt)

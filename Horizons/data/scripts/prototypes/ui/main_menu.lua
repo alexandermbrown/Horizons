@@ -1,8 +1,9 @@
 local bit = require("bit")
 require "data.scripts.prototypes.ui_enums"
 
-local CreateMainMenuButton = function(text)
+local CreateMainMenuButton = function(name, text)
 	return {
+		name = name,
 		layout_contain = LAYOUT_CONTAIN.COLUMN,
 		layout_behave = LAYOUT_BEHAVE.TOP,
 		width = 400, height = 70,
@@ -37,8 +38,8 @@ local bg_nebula = {  -- Background nebula
 	texture = "space_scene_1_nebula",
 	texture_crop = true,
 	children = {
-		CreateMainMenuButton("Play"),
-		CreateMainMenuButton("Level Editor")
+		CreateMainMenuButton("button_play", "Play"),
+		CreateMainMenuButton("button_level_editor", "Level Editor")
 	}
 }
 

@@ -2,7 +2,6 @@
 #include "SplashScreenScene.h"
 
 #include "MainMenuScene.h"
-#include "GameScene.h"
 #include "Horizons.h"
 
 #include "Horizons/Core/AppState.h"

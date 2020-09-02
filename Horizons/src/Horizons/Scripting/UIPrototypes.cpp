@@ -57,10 +57,10 @@ void UIPrototypes::LoadFunctions()
 
 	s_Data->Lua.set_function("UIGetElementWithName", [](sol::light<entt::registry> registry, const char* name) -> entt::entity
 	{
-		auto view = registry.value->view<cp::ui_element>();
+		auto view = registry.value->view<cp::ui_name>();
 		for (entt::entity entity : view)
 		{
-			if (view.get<cp::ui_element>(entity).name == name)
+			if (view.get<cp::ui_name>(entity).name == name)
 				return entity;
 		}
 		return entt::null;
@@ -93,13 +93,16 @@ void UIPrototypes::UILoadElement(entt::registry& registry, entt::entity parent, 
 	entt::entity entity = registry.create();
 	registry.emplace<cp::ui_transform>(entity);
 
+	// Name.
+	sol::optional<const char*> name = element["name"];
+	if (name)
+	{
+		registry.emplace<cp::ui_name>(entity, std::string(name.value()));
+	}
+
 	// Layout.
 	{
 		auto& layout = registry.emplace<cp::ui_element>(entity);
-
-		sol::optional<const char*> name = element["name"];
-		if (name)
-			layout.name = name.value();
 
 		sol::optional<int> width = element["width"];
 		if (width)

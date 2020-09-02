@@ -18,6 +18,9 @@ public:
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
 
+	inline li::Scene* GetTransitionScene() { return m_TransitionScene; }
+
 private:
 	entt::registry m_Registry;
+	li::Scene* m_TransitionScene = nullptr;
 };
