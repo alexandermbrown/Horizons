@@ -28,7 +28,7 @@
 
 		<texture2d name="texture_default">
 			<source>./res/textures/default.png</source>
-			<min_filter>LINEAR</min_filter>
+			<min_filter>NEAREST</min_filter>
 			<mag_filter>NEAREST</mag_filter>
 			<wrap_s>REPEAT</wrap_s>
 			<wrap_t>REPEAT</wrap_t>
@@ -84,7 +84,7 @@
 		<texture_atlas name="atlas_test">
 			<texture>texture_default</texture>
 			<entries>
-				<entry alias="test_small" x="0.1" y="0.0" width="0.7" height="1.0" />
+				<entry alias="test_small" x="0.0" y="0.0" width="1.0" height="1.0" />
 			</entries>
 		</texture_atlas>
 

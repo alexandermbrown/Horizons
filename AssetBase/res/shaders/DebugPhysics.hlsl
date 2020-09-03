@@ -1,7 +1,7 @@
 
 struct VS_IN
 {
-	float2 position : POSITION;
+	float3 position : POSITION;
 	float4 color : COLOR;
 };
 
@@ -20,7 +20,7 @@ PS_IN vs_main(VS_IN input)
 {
 	PS_IN output;
 
-	output.position = mul(u_ViewProj, float4(input.position, 0.0, 1.0));
+	output.position = mul(u_ViewProj, float4(input.position, 1.0));
 	output.color = input.color;
 
 	return output;

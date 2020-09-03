@@ -41,6 +41,8 @@ private:
 	void Shutdown();
 
 	bool m_Running;
+	std::atomic<bool>* m_AppRun;
+
 	std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 	moodycamel::ReaderWriterQueue<SDL_Event>* m_EventQueue;
 	SyncEventQueue* m_SyncQueue;
@@ -51,7 +53,7 @@ private:
 	ConfigStore m_ConfigStore;
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	DebugDrawCommandQueue* m_DebugDrawQueue;
+	DebugDrawCommandQueue* m_DebugDrawQueue = nullptr;
 #endif
 
 	static Game* s_Instance;

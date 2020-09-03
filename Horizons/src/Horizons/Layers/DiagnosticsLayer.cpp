@@ -47,12 +47,12 @@ void DiagnosticsLayer::OnUpdate(float dt)
 		m_Maximums[m_EntryIndex] = m_Max;
 		m_Minimums[m_EntryIndex] = m_Min;
 
-		m_EntryIndex = (m_EntryIndex + 1) % HZ_DIAGNOSTICS_MAX_ENTRIES;
+		m_EntryIndex = (m_EntryIndex + 1) % DiagnosticsMaxEntries;
 
 		m_Min = dt;
 		m_Max = dt;
 
-		if (m_NumEntries < HZ_DIAGNOSTICS_MAX_ENTRIES) m_NumEntries++;
+		if (m_NumEntries < DiagnosticsMaxEntries) m_NumEntries++;
 	}
 }
 

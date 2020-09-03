@@ -4,13 +4,12 @@
 namespace li
 {
 	LayerStack::LayerStack()
-		: m_Layers()
+		: m_Layers(), m_LayerInsertIndex(0)
 	{
 	}
 
 	LayerStack::~LayerStack()
 	{
-		Clear();
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
@@ -27,28 +26,25 @@ namespace li
 	void LayerStack::PopLayer(Layer* layer)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
-		if (it != m_Layers.end())
-		{
-			layer->OnDetach();
-			m_Layers.erase(it);
-			m_LayerInsertIndex--;
-		}
+		LI_CORE_ASSERT(it != m_Layers.end(), "Layer does not exist!");
+		layer->OnDetach();
+		m_Layers.erase(it);
+		m_LayerInsertIndex--;
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
-		if (it != m_Layers.end()) {
-			overlay->OnDetach();
-			m_Layers.erase(it);
-		}
+		LI_CORE_ASSERT(it != m_Layers.end(), "Layer does not exist!");
+		overlay->OnDetach();
+		m_Layers.erase(it);
 	}
 
 	void LayerStack::Clear()
 	{
-		for (int i = (int)m_Layers.size() - 1; i >= 0; --i) {
+		for (int i = (int)m_Layers.size() - 1; i >= 0; --i)
+		{
 			m_Layers[i]->OnDetach();
-			delete m_Layers[i];
 			m_Layers.pop_back();
 		}
 	}

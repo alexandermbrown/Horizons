@@ -22,6 +22,6 @@ public:
 
 private:
 
-	SplashScreenLayer* m_SplashScreenLayer;
-	ConfigUpdateLayer* m_ConfigCleanLayer;
+	SplashScreenLayer m_SplashScreenLayer;
+	ConfigUpdateLayer m_ConfigCleanLayer;
 };

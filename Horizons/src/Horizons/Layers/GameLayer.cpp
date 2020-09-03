@@ -25,13 +25,15 @@
 #include <thread>
 
 GameLayer::GameLayer()
-	: Layer("GameLayer"), m_EventQueue(256ull), m_SyncQueue(256ull), m_TransformQueue(256ull), m_Registry()
+	: Layer("GameLayer"), m_EventQueue(256ull), m_SyncQueue(256ull), m_TransformQueue(256ull),
+		m_Registry(), m_ReturnToMainMenu(false), m_ThreadRun(true)
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	, m_DebugDrawQueue(256ull), m_DebugPhysicsRenderer(&m_DebugDrawQueue)
 #endif
 {
 	// Start up tick thread.
 	TickThreadData threadData;
+	threadData.Running = &m_ThreadRun;
 	threadData.EventQueue = &m_EventQueue;
 	threadData.SyncQueue = &m_SyncQueue;
 	threadData.TransformQueue = &m_TransformQueue;
@@ -45,40 +47,35 @@ GameLayer::GameLayer()
 
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
 
-	entt::entity test = m_Registry.create();
-	m_Registry.emplace<cp::texture>(test, "test_small");
-	cp::transform& transform = m_Registry.emplace<cp::transform>(test);
-
-	transform.position = { 1.0f, -1.0f, 0.4f };
-	transform.rotation = 1.0f;
-	transform.scale = { 1.0f, 2.0f, 1.0f };
-	transform.old = true;
-
 	SyncEventReceiveSystem::Init(m_Registry);
 	SyncTransformReceiveSystem::Init(m_Registry);
 	CameraControllerSystem::Init(m_Registry);
 
 	TerrainManager::LoadWorld("data/worlds/test.terrain", { 0, 0 });
-}
 
-GameLayer::~GameLayer()
-{
-	CameraControllerSystem::Shutdown(m_Registry);
-}
-
-void GameLayer::OnAttach()
-{
 	m_AudioSource = li::CreateRef<li::AudioSource>();
 	m_AudioSource->SetAudio(li::ResourceManager::Get<li::Audio>("audio_wind"));
 	m_AudioSource->Play();
 }
 
-void GameLayer::OnDetach()
+GameLayer::~GameLayer()
 {
+	m_ThreadRun = false;
+	CameraControllerSystem::Shutdown(m_Registry);
 	TerrainManager::UnloadWorld();
 	m_TickThread.join();
 	// Clear queue to free pointers.
 	SyncEventReceiveSystem::Update(m_Registry, &m_SyncQueue);
+}
+
+void GameLayer::OnAttach()
+{
+	
+}
+
+void GameLayer::OnDetach()
+{
+	
 }
 
 void GameLayer::OnUpdate(float dt)
@@ -102,7 +99,6 @@ void GameLayer::OnUpdate(float dt)
 
 	TransformUpdateSystem::Update(m_Registry);
 
-
 	cp::camera& camera = m_Registry.ctx<cp::camera>();
 
 	TerrainManager::RenderFramebuffer();
@@ -114,11 +110,12 @@ void GameLayer::OnUpdate(float dt)
 	TerrainManager::RenderQuad();
 	RenderingSystem::Render(m_Registry);
 
+	li::Renderer::EndScene();
+
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	//m_DebugPhysicsRenderer.Render();
+	m_DebugPhysicsRenderer.Render();
 #endif
 
-	li::Renderer::EndScene();
 }
 
 void GameLayer::OnImGuiRender()
@@ -131,16 +128,21 @@ void GameLayer::OnEvent(SDL_Event* event)
 
 	CameraControllerSystem::OnEvent(m_Registry, event);
 
-	li::EventDispatcher dispatcher(event);
-	dispatcher.Dispatch(SDL_KEYUP, [&](SDL_Event* e) {
-
-		if (e->key.keysym.scancode == SDL_SCANCODE_F11) {
+	if (event->type == SDL_KEYUP)
+	{
+		switch (event->key.keysym.scancode)
+		{
+		case SDL_SCANCODE_F11:
 			if (li::Application::Get()->GetWindow()->GetFullscreen() == li::FullscreenType::Windowed) {
 				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::FullscreenWindowed);
 			}
 			else {
 				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::Windowed);
 			}
+			break;
+		case SDL_SCANCODE_ESCAPE:
+			m_ReturnToMainMenu = true;
+			break;
 		}
-	});
+	}
 }

@@ -8,12 +8,12 @@ local CreateMainMenuButton = function(name, text)
 		layout_behave = LAYOUT_BEHAVE.TOP,
 		width = 400, height = 70,
 		margins = { top = 16, bottom = 16 },
-		color = { 0.3, 0.5, 0.4, 0.3 },
+		color = { 0.3, 0.5, 0.4, 0.2 },
 		OnMouseEnter = function(registry, entity)
-			SetColor(registry, entity, { 0.3, 0.5, 0.4, 0.4 })
+			SetColor(registry, entity, { 0.3, 0.5, 0.4, 0.3 })
 		end,
 		OnMouseLeave = function(registry, entity)
-			SetColor(registry, entity, { 0.3, 0.5, 0.4, 0.3 })
+			SetColor(registry, entity, { 0.3, 0.5, 0.4, 0.2 })
 		end,
 		children = {
 			{

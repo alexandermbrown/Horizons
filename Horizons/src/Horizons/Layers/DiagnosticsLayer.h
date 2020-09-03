@@ -3,8 +3,6 @@
 #include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
-#define HZ_DIAGNOSTICS_MAX_ENTRIES 2048
-
 class DiagnosticsLayer : public li::Layer
 {
 public:
@@ -19,6 +17,8 @@ public:
 	virtual void OnEvent(SDL_Event* event) override;
 
 private:
+
+	constexpr static int DiagnosticsMaxEntries = 2048;
 
 	bool m_PerformanceOpen = false;
 	bool m_CVarsOpen = false;
@@ -40,9 +40,9 @@ private:
 	float m_ScaleMin = 0.0f;
 	float m_ScaleMax = 0.0015f;
 
-	float m_Averages[HZ_DIAGNOSTICS_MAX_ENTRIES] = { 0.0f };
-	float m_Minimums[HZ_DIAGNOSTICS_MAX_ENTRIES] = { 0.0f };
-	float m_Maximums[HZ_DIAGNOSTICS_MAX_ENTRIES] = { 0.0f };
+	float m_Averages[DiagnosticsMaxEntries] = { 0.0f };
+	float m_Minimums[DiagnosticsMaxEntries] = { 0.0f };
+	float m_Maximums[DiagnosticsMaxEntries] = { 0.0f };
 	int m_NumEntries = 0;
 	int m_EntryIndex = 0;
 

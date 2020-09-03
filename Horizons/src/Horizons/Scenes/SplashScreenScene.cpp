@@ -8,7 +8,7 @@
 #include "Horizons/Terrain/TerrainManager.h"
 
 SplashScreenScene::SplashScreenScene()
-	: m_SplashScreenLayer(nullptr), m_ConfigCleanLayer(nullptr)
+	: m_SplashScreenLayer(), m_ConfigCleanLayer()
 {
 }
 
@@ -18,11 +18,8 @@ void SplashScreenScene::TransitionIn()
 
 	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::SplashScreen);
 
-	m_ConfigCleanLayer = new ConfigUpdateLayer();
-	app->PushLayer(m_ConfigCleanLayer);
-
-	m_SplashScreenLayer = new SplashScreenLayer();
-	app->PushLayer(m_SplashScreenLayer);
+	app->PushLayer(&m_ConfigCleanLayer);
+	app->PushLayer(&m_SplashScreenLayer);
 
 #ifdef LI_DEBUG
 	li::ResourceManager::BeginStaggeredLoad("data/resources.lab-debug");
@@ -34,7 +31,8 @@ void SplashScreenScene::TransitionIn()
 void SplashScreenScene::TransitionOut()
 {
 	Horizons* app = li::Application::Get<Horizons>();
-	app->PopLayer(m_SplashScreenLayer);
+	app->PopLayer(&m_ConfigCleanLayer);
+	app->PopLayer(&m_SplashScreenLayer);
 
 	int width = app->GetConfig().Get("window_width").GetInt();
 	int height = app->GetConfig().Get("window_height").GetInt();
@@ -45,8 +43,6 @@ void SplashScreenScene::TransitionOut()
 	window->SetPosition(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	window->SetResizable(true);
 	window->SetIcon("data/images/icon.png");
-
-	m_ConfigCleanLayer->FinishSplashScreen();
 }
 
 void SplashScreenScene::OnUpdate(float dt)

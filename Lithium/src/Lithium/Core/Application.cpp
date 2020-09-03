@@ -166,7 +166,6 @@ namespace li
 		}
 
 		delete m_CurrentScene;
-		m_LayerStack.Clear();
 	}
 
 	void Application::OnEvent(SDL_Event* event)

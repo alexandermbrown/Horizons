@@ -17,7 +17,8 @@
 Game* Game::s_Instance = nullptr;
 
 Game::Game(const TickThreadData& data)
-	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue), m_ConfigStore(data.Config), m_Registry()
+	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue),
+	m_ConfigStore(data.Config), m_Registry(), m_AppRun(data.Running)
 {
 	LI_ASSERT(!s_Instance, "Game already created!");
 	s_Instance = this;
@@ -25,7 +26,8 @@ Game::Game(const TickThreadData& data)
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 Game::Game(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue)
-	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue), m_ConfigStore(data.Config), m_DebugDrawQueue(debugDrawQueue)
+	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue),
+	m_ConfigStore(data.Config), m_DebugDrawQueue(debugDrawQueue), m_AppRun(data.Running)
 {
 	LI_ASSERT(!s_Instance, "Game already created!");
 	s_Instance = this;
@@ -50,7 +52,7 @@ void Game::Run()
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
-	while (m_Running)
+	while (m_Running && m_AppRun->load())
 	{
 		std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
 		std::chrono::nanoseconds diff = currentTime - m_LastUpdateTime;

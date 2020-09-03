@@ -32,6 +32,11 @@ namespace li
 	{
 		ALCall( alSourcePlay(m_SourceID) );
 	}
+
+	void AudioSource::Stop()
+	{
+		ALCall( alSourceStop(m_SourceID) );
+	}
 }
 
 

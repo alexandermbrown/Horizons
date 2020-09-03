@@ -19,8 +19,13 @@ public:
 	virtual void OnEvent(SDL_Event* event) override;
 
 	inline li::Scene* GetTransitionScene() { return m_TransitionScene; }
+	inline bool IsFinished() const { return m_Finished; }
 
 private:
 	entt::registry m_Registry;
 	li::Scene* m_TransitionScene = nullptr;
+
+	bool m_Finished = false;
+	bool m_StartedTransition = false;
+	li::Timer<float> m_TransitionTimer;
 };

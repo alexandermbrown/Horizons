@@ -20,4 +20,7 @@ public:
 
 private:
 	entt::registry m_Registry;
+
+	bool m_FadeIn;
+	li::Timer<float> m_FadeInTimer;
 };

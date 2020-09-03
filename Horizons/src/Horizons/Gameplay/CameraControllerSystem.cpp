@@ -31,12 +31,10 @@ void CameraControllerSystem::Update(entt::registry& registry, float dt)
 {
 	cp::camera& camera = registry.ctx<cp::camera>();
 
-	auto player_view = registry.view<cp::transform, cp::player>();
-	for (entt::entity player : player_view)
+	for (auto&& [entity, transform, player] : registry.view<cp::transform, cp::player>().proxy())
 	{
-		cp::transform& player_transform = player_view.get<cp::transform>(player);
-		if (camera.camera->GetPosition() != player_transform.position)
-			camera.camera->SetPosition(player_transform.position);
+		if (camera.camera->GetPosition() != transform.position)
+			camera.camera->SetPosition(transform.position);
 
 		break;
 	}

@@ -9,7 +9,7 @@
 
 bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int button)
 {
-	auto view = registry.view<cp::ui_transform, cp::ui_click>();
+	auto view = registry.view<cp::ui_transform>();
 
 	bool clickHandled = false;
 	bool mouseDownHandled = false;
@@ -18,10 +18,13 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 	float prev = std::numeric_limits<float>::max();
 #endif
 
-	for (entt::entity entity : view)
+	for (auto it = view.rbegin(); it != view.rend(); ++it)
 	{
+		entt::entity entity = *it;
+		if (!registry.has<cp::ui_click>(entity))
+			continue;
+		auto& click = registry.get<cp::ui_click>(entity);
 		auto& transform = view.get<cp::ui_transform>(entity);
-		auto& click = view.get<cp::ui_click>(entity);
 
 #ifdef LI_ENABLE_ASSERTS
 		LI_ASSERT(prev >= transform.transform[3][2], "Must iterate from highest to lowest!");
@@ -72,14 +75,17 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 
 bool UIClickSystem::OnMouseUp(entt::registry& registry, int x, int y, int button)
 {
-	auto view = registry.view<cp::ui_transform, cp::ui_click>();
+	auto view = registry.view<cp::ui_transform>();
 
 	bool clickHandled = false;
 	bool mouseUpHandled = false;
 
-	for (entt::entity entity : view)
+	for (auto it = view.rbegin(); it != view.rend(); ++it)
 	{
-		auto& click = view.get<cp::ui_click>(entity);
+		entt::entity entity = *it;
+		if (!registry.has<cp::ui_click>(entity))
+			continue;
+		auto& click = registry.get<cp::ui_click>(entity);
 		auto& transform = view.get<cp::ui_transform>(entity);
 
 		if ((!clickHandled || !mouseUpHandled) && Math::TransformContainsPoint(transform.transform, x, y))

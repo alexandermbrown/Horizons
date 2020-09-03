@@ -9,6 +9,7 @@
 class GameScene : public li::Scene
 {
 public:
+	GameScene();
 	virtual ~GameScene() = default;
 
 	virtual void TransitionIn() override;
@@ -19,6 +20,6 @@ public:
 	virtual bool Finished() override { return true; }
 
 private:
-	GameLayer* m_GameLayer;
-	HUDLayer* m_HUDLayer;
+	GameLayer m_GameLayer;
+	HUDLayer m_HUDLayer;
 };

@@ -11,12 +11,12 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 	m_VertexArray = li::VertexArray::Create();
 
 	li::BufferLayout layout = {
-		{ li::ShaderDataType::Float2, "POSITION", 0 },
+		{ li::ShaderDataType::Float3, "POSITION", 0 },
 		{ li::ShaderDataType::Float4, "COLOR", 1 }
 	};
 
 	// Ensure the vertex struct is packed so it can be safely sent the GPU.
-	static_assert(sizeof(DebugPhysicsVertex) == sizeof(glm::vec2) + sizeof(glm::vec4), "Vertex struct not packed!");
+	static_assert(sizeof(DebugPhysicsVertex) == sizeof(glm::vec3) + sizeof(glm::vec4), "Vertex struct not packed!");
 
 	m_VertexBuffer = li::VertexBuffer::Create(HZ_PHYSICS_DEBUG_DRAW_MAX_VERTICES * sizeof(DebugPhysicsVertex), li::BufferUsage::DynamicDraw);
 	m_VertexBuffer->SetLayout(layout);
@@ -59,25 +59,25 @@ void DebugPhysicsRenderer::Render()
 			{
 			case DebugDrawType::Point:
 				// Draw a '+' with two lines to represent the point.
-				m_Vertices[m_VertexCount].Position = { command.Point1.x - 0.01, command.Point1.y };
+				m_Vertices[m_VertexCount].Position = { command.Point1.x - 0.01, command.Point1.y, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
 				m_IndexCount++;
 
-				m_Vertices[m_VertexCount].Position = { command.Point1.x + 0.01, command.Point1.y };
+				m_Vertices[m_VertexCount].Position = { command.Point1.x + 0.01, command.Point1.y, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
 				m_IndexCount++;
 
-				m_Vertices[m_VertexCount].Position = { command.Point1.x, command.Point1.y - 0.01 };
+				m_Vertices[m_VertexCount].Position = { command.Point1.x, command.Point1.y - 0.01, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
 				m_IndexCount++;
 
-				m_Vertices[m_VertexCount].Position = { command.Point1.x, command.Point1.y + 0.01 };
+				m_Vertices[m_VertexCount].Position = { command.Point1.x, command.Point1.y + 0.01, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
@@ -86,13 +86,13 @@ void DebugPhysicsRenderer::Render()
 				break;
 			case DebugDrawType::Line:
 				// Draw a line with the two vertices.
-				m_Vertices[m_VertexCount].Position = command.Point1;
+				m_Vertices[m_VertexCount].Position = { command.Point1, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
 				m_IndexCount++;
 
-				m_Vertices[m_VertexCount].Position = command.Point2;
+				m_Vertices[m_VertexCount].Position = { command.Point2, ZPos };
 				m_Vertices[m_VertexCount].Color = command.Color;
 				m_Indices[m_IndexCount] = m_VertexCount;
 				m_VertexCount++;
@@ -107,7 +107,8 @@ void DebugPhysicsRenderer::Render()
 
 				for (uint32_t i = 0; i < command.VertexCount; i++)
 				{
-					m_Vertices[m_VertexCount].Position = command.Vertices[i];
+
+					m_Vertices[m_VertexCount].Position = { command.Vertices[i], ZPos };
 					m_Vertices[m_VertexCount].Color = command.Color;
 
 					m_Indices[m_IndexCount++] = m_VertexCount;
@@ -128,9 +129,11 @@ void DebugPhysicsRenderer::Render()
 				{
 					float angle = (float)i / (float)resolution * 2.0f * (float)M_PI;
 					
-					m_Vertices[m_VertexCount].Position = { 
-						SDL_cosf(angle) * command.Radius + command.Point1.x, 
-						SDL_sinf(angle) * command.Radius + command.Point1.y };
+					m_Vertices[m_VertexCount].Position = {
+						SDL_cosf(angle) * command.Radius + command.Point1.x,
+						SDL_sinf(angle) * command.Radius + command.Point1.y,
+						ZPos
+					};
 					m_Vertices[m_VertexCount].Color = command.Color;
 
 					m_Indices[m_IndexCount++] = m_VertexCount;
@@ -154,7 +157,6 @@ void DebugPhysicsRenderer::Render()
 	if (m_IndexCount > 0)
 	{
 		m_VertexArray->Bind();
-		
 		m_Shader->Bind();
 		
 		li::RendererAPI::SetDrawMode(li::DrawMode::Lines);

@@ -42,7 +42,7 @@ namespace li
 		float height = (float)window->GetHeight();
 		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
 
-		RendererAPI::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		RendererAPI::SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //

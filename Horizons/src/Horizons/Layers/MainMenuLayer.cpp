@@ -10,6 +10,7 @@
 #include "Horizons/UI/UIClickSystem.h"
 
 #include "Horizons/Scenes/GameScene.h"
+#include "Horizons/Scenes/LevelEditorScene.h"
 #include "Horizons/Gameplay/RNGSystem.h"
 #include "Horizons/Rendering/FlickerSystem.h"
 
@@ -18,7 +19,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 MainMenuLayer::MainMenuLayer()
-	: Layer("MainMenuLayer"), m_Registry()
+	: Layer("MainMenuLayer"), m_Registry(), m_TransitionTimer(0.25f, true)
 {
 	UILayoutSystem::Init(m_Registry);
 
@@ -40,6 +41,7 @@ MainMenuLayer::MainMenuLayer()
 			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
 				if (button == 1)
 				{
+					m_StartedTransition = true;
 					m_TransitionScene = new GameScene();
 				}
 				return true;
@@ -47,7 +49,15 @@ MainMenuLayer::MainMenuLayer()
 		}
 		else if (name.name == "button_level_editor")
 		{
-
+			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
+			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
+				if (button == 1)
+				{
+					m_StartedTransition = true;
+					m_TransitionScene = new LevelEditorScene();
+				}
+				return true;
+			};
 		}
 	});
 }
@@ -77,6 +87,16 @@ void MainMenuLayer::OnUpdate(float dt)
 
 	li::Renderer::BeginUI();
 	UIRenderSystem::Render(m_Registry);
+
+	if (m_StartedTransition)
+	{
+		// Fade to black.
+		li::Window* window = li::Application::Get()->GetWindow();
+		li::Renderer::UISubmitColored({ 0.0f, 0.0f, 0.0f, m_TransitionTimer.GetFraction() }, glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 99.0f}) *
+			glm::scale(glm::mat4(1.0f), { window->GetWidth(), window->GetHeight(), 1.0f }));
+		m_Finished = m_TransitionTimer.Update(dt);
+	}
+
 	li::Renderer::EndUI();
 	UIRenderSystem::RenderLabels(m_Registry);
 }

@@ -14,6 +14,7 @@ namespace li
 
 		void SetAudio(const Ref<Audio>& audio);
 		void Play();
+		void Stop();
 
 	private:
 

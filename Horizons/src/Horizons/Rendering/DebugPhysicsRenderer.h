@@ -21,9 +21,11 @@ public:
 
 private:
 
+	constexpr static float ZPos = 0.31f;
+
 	struct DebugPhysicsVertex
 	{
-		glm::vec2 Position;
+		glm::vec3 Position;
 		glm::vec4 Color;
 	};
 

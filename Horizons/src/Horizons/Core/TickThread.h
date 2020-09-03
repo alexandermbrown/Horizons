@@ -12,8 +12,11 @@
 #	include "Horizons/Rendering/DebugPhysicsDrawShared.h"
 #endif
 
+#include <atomic>
+
 struct TickThreadData
 {
+	std::atomic<bool>* Running;
 	moodycamel::ReaderWriterQueue<SDL_Event>* EventQueue;
 	SyncEventQueue* SyncQueue;
 	SyncTransformQueue* TransformQueue;

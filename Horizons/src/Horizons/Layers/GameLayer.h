@@ -19,7 +19,7 @@ class GameLayer : public li::Layer
 {
 public:
 	GameLayer();
-	~GameLayer();
+	virtual ~GameLayer();
 
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -27,6 +27,8 @@ public:
 	virtual void OnUpdate(float dt) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
+
+	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
 
 private:
 	li::Ref<li::AudioSource> m_AudioSource;
@@ -39,8 +41,12 @@ private:
 
 	entt::registry m_Registry;
 
+	std::atomic<bool> m_ThreadRun;
+
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	DebugDrawCommandQueue m_DebugDrawQueue;
 	DebugPhysicsRenderer m_DebugPhysicsRenderer;
 #endif
+
+	bool m_ReturnToMainMenu;
 };

@@ -11,8 +11,10 @@
 
 #include "Horizons/Scripting/UIPrototypes.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+
 HUDLayer::HUDLayer()
-	: m_Registry()
+	: Layer("HUD"), m_Registry(), m_FadeInTimer(0.25f, true), m_FadeIn(true)
 {
 	UILayoutSystem::Init(m_Registry);
 
@@ -44,7 +46,18 @@ void HUDLayer::OnUpdate(float dt)
 	UITransformSortSystem::SortTransforms(m_Registry);
 
 	li::Renderer::BeginUI();
+
 	UIRenderSystem::Render(m_Registry);
+
+	if (m_FadeIn)
+	{
+		// Fade to black.
+		li::Window* window = li::Application::Get()->GetWindow();
+		li::Renderer::UISubmitColored({ 0.0f, 0.0f, 0.0f, 1.0f - m_FadeInTimer.GetFraction() }, glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 99.0f }) *
+			glm::scale(glm::mat4(1.0f), { window->GetWidth(), window->GetHeight(), 1.0f }));
+		m_FadeIn = !m_FadeInTimer.Update(dt);
+	}
+
 	li::Renderer::EndUI();
 	UIRenderSystem::RenderLabels(m_Registry);
 }
