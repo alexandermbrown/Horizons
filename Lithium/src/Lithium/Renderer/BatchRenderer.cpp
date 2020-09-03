@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "BatchRenderer.h"
-#include "RendererAPI.h"
+
+#include "Lithium/Core/Application.h"
 #include "Lithium/Resources/ResourceManager.h"
 
 #include "glm/gtc/type_ptr.hpp"
@@ -159,12 +160,12 @@ namespace li
 			m_InstanceBuffer->SetSubData(
 				(float*)m_InstanceData.data(),
 				sizeof(BatchData) * m_InstanceCount,
-				0, true, BufferTarget::ArrayBuffer
+				0, true
 			);
 
 			m_InstanceVA->Bind();
-			li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
-			RendererAPI::DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);
+			Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
+			Application::Get()->GetWindow()->GetContext()->DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);
 			m_InstanceVA->Unbind();
 		}
 		m_InstanceCount = 0;

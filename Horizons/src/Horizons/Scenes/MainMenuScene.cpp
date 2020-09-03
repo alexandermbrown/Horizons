@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "MainMenuScene.h"
 
+#include "Horizons.h"
+#include "Horizons/Core/AppState.h"
+
 MainMenuScene::MainMenuScene()
 	: m_MainMenuLayer(), m_Diagnostics()
 {
@@ -15,8 +18,8 @@ MainMenuScene::~MainMenuScene()
 
 void MainMenuScene::TransitionIn()
 {
-	li::Application* app = li::Application::Get();
-
+	Horizons* app = li::Application::Get<Horizons>();
+	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::MainMenu);
 	app->PushLayer(&m_MainMenuLayer);
 	app->PushOverlay(&m_Diagnostics);
 }

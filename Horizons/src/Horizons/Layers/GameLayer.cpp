@@ -103,8 +103,8 @@ void GameLayer::OnUpdate(float dt)
 
 	TerrainManager::RenderFramebuffer();
 
-	li::RendererAPI::BindDefaultRenderTarget();
-	li::RendererAPI::Clear();
+	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
+	li::Application::Get()->GetWindow()->GetContext()->Clear();
 	li::Renderer::BeginScene(camera.camera);
 
 	TerrainManager::RenderQuad();
@@ -113,9 +113,10 @@ void GameLayer::OnUpdate(float dt)
 	li::Renderer::EndScene();
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
+	li::Renderer::BeginScene(camera.camera);
 	m_DebugPhysicsRenderer.Render();
+	li::Renderer::EndScene();
 #endif
-
 }
 
 void GameLayer::OnImGuiRender()

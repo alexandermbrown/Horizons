@@ -1,8 +1,7 @@
 #include "lipch.h"
 #include "Texture.h"
 
-#include "Lithium/Renderer/Renderer.h"
-#include "Lithium/Renderer/RendererAPI.h"
+#include "Lithium/Core/Application.h"
 
 #ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLTexture.h"
@@ -18,14 +17,14 @@ namespace li
 		WrapType wrapS, WrapType wrapT,
 		FilterType minFilter, FilterType magFilter, int channels)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return CreateRef<OpenGLTexture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter, channels);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return CreateRef<D3D11Texture2D>(width, height, data, wrapS, wrapT, minFilter, magFilter, channels);
 #endif
 		}
@@ -38,14 +37,14 @@ namespace li
 		WrapType wrapS, WrapType wrapT,
 		FilterType minFilter, FilterType magFilter)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return CreateRef<OpenGLTexture2D>(path, wrapS, wrapT, minFilter, magFilter);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return CreateRef<D3D11Texture2D>(path, wrapS, wrapT, minFilter, magFilter);
 #endif
 		}
@@ -56,14 +55,14 @@ namespace li
 
 	Ref<Texture2D> Texture2D::Create(size_t imageSize, const uint8_t* rawData, WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return CreateRef<OpenGLTexture2D>(imageSize, rawData, wrapS, wrapT, minFilter, magFilter);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return CreateRef<D3D11Texture2D>(imageSize, rawData, wrapS, wrapT, minFilter, magFilter);
 #endif
 		}

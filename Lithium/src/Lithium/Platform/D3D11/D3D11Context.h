@@ -12,25 +12,25 @@ namespace li
 	class D3D11Context : public GraphicsContext
 	{
 	public:
-
 		D3D11Context(HWND hwnd, int width, int height);
 		~D3D11Context();
 
-		void SwapBuffers();
-
-		void Resize(int width, int height);
-
-		inline void SetClearColor(const glm::vec4& color) { m_ClearColor = color; }
-		void Clear();
-		void BindDefaultRenderTarget();
-
+		virtual void BindDefaultRenderTarget() override;
+		virtual void Clear() override;
+		virtual void DrawArrays(uint32_t vertexCount) override;
+		virtual void DrawIndexed(uint32_t indexCount) override;
+		virtual void DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount) override;
+		virtual void ResizeView(int width, int height) override;
+		virtual void SetClearColor(const glm::vec4& color) override { m_ClearColor = color; }
+		virtual void SetDepthTest(bool enabled) override;
+		virtual void SetDrawMode(DrawMode mode) override;
+		virtual void SwapBuffers() override;
 
 		ID3D11Device* GetDevice() { return m_Device; }
 		ID3D11DeviceContext* GetDeviceContext() { return m_DeviceContext; }
 		ID3D11DepthStencilView* GetDepthStencilView() { return m_DepthStencilView; }
 
 	private:
-
 		constexpr static int NumSwapChainBuffers = 2;
 
 		void InitSwapChain(HWND hwnd, int width, int height);

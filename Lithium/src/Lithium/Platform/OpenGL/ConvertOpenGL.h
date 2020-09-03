@@ -9,7 +9,6 @@ namespace li
 	{
 	public:
 		static uint32_t BufferUsage(BufferUsage usage);
-		static uint32_t BufferTarget(BufferTarget target);
 		static uint32_t DrawMode(DrawMode mode);
 		static uint32_t WrapType(WrapType type);
 		static uint32_t FilterType(FilterType type);

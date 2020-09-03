@@ -5,6 +5,8 @@
 #include "Lithium/Core/Input.h"
 #include "Lithium/Core/Scene.h"
 
+#include "Lithium/Renderer/RendererAPI.h"
+
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
 #include <functional>
@@ -36,11 +38,14 @@ namespace li
 		inline Window* GetWindow() { return m_Window;  }
 		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
 		inline const Input& GetInput() { return m_Input; }
+		inline RendererAPI GetAPI() const { return m_RendererAPI; }
 
 		void Transition(Scene* scene);
 
 	private:
 		void OnWindowEvent(SDL_Event* event);
+
+		RendererAPI m_RendererAPI;
 
 		bool m_Running;
 		std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;

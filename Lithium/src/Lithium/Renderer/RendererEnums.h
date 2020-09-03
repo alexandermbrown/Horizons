@@ -22,13 +22,6 @@ namespace li
 		DynamicDraw
 	};
 
-	enum class BufferTarget
-	{
-		Error = 0,
-		ArrayBuffer,
-		ElementArrayBuffer
-	};
-
 	enum class DrawMode
 	{
 		Error = 0,

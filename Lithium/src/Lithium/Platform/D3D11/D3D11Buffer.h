@@ -18,7 +18,7 @@ namespace li
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ArrayBuffer) override;
+		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard) override;
 
 		inline ID3D11Buffer* GetBuffer() { return m_Buffer; }
 
@@ -43,7 +43,7 @@ namespace li
 
 		virtual uint32_t GetCount() const { return m_Count; }
 
-		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ElementArrayBuffer) override;
+		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard) override;
 
 	private:
 		ID3D11Buffer* m_Buffer = nullptr;

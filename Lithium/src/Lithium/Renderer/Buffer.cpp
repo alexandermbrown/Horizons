@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "Buffer.h"
 
-#include "Lithium/Renderer/RendererAPI.h"
+#include "Lithium/Core/Application.h"
 
 #ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLBuffer.h"
@@ -14,13 +14,13 @@ namespace li
 {
 	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size, usage);
+		case RendererAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size, usage);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11VertexBuffer>(size, usage);
+		case RendererAPI::D3D11:  return CreateRef<D3D11VertexBuffer>(size, usage);
 #endif
 		}
 
@@ -30,13 +30,13 @@ namespace li
 
 	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size, BufferUsage usage)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size, usage);
+		case RendererAPI::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size, usage);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11VertexBuffer>(vertices, size, usage);
+		case RendererAPI::D3D11:  return CreateRef<D3D11VertexBuffer>(vertices, size, usage);
 #endif
 		}
 
@@ -46,13 +46,13 @@ namespace li
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t size, BufferUsage usage)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(size, usage);
+		case RendererAPI::OpenGL:  return CreateRef<OpenGLIndexBuffer>(size, usage);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(size, usage);
+		case RendererAPI::D3D11:  return CreateRef<D3D11IndexBuffer>(size, usage);
 #endif
 		}
 
@@ -62,13 +62,13 @@ namespace li
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count, BufferUsage usage)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count, usage);
+		case RendererAPI::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count, usage);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11IndexBuffer>(indices, count, usage);
+		case RendererAPI::D3D11:  return CreateRef<D3D11IndexBuffer>(indices, count, usage);
 #endif
 		}
 

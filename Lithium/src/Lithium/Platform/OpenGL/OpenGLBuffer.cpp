@@ -38,10 +38,17 @@ namespace li {
 		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
 	}
 
-	void OpenGLVertexBuffer::SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target)
+	void OpenGLVertexBuffer::SetSubData(float* data, uint32_t size, uint32_t offset, bool discard)
 	{
-		GLCall( glBindBuffer(ConvertOpenGL::BufferTarget(target), m_RendererID) );
-		GLCall( glBufferSubData(ConvertOpenGL::BufferTarget(target), offset, static_cast<GLsizeiptr>(size), data) );
+		GLCall( glBindBuffer(GL_ARRAY_BUFFER, m_RendererID) );
+
+		GLbitfield access = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
+		if (discard) access |= GL_MAP_INVALIDATE_BUFFER_BIT;
+
+		void* dest = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, access);
+		LI_CORE_ASSERT(dest, "Error mapping buffer.");
+		memcpy(dest, data, size);
+		GLCall( glUnmapBuffer(GL_ARRAY_BUFFER) );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -75,10 +82,17 @@ namespace li {
 		GLCall( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID) );
 	}
 
-	void OpenGLIndexBuffer::SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target)
+	void OpenGLIndexBuffer::SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard)
 	{
 		m_Count = size / sizeof(uint32_t);
-		GLCall( glBindBuffer(ConvertOpenGL::BufferTarget(target), m_RendererID) );
-		GLCall( glBufferSubData(ConvertOpenGL::BufferTarget(target), offset, static_cast<GLsizeiptr>(size), data) );
+		GLCall( glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID) );
+
+		GLbitfield access = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
+		if (discard) access |= GL_MAP_INVALIDATE_BUFFER_BIT;
+
+		void* dest = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, size, access);
+		LI_CORE_ASSERT(dest, "Error mapping buffer.");
+		memcpy(dest, data, size);
+		GLCall( glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER) );
 	}
 }

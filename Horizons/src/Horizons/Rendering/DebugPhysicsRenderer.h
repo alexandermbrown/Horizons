@@ -8,9 +8,6 @@
 
 #include <queue>
 
-#define HZ_PHYSICS_DEBUG_DRAW_MAX_VERTICES 32768U
-#define HZ_PHYSICS_DEBUG_DRAW_MAX_INDICES HZ_PHYSICS_DEBUG_DRAW_MAX_VERTICES * 4
-
 class DebugPhysicsRenderer
 {
 public:
@@ -21,6 +18,8 @@ public:
 
 private:
 
+	constexpr static int MaxDrawVertices = 32768;
+	constexpr static int MaxDrawIndices = MaxDrawVertices * 4;
 	constexpr static float ZPos = 0.31f;
 
 	struct DebugPhysicsVertex
@@ -40,8 +39,8 @@ private:
 
 	uint32_t m_VertexCount;
 	uint32_t m_IndexCount;
-	std::array<DebugPhysicsVertex, HZ_PHYSICS_DEBUG_DRAW_MAX_VERTICES> m_Vertices;
-	std::array<uint32_t, HZ_PHYSICS_DEBUG_DRAW_MAX_INDICES> m_Indices;
+	std::array<DebugPhysicsVertex, MaxDrawVertices> m_Vertices;
+	std::array<uint32_t, MaxDrawIndices> m_Indices;
 };
 
 #endif

@@ -21,8 +21,8 @@ void SplashScreenLayer::OnDetach()
 
 void SplashScreenLayer::OnUpdate(float dt)
 {
-	li::RendererAPI::BindDefaultRenderTarget();
-	li::RendererAPI::Clear();
+	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
+	li::Application::Get()->GetWindow()->GetContext()->Clear();
 	li::Renderer::UISubmit(m_Texture, m_Transform);
 }
 

@@ -66,7 +66,7 @@ namespace li
 		m_SwapChain->Present(0, 0);
 	}
 
-	void D3D11Context::Resize(int width, int height)
+	void D3D11Context::ResizeView(int width, int height)
 	{
 		m_DeviceContext->OMSetRenderTargets(0, 0, 0);
 
@@ -120,16 +120,60 @@ namespace li
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
+	void D3D11Context::BindDefaultRenderTarget()
+	{
+		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
+		m_DeviceContext->RSSetViewports(1, &m_Viewport);
+	}
+
 	void D3D11Context::Clear()
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView, glm::value_ptr(m_ClearColor));
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void D3D11Context::BindDefaultRenderTarget()
+	void D3D11Context::DrawArrays(uint32_t vertexCount)
 	{
-		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
-		m_DeviceContext->RSSetViewports(1, &m_Viewport);
+		m_DeviceContext->Draw(vertexCount, 0);
+	}
+
+	void D3D11Context::DrawIndexed(uint32_t indexCount)
+	{
+		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+	}
+
+	void D3D11Context::DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount)
+	{
+		m_DeviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
+	}
+
+	void D3D11Context::SetDepthTest(bool enabled)
+	{
+	}
+
+	void D3D11Context::SetDrawMode(DrawMode mode)
+	{
+		switch (mode)
+		{
+		case DrawMode::Points:
+			m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+			break;
+		case DrawMode::Lines:
+			m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+			break;
+		case DrawMode::LineStrip:
+			m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+			break;
+		case DrawMode::Triangles:
+			m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			break;
+		case DrawMode::TriangleStrip:
+			m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			break;
+		default:
+			LI_ASSERT(false, "Unknown draw mode!");
+			break;
+		}
 	}
 
 	void D3D11Context::InitSwapChain(HWND hwnd, int width, int height)
@@ -315,4 +359,3 @@ namespace li
 	}
 #endif
 }
-

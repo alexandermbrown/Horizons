@@ -16,11 +16,11 @@ namespace li
 		switch (props.API)
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return new OpenGLWindow(props);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return new D3D11Window(props);
 #endif
 		default:

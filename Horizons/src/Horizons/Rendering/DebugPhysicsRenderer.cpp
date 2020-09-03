@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "DebugPhysicsRenderer.h"
 
+#include <math.h>
+
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 
 DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
@@ -10,18 +12,17 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 
 	m_VertexArray = li::VertexArray::Create();
 
-	li::BufferLayout layout = {
+	// Ensure the vertex struct is packed so it can be safely sent the GPU.
+	static_assert(sizeof(DebugPhysicsVertex) == sizeof(glm::vec3) + sizeof(glm::vec4));
+	static_assert(sizeof(m_Vertices) == (sizeof(float) * 3 + sizeof(float) * 4) * MaxDrawVertices);
+
+	m_VertexBuffer = li::VertexBuffer::Create(MaxDrawVertices * sizeof(DebugPhysicsVertex), li::BufferUsage::DynamicDraw);
+	m_VertexBuffer->SetLayout({
 		{ li::ShaderDataType::Float3, "POSITION", 0 },
 		{ li::ShaderDataType::Float4, "COLOR", 1 }
-	};
+	});
 
-	// Ensure the vertex struct is packed so it can be safely sent the GPU.
-	static_assert(sizeof(DebugPhysicsVertex) == sizeof(glm::vec3) + sizeof(glm::vec4), "Vertex struct not packed!");
-
-	m_VertexBuffer = li::VertexBuffer::Create(HZ_PHYSICS_DEBUG_DRAW_MAX_VERTICES * sizeof(DebugPhysicsVertex), li::BufferUsage::DynamicDraw);
-	m_VertexBuffer->SetLayout(layout);
-
-	m_IndexBuffer = li::IndexBuffer::Create(HZ_PHYSICS_DEBUG_DRAW_MAX_INDICES * static_cast<uint32_t>(sizeof uint32_t), li::BufferUsage::DynamicDraw);
+	m_IndexBuffer = li::IndexBuffer::Create(MaxDrawIndices * (uint32_t)(sizeof uint32_t), li::BufferUsage::DynamicDraw);
 
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 	m_VertexArray->SetIndexBuffer(m_IndexBuffer);
@@ -111,8 +112,10 @@ void DebugPhysicsRenderer::Render()
 					m_Vertices[m_VertexCount].Position = { command.Vertices[i], ZPos };
 					m_Vertices[m_VertexCount].Color = command.Color;
 
-					m_Indices[m_IndexCount++] = m_VertexCount;
-					m_Indices[m_IndexCount++] = (i == command.VertexCount - 1) ? firstIndex : m_VertexCount + 1;
+					m_Indices[m_IndexCount] = m_VertexCount;
+					m_IndexCount++;
+					m_Indices[m_IndexCount] = (i == command.VertexCount - 1) ? firstIndex : m_VertexCount + 1;
+					m_IndexCount++;
 
 					m_VertexCount++;
 				}
@@ -124,20 +127,22 @@ void DebugPhysicsRenderer::Render()
 			{
 				uint32_t firstIndex = m_VertexCount;
 
-				const int resolution = 32;
+				constexpr int resolution = 32;
 				for (int i = 0; i < resolution; i++)
 				{
 					float angle = (float)i / (float)resolution * 2.0f * (float)M_PI;
 					
 					m_Vertices[m_VertexCount].Position = {
-						SDL_cosf(angle) * command.Radius + command.Point1.x,
-						SDL_sinf(angle) * command.Radius + command.Point1.y,
+						std::cos(angle) * command.Radius + command.Point1.x,
+						std::sin(angle) * command.Radius + command.Point1.y,
 						ZPos
 					};
 					m_Vertices[m_VertexCount].Color = command.Color;
 
-					m_Indices[m_IndexCount++] = m_VertexCount;
-					m_Indices[m_IndexCount++] = (i == resolution - 1) ? firstIndex : m_VertexCount + 1;
+					m_Indices[m_IndexCount] = m_VertexCount;
+					m_IndexCount++;
+					m_Indices[m_IndexCount] = (i == resolution - 1) ? firstIndex : m_VertexCount + 1;
+					m_IndexCount++;
 
 					m_VertexCount++;
 				}
@@ -156,11 +161,10 @@ void DebugPhysicsRenderer::Render()
 	// Render the lines.
 	if (m_IndexCount > 0)
 	{
-		m_VertexArray->Bind();
 		m_Shader->Bind();
-		
-		li::RendererAPI::SetDrawMode(li::DrawMode::Lines);
-		li::RendererAPI::DrawIndexed(m_IndexCount);
+		m_VertexArray->Bind();
+		li::Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Lines);
+		li::Application::Get()->GetWindow()->GetContext()->DrawIndexed(m_IndexCount);
 		m_VertexArray->Unbind();
 	}
 }

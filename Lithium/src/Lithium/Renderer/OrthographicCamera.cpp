@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "OrthographicCamera.h"
 
-#include "RendererAPI.h"
+#include "Lithium/Core/Application.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace li 
@@ -9,12 +9,12 @@ namespace li
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
 		: m_ViewMatrix(1.0f)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 1.0f);
 			break;
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 100.0f, -1.0f);
 			break;
 		}
@@ -24,12 +24,12 @@ namespace li
 
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 1.0f);
 			break;
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			m_ProjectionMatrix = glm::orthoLH_ZO(left, right, bottom, top, 100.0f, -1.0f);
 			break;
 		}

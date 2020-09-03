@@ -20,10 +20,13 @@ namespace li
 		if (props.Borderless)
 			flags |= SDL_WINDOW_BORDERLESS;
 
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 		m_Window = SDL_CreateWindow(props.Title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, flags);
 		LI_CORE_ASSERT(m_Window, "Error creating window.");
 
-		m_Context = new OpenGLContext(m_Window);
+		m_Context = new OpenGLContext(m_Window, m_Width, m_Height);
 	}
 
 	OpenGLWindow::~OpenGLWindow()

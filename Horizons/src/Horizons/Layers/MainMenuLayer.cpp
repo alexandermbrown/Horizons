@@ -82,8 +82,8 @@ void MainMenuLayer::OnUpdate(float dt)
 
 	FlickerSystem::Update(m_Registry, dt);
 
-	li::RendererAPI::BindDefaultRenderTarget();
-	li::RendererAPI::Clear();
+	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
+	li::Application::Get()->GetWindow()->GetContext()->Clear();
 
 	li::Renderer::BeginUI();
 	UIRenderSystem::Render(m_Registry);

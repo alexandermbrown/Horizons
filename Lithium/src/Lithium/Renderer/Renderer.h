@@ -52,7 +52,6 @@ namespace li
 
 		static void Resize(int width, int height);
 
-		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 		inline static Ref<UniformBuffer> GetViewProjUniformBuffer() { return s_Data->ViewProjUB; }
 		inline static Ref<UniformBuffer> GetTransformUniformBuffer() { return s_Data->TransformMatrixUB; }
 		inline static Ref<Shader> GetFontShader() { return s_Data->FontShader; }

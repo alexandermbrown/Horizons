@@ -16,7 +16,7 @@ namespace li
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target) override;
+		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard) override;
 
 	private:
 		uint32_t m_RendererID;
@@ -34,7 +34,7 @@ namespace li
 
 		virtual uint32_t GetCount() const override { return m_Count; }
 
-		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target) override;
+		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard) override;
 
 	private:
 		uint32_t m_RendererID;

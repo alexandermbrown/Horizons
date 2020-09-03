@@ -49,13 +49,13 @@ namespace li
 
 	Ref<ImGuiRenderer> ImGuiRenderer::Create()
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLImGuiRenderer>();
+		case RendererAPI::OpenGL:  return CreateRef<OpenGLImGuiRenderer>();
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:  return CreateRef<D3D11ImGuiRenderer>();
+		case RendererAPI::D3D11:  return CreateRef<D3D11ImGuiRenderer>();
 #endif
 		}
 

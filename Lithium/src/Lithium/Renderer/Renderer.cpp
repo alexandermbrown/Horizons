@@ -12,8 +12,10 @@ namespace li
 
 	void Renderer::Init()
 	{
-		RendererAPI::SetDepthTest(true);
 		s_Data = CreateScope<Renderer::RendererData>();
+
+		Application::Get()->GetWindow()->GetContext()->SetDepthTest(true);
+		Application::Get()->GetWindow()->GetContext()->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {
 			{ "u_ViewProj", ShaderDataType::Mat4 },
@@ -42,7 +44,6 @@ namespace li
 		float height = (float)window->GetHeight();
 		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
 
-		RendererAPI::SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
@@ -214,8 +215,8 @@ namespace li
 
 		texture->Bind();
 		s_Data->QuadVA->Bind();
-		RendererAPI::SetDrawMode(DrawMode::Triangles);
-		RendererAPI::DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
+		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);
+		Application::Get()->GetWindow()->GetContext()->DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
 	}
 
 	void Renderer::RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
@@ -234,8 +235,8 @@ namespace li
 
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
-		RendererAPI::SetDrawMode(DrawMode::Triangles);
-		RendererAPI::DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
+		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);
+		Application::Get()->GetWindow()->GetContext()->DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
 		vertexArray->Unbind();
 	}
 }

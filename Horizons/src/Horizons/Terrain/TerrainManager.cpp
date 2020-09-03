@@ -87,12 +87,12 @@ void TerrainManager::Init()
 
 	constexpr int HalfRenderWidth = RenderWidth / 2;
 
-	switch (li::RendererAPI::GetAPI())
+	switch (li::Application::Get()->GetAPI())
 	{
-	case li::RendererAPI::API::OpenGL:
+	case li::RendererAPI::OpenGL:
 		s_Data->TerrainCamera = li::CreateScope<li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f);
 		break;
-	case li::RendererAPI::API::D3D11:
+	case li::RendererAPI::D3D11:
 		s_Data->TerrainCamera = li::CreateScope<li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth);
 		break;
 	}
@@ -295,8 +295,8 @@ void TerrainManager::RenderFramebuffer()
 		s_Data->TerrainShader->SetTexture("u_Noise3", 3);
 
 		chunk.VertexArray->Bind();
-		li::RendererAPI::SetDrawMode(li::DrawMode::Triangles);
-		li::RendererAPI::DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());
+		li::Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
+		li::Application::Get()->GetWindow()->GetContext()->DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());
 		chunk.VertexArray->Unbind();
 	}
 }

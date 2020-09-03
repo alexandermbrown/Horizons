@@ -1,8 +1,7 @@
 #include "lipch.h"
 #include "VertexArray.h"
 
-#include "Lithium/Renderer/Renderer.h"
-#include "Lithium/Renderer/RendererAPI.h"
+#include "Lithium/Core/Application.h"
 
 #ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLVertexArray.h"
@@ -16,14 +15,14 @@ namespace li
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
-		switch (Renderer::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return CreateRef<OpenGLVertexArray>();
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return CreateRef<D3D11VertexArray>();
 #endif
 		}

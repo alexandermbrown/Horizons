@@ -105,12 +105,10 @@ namespace li
 	private:
 		void CalculateOffsetsAndStride()
 		{
-			size_t offset = 0;
 			m_Stride = 0;
 			for (auto& element : m_Elements)
 			{
-				element.Offset = offset;
-				offset += element.Size;
+				element.Offset = m_Stride;
 				m_Stride += element.Size;
 			}
 		}
@@ -129,7 +127,7 @@ namespace li
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ArrayBuffer) = 0;
+		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard) = 0;
 
 		static Ref<VertexBuffer> Create(uint32_t size, BufferUsage usage);
 		static Ref<VertexBuffer> Create(float* vertices, uint32_t size, BufferUsage usage);
@@ -144,7 +142,7 @@ namespace li
 
 		virtual uint32_t GetCount() const = 0;
 
-		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target = BufferTarget::ElementArrayBuffer) = 0;
+		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard) = 0;
 
 		static Ref<IndexBuffer> Create(uint32_t size, BufferUsage usage);
 		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count, BufferUsage usage = BufferUsage::StaticDraw);

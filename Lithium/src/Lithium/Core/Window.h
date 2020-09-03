@@ -10,7 +10,7 @@ namespace li
 {
 	struct WindowProps
 	{
-		RendererAPI::API API;
+		RendererAPI API;
 		const char* Title;
 		int Width;
 		int Height;

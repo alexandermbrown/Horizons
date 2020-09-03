@@ -61,7 +61,7 @@ namespace li
 		m_Buffer = nullptr;
 	}
 
-	void D3D11VertexBuffer::SetSubData(float* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target)
+	void D3D11VertexBuffer::SetSubData(float* data, uint32_t size, uint32_t offset, bool discard)
 	{
 		LI_CORE_ASSERT(size <= m_Size, "Buffer overflow.");
 
@@ -133,7 +133,7 @@ namespace li
 		m_ContextHandle->IASetIndexBuffer(m_Buffer, DXGI_FORMAT_R32_UINT, 0);
 	}
 
-	void D3D11IndexBuffer::SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard, BufferTarget target)
+	void D3D11IndexBuffer::SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard)
 	{
 		LI_CORE_ASSERT(size <= m_Size - offset, "Buffer overflow.");
 		m_Count = offset / sizeof(uint32_t) + size / sizeof(uint32_t);

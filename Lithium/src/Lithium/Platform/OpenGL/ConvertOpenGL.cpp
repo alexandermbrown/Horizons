@@ -19,20 +19,6 @@ namespace li
 		}
 	}
 
-	uint32_t ConvertOpenGL::BufferTarget(li::BufferTarget target)
-	{
-		switch (target)
-		{
-		case BufferTarget::ArrayBuffer:
-			return GL_ARRAY_BUFFER;
-		case BufferTarget::ElementArrayBuffer:
-			return GL_ELEMENT_ARRAY_BUFFER;
-		default:
-			LI_CORE_ERROR("Unknown buffer target {}.", target);
-			return 0;
-		}
-	}
-
 	uint32_t ConvertOpenGL::DrawMode(li::DrawMode mode)
 	{
 		switch (mode)

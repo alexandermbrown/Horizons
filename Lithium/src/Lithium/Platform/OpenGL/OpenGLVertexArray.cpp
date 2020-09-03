@@ -40,6 +40,7 @@ namespace li
 	void OpenGLVertexArray::Bind() const
 	{
 		GLCall( glBindVertexArray(m_RendererID) );
+		m_IndexBuffer->Bind();
 	}
 
 	void OpenGLVertexArray::Unbind() const
@@ -51,8 +52,8 @@ namespace li
 	{
 		LI_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
-		GLCall( glBindVertexArray(m_RendererID) );
 		vertexBuffer->Bind();
+		GLCall( glBindVertexArray(m_RendererID) );
 
 		const auto& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout)

@@ -19,10 +19,10 @@ namespace li
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
-		: m_Running(false), m_LayerStack(), m_EventHandled(false), m_Window(nullptr),
+		: m_Running(false), m_LayerStack(), m_EventHandled(false), m_Window(nullptr), m_RendererAPI(props.API),
 		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
 	{
-		LI_CORE_ASSERT(!s_Instance, "Instance of Application already exists!");
+		LI_CORE_ASSERT(s_Instance == nullptr, "Instance of Application already exists!");
 		s_Instance = this;
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -51,10 +51,8 @@ namespace li
 
 		m_EventCallbackFn = LI_BIND_FN(Application::OnEvent);
 
-		RendererAPI::Create(props.API);
 		m_Window = Window::Create(props);
-		RendererAPI::SetContext(m_Window->GetContext());
-		RendererAPI::ResizeView(props.Width, props.Height);
+		m_Window->GetContext()->ResizeView(props.Width, props.Height);
 
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 	}
@@ -248,7 +246,7 @@ namespace li
 			LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
 
 			m_Window->OnWindowResize(w, h);
-			RendererAPI::ResizeView(w, h);
+			m_Window->GetContext()->ResizeView(w, h);
 			Renderer::Resize(w, h);
 			m_ImGuiRenderer->Resize(w, h);
 

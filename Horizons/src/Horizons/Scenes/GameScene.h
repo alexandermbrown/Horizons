@@ -5,6 +5,7 @@
 
 #include "Horizons/Layers/GameLayer.h"
 #include "Horizons/Layers/HUDLayer.h"
+#include "Horizons/Layers/DiagnosticsLayer.h"
 
 class GameScene : public li::Scene
 {
@@ -22,4 +23,5 @@ public:
 private:
 	GameLayer m_GameLayer;
 	HUDLayer m_HUDLayer;
+	DiagnosticsLayer m_Diagnostics;
 };

@@ -47,7 +47,7 @@ void SplashScreenScene::TransitionOut()
 
 void SplashScreenScene::OnUpdate(float dt)
 {
-	li::RendererAPI::Clear();
+	li::Application::Get()->GetWindow()->GetContext()->Clear();
 
 	if (!li::ResourceManager::UpdateStaggeredLoad())
 	{

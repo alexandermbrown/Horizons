@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "UniformBuffer.h"
 
-#include "RendererAPI.h"
+#include "Lithium/Core/Application.h"
 #include "Buffer.h"
 
 #ifdef LI_INCLUDE_OPENGL
@@ -60,9 +60,9 @@ namespace li
 		// Current offset in multiples of 4 bytes.
 		uint32_t componentOffset = 0;
 
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			// Conform to OpenGL's std140 layout.
 			// https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_uniform_buffer_object.txt
 			// - Variables consuming N basic machine units have a base alignment of N.
@@ -82,7 +82,7 @@ namespace li
 			m_Size = componentOffset * 4;
 
 			break;
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 		{
 			// Conform to D3D11's HLSL packing rules.
 			// https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules
@@ -117,14 +117,14 @@ namespace li
 
 	Ref<UniformBuffer> li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (Application::Get()->GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::API::OpenGL:
+		case RendererAPI::OpenGL:
 			return CreateRef<OpenGLUniformBuffer>(name, bindingSlot, layout);
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::API::D3D11:
+		case RendererAPI::D3D11:
 			return CreateRef<D3D11UniformBuffer>(name, bindingSlot, shaderType, layout);
 #endif
 		}
