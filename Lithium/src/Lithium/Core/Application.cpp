@@ -236,6 +236,11 @@ namespace li
 		}
 	}
 
+	void Application::Exit()
+	{
+		m_Running = false;
+	}
+
 	void Application::OnWindowEvent(SDL_Event* event)
 	{
 		switch(event->window.event)

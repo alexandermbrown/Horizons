@@ -2,6 +2,8 @@
 #ifndef LI_DIST
 #include "LevelEditorScene.h"
 
+#include "MainMenuScene.h"
+
 LevelEditorScene::LevelEditorScene()
 {
 }
@@ -25,5 +27,9 @@ void LevelEditorScene::TransitionOut()
 
 void LevelEditorScene::OnUpdate(float dt)
 {
+	if (m_LevelEditorLayer.ReturnToMainMenu())
+	{
+		li::Application::Get()->Transition(new MainMenuScene());
+	}
 }
 #endif // !LI_DIST

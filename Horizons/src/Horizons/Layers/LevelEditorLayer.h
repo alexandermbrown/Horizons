@@ -17,10 +17,13 @@ public:
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
 
+	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
+
 private:
+	bool m_ReturnToMainMenu;
+
 	entt::registry m_Registry;
 
-	// TODO: make config variables in a seperate file.
 	float m_BrushInnerRadius;
 	float m_BrushOuterRadius;
 	float m_BrushAmplitude;

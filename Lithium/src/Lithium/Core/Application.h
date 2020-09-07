@@ -43,6 +43,7 @@ namespace li
 		inline RendererAPI GetAPI() const { return m_RendererAPI; }
 
 		void Transition(Scene* scene);
+		void Exit();
 
 	private:
 		void OnWindowEvent(SDL_Event* event);

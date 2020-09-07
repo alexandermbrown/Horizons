@@ -5,7 +5,7 @@
 #include "imgui.h"
 
 LevelEditorLayer::LevelEditorLayer()
-	: m_BrushInnerRadius(0.5f), m_BrushOuterRadius(2.0f), m_BrushAmplitude(1.0f),
+	: m_ReturnToMainMenu(false), m_BrushInnerRadius(0.5f), m_BrushOuterRadius(2.0f), m_BrushAmplitude(1.0f),
 	m_DockspaceOpen(true), m_ViewportOpen(true), m_ViewportSize(512, 256)
 {
 	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
@@ -73,8 +73,13 @@ void LevelEditorLayer::OnImGuiRender()
 		{
 			if (ImGui::MenuItem("New", "Ctrl+N")) {}
 			if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+			ImGui::Separator();
 			if (ImGui::MenuItem("Save", "Ctrl+S")) {}
 			if (ImGui::MenuItem("Save As", "Ctrl+Shift+S")) {}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Return to Main Menu")) m_ReturnToMainMenu = true;
+			if (ImGui::MenuItem("Exit")) li::Application::Get()->Exit(); 
+
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Edit"))
