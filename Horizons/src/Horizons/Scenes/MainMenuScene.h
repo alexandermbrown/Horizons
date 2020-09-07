@@ -20,5 +20,7 @@ public:
 
 private:
 	MainMenuLayer m_MainMenuLayer;
+#ifndef LI_DIST
 	DiagnosticsLayer m_Diagnostics;
+#endif
 };

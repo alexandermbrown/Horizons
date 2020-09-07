@@ -1,7 +1,6 @@
 #include "pch.h"
+#ifndef LI_DIST
 #include "ConsoleLayer.h"
-
-#ifdef HZ_CONSOLE_ENABLED
 
 #include "glm/glm.hpp"
 #include "Horizons.h"
@@ -17,9 +16,9 @@ ConsoleLayer::ConsoleLayer()
 	CommandLayout clear_layout = {};
 
 	AddCommand(li::CreateRef<Command>("clear", "Clears the console.", clear_layout, [](std::vector<CommandValue>&& args, std::string* errorOut)
-		{
-			li::Application::Get<Horizons>()->GetConsole()->Clear();
-		}));
+	{
+		li::Application::Get<Horizons>()->GetConsole()->Clear();
+	}));
 }
 
 void ConsoleLayer::OnAttach()
@@ -50,12 +49,12 @@ void ConsoleLayer::OnImGuiRender()
 
 		ImGui::Separator();
 		const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-		ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::BeginChild("ScrollingRegion", { 0, -footer_height_to_reserve }, false, ImGuiWindowFlags_HorizontalScrollbar);
 
 		for (int i = 0; i < m_LineCount; i++)
 		{
-			int current_index = m_LineCount == HZ_CONSOLE_OUTPUT_NUM_LINES ?
-				current_index = (m_CurrentLine + i) % HZ_CONSOLE_OUTPUT_NUM_LINES : i;
+			int current_index = m_LineCount == NumOutputLines ?
+				current_index = (m_CurrentLine + i) % NumOutputLines : i;
 
 
 			const glm::vec4& color = m_Lines[current_index].Color;
@@ -77,7 +76,7 @@ void ConsoleLayer::OnImGuiRender()
 
 		constexpr ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
 		constexpr auto callback = [](ImGuiTextEditCallbackData* data) -> int { return ((ConsoleLayer*)data->UserData)->InputTextCallback(data); };
-		if (ImGui::InputText("Input", m_InputBuffer, HZ_CONSOLE_INPUT_BUFFER_SIZE, flags, callback, this))
+		if (ImGui::InputText("Input", m_InputBuffer, InputBufferSize, flags, callback, this))
 		{
 			if (m_InputBuffer[0] != '\0')
 			{
@@ -131,8 +130,8 @@ void ConsoleLayer::OnEvent(SDL_Event* event)
 void ConsoleLayer::Print(const Line& line)
 {
 	m_Lines[m_CurrentLine] = line;
-	m_CurrentLine = (m_CurrentLine + 1) % HZ_CONSOLE_OUTPUT_NUM_LINES;
-	if (m_LineCount < HZ_CONSOLE_OUTPUT_NUM_LINES)
+	m_CurrentLine = (m_CurrentLine + 1) % NumOutputLines;
+	if (m_LineCount < NumOutputLines)
 		m_LineCount++;
 }
 
@@ -200,10 +199,9 @@ void ConsoleLayer::AddHistory(const std::string& command)
 
 	// Add the command to the history buffer.
 	m_HistoryBuffer[m_LatestHistory] = command;
-	m_LatestHistory = (m_LatestHistory + 1) % HZ_CONSOLE_INPUT_HISTORY_COUNT;
-	if (m_HistoryCount < HZ_CONSOLE_INPUT_HISTORY_COUNT)
+	m_LatestHistory = (m_LatestHistory + 1) % InputHistoryCount;
+	if (m_HistoryCount < InputHistoryCount)
 		m_HistoryCount++;
-
 }
 
 void ConsoleLayer::UpdateHistory(ImGuiInputTextCallbackData* data)
@@ -218,7 +216,7 @@ void ConsoleLayer::UpdateHistory(ImGuiInputTextCallbackData* data)
 		int index = m_LatestHistory - m_HistoryIndex - 1;
 
 		while (index < 0)
-			index += HZ_CONSOLE_INPUT_HISTORY_COUNT;
+			index += InputHistoryCount;
 
 		strcpy_s(data->Buf, data->BufSize, m_HistoryBuffer[index].c_str());
 		data->BufTextLen = (int)m_HistoryBuffer[index].size();

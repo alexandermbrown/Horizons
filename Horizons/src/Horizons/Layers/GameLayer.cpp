@@ -2,53 +2,28 @@
 #include "GameLayer.h"
 
 #include "Horizons.h"
-#include "Horizons/Core/TickThread.h"
 #include "Horizons/Gameplay/Components.h"
 #include "Horizons/Terrain/TerrainManager.h"
 #include "Horizons/Rendering/RenderingSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/TransformUpdateSystem.h"
 #include "Horizons/Gameplay/CameraControllerSystem.h"
-#include "Horizons/Gameplay/Sync/SyncEventReceiveSystem.h"
-#include "Horizons/Gameplay/Sync/SyncTransformReceiveSystem.h"
 
 #include "Horizons/Gameplay/Player/PlayerComponents.h"
-#include "Horizons/Gameplay/Sync/SyncTransform.h"
 #include "Horizons/Gameplay/Components.h"
 
 #include "Horizons/Terrain/SimplexNoise.h"
 
-#include "entt/entt.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 
-#include <thread>
-
 GameLayer::GameLayer()
-	: Layer("GameLayer"), m_EventQueue(256ull), m_SyncQueue(256ull), m_TransformQueue(256ull),
-		m_Registry(), m_ReturnToMainMenu(false), m_ThreadRun(true)
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-	, m_DebugDrawQueue(256ull), m_DebugPhysicsRenderer(&m_DebugDrawQueue)
-#endif
+	: Layer("GameLayer"), m_Registry(), m_ReturnToMainMenu(false)
 {
-	// Start up tick thread.
-	TickThreadData threadData;
-	threadData.Running = &m_ThreadRun;
-	threadData.EventQueue = &m_EventQueue;
-	threadData.SyncQueue = &m_SyncQueue;
-	threadData.TransformQueue = &m_TransformQueue;
-	threadData.Config = li::Application::Get<Horizons>()->GetConfig();
-
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-	m_TickThread = std::thread(TickThreadEntryPointDebugDraw, threadData, &m_DebugDrawQueue);
-#else
-	m_TickThread = std::thread(TickThreadEntryPoint, threadData);
-#endif
+	m_TickThread.Begin(m_Registry);
 
 	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
 
-	SyncEventReceiveSystem::Init(m_Registry);
-	SyncTransformReceiveSystem::Init(m_Registry);
 	CameraControllerSystem::Init(m_Registry);
 
 	TerrainManager::LoadWorld("data/worlds/test.terrain", { 0, 0 });
@@ -60,12 +35,9 @@ GameLayer::GameLayer()
 
 GameLayer::~GameLayer()
 {
-	m_ThreadRun = false;
 	CameraControllerSystem::Shutdown(m_Registry);
 	TerrainManager::UnloadWorld();
-	m_TickThread.join();
-	// Clear queue to free pointers.
-	SyncEventReceiveSystem::Update(m_Registry, &m_SyncQueue);
+	m_TickThread.Finish(m_Registry);
 }
 
 void GameLayer::OnAttach()
@@ -80,8 +52,7 @@ void GameLayer::OnDetach()
 
 void GameLayer::OnUpdate(float dt)
 {
-	SyncEventReceiveSystem::Update(m_Registry, &m_SyncQueue);
-	SyncTransformReceiveSystem::Update(m_Registry, &m_TransformQueue, dt);
+	m_TickThread.UpdateSync(m_Registry, dt);
 
 	auto player_view = m_Registry.view<cp::sync_transform, cp::player>();
 	for (entt::entity player : player_view)
@@ -107,26 +78,21 @@ void GameLayer::OnUpdate(float dt)
 	li::Application::Get()->GetWindow()->GetContext()->Clear();
 	li::Renderer::BeginScene(camera.camera);
 
-	TerrainManager::RenderQuad();
+	TerrainManager::SubmitQuad();
 	RenderingSystem::Render(m_Registry);
 
 	li::Renderer::EndScene();
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	li::Renderer::BeginScene(camera.camera);
-	m_DebugPhysicsRenderer.Render();
+	m_DebugPhysicsRenderer.Render(m_TickThread.GetDebugDrawQueue());
 	li::Renderer::EndScene();
 #endif
 }
 
-void GameLayer::OnImGuiRender()
-{
-}
-
 void GameLayer::OnEvent(SDL_Event* event)
 {
-	m_EventQueue.enqueue(*event);
-
+	m_TickThread.OnEvent(event);
 	CameraControllerSystem::OnEvent(m_Registry, event);
 
 	if (event->type == SDL_KEYUP)
@@ -147,3 +113,9 @@ void GameLayer::OnEvent(SDL_Event* event)
 		}
 	}
 }
+
+#ifndef LI_DIST
+void GameLayer::OnImGuiRender()
+{
+}
+#endif

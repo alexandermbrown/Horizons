@@ -16,7 +16,7 @@
 
 Game* Game::s_Instance = nullptr;
 
-Game::Game(const TickThreadData& data)
+Game::Game(const TickThreadInput& data)
 	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue),
 	m_ConfigStore(data.Config), m_Registry(), m_AppRun(data.Running)
 {
@@ -25,7 +25,7 @@ Game::Game(const TickThreadData& data)
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-Game::Game(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue)
+Game::Game(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue)
 	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue),
 	m_ConfigStore(data.Config), m_DebugDrawQueue(debugDrawQueue), m_AppRun(data.Running)
 {

@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
@@ -49,3 +49,4 @@ private:
 	bool m_ShowAverave = true, m_ShowMin = false, m_ShowMax = false;
 	bool m_ShowLive = true, m_ShowHistory = false;
 };
+#endif

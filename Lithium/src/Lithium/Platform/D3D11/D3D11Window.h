@@ -23,6 +23,7 @@ namespace li
 		virtual inline int GetHeight() const override { return m_Height; }
 		virtual inline GraphicsContext* GetContext() const override { return m_Context; }
 		virtual inline SDL_Window* GetWindow() const override { return m_Window; }
+		virtual uint32_t GetWindowID() const override { return m_ID; }
 
 		virtual void SetVSync(bool enabled) override;
 		virtual inline bool IsVSync() const override { return false; } // { return m_VSync; } TODO
@@ -42,6 +43,7 @@ namespace li
 	private:
 		SDL_Window* m_Window;
 		D3D11Context* m_Context;
+		uint32_t m_ID;
 
 		SDL_Surface* m_Icon;
 		unsigned char* m_IconData;

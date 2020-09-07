@@ -11,13 +11,10 @@
 class DebugPhysicsRenderer
 {
 public:
-
-	DebugPhysicsRenderer(DebugDrawCommandQueue* queue);
-
-	void Render();
+	DebugPhysicsRenderer();
+	void Render(DebugDrawCommandQueue* queue);
 
 private:
-
 	constexpr static int MaxDrawVertices = 32768;
 	constexpr static int MaxDrawIndices = MaxDrawVertices * 4;
 	constexpr static float ZPos = 0.31f;
@@ -28,7 +25,6 @@ private:
 		glm::vec4 Color;
 	};
 
-	DebugDrawCommandQueue* m_ThreadQueue;
 	std::queue<DebugDrawCommand> m_CommandQueue;
 
 	li::Ref<li::VertexArray> m_VertexArray;

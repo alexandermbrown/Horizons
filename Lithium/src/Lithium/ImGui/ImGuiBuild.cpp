@@ -1,4 +1,6 @@
 #include "lipch.h"
+#ifndef LI_DIST
+
 #include "Lithium/Core/Core.h"
 
 #ifdef _WIN32
@@ -14,4 +16,6 @@
 
 #ifdef LI_INCLUDE_D3D11
 #include "examples/imgui_impl_dx11.cpp"
+#endif
+
 #endif

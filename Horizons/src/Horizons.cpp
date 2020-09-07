@@ -47,10 +47,10 @@ Horizons::Horizons()
 	LI_ASSERT(game_to_app != ((uint32_t)-1), "Failed to create user event.");
 	LI_ASSERT(app_to_game != ((uint32_t)-1), "Failed to create user event.");
 
-	m_ConfigStore.Add(ConfigVar("event_game_to_app", game_to_app, HZ_CVAR_UNSIGNED, false));
-	m_ConfigStore.Add(ConfigVar("event_app_to_game", app_to_game, HZ_CVAR_UNSIGNED, false));
+	m_ConfigStore.Add(ConfigVar{ "event_game_to_app", game_to_app, HZ_CVAR_UNSIGNED, false });
+	m_ConfigStore.Add(ConfigVar{ "event_app_to_game", app_to_game, HZ_CVAR_UNSIGNED, false });
 
-	m_ConfigStore.Add(ConfigVar("app_state", 0, HZ_CVAR_UNSIGNED,  false));
+	m_ConfigStore.Add(ConfigVar{ "app_state", 0, HZ_CVAR_UNSIGNED,  false });
 
 	Transition(new SplashScreenScene());
 }

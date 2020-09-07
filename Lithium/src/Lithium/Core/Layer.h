@@ -14,9 +14,10 @@ namespace li
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
 		virtual void OnUpdate(float dt) {}
-		virtual void OnImGuiRender() {}
 		virtual void OnEvent(SDL_Event* event) {}
-
+#ifndef LI_DIST
+		virtual void OnImGuiRender() {}
+#endif
 		inline const std::string GetName() const { return m_DebugName; }
 
 	private:

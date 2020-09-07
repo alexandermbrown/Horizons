@@ -23,6 +23,8 @@ namespace li
 		m_Window = SDL_CreateWindow(props.Title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, flags);
 		LI_CORE_ASSERT(m_Window, "Error creating window.");
 
+		m_ID = SDL_GetWindowID(m_Window);
+
 		SDL_SysWMinfo wmInfo;
 		SDL_VERSION(&wmInfo.version);
 		SDL_GetWindowWMInfo(m_Window, &wmInfo);

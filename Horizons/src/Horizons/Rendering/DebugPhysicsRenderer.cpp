@@ -1,12 +1,11 @@
 #include "pch.h"
 #include "DebugPhysicsRenderer.h"
+#ifdef HZ_PHYSICS_DEBUG_DRAW
 
 #include <math.h>
 
-#ifdef HZ_PHYSICS_DEBUG_DRAW
-
-DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
-	: m_ThreadQueue(queue), m_VertexCount(0), m_IndexCount(0)
+DebugPhysicsRenderer::DebugPhysicsRenderer()
+	: m_VertexCount(0), m_IndexCount(0)
 {
 	m_Shader = li::ResourceManager::Get<li::Shader>("shader_debug_physics");
 
@@ -31,10 +30,10 @@ DebugPhysicsRenderer::DebugPhysicsRenderer(DebugDrawCommandQueue* queue)
 	m_Shader->AddUniformBuffer(li::Renderer::GetViewProjUniformBuffer());
 }
 
-void DebugPhysicsRenderer::Render()
+void DebugPhysicsRenderer::Render(DebugDrawCommandQueue* queue)
 {
 	DebugDrawCommand command;
-	while (m_ThreadQueue->try_dequeue(command)) // TODO: check if there are multiple ENDs in the queue, only render most recent.
+	while (queue->try_dequeue(command)) // TODO: check if there are multiple ENDs in the queue, only render most recent.
 	{
 		m_CommandQueue.push(command);
 	}

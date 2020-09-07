@@ -1,4 +1,5 @@
 #include "lipch.h"
+#ifndef LI_DIST
 #include "D3D11ImGuiRenderer.h"
 
 #include "Lithium/Core/Application.h"
@@ -16,6 +17,8 @@ namespace li
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		ImGui::StyleColorsDark();
 
 		Application* app = Application::Get();
@@ -44,5 +47,9 @@ namespace li
 	{
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
 	}
 }
+#endif

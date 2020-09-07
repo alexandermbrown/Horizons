@@ -5,7 +5,10 @@
 #include "Horizons/Core/AppState.h"
 
 MainMenuScene::MainMenuScene()
-	: m_MainMenuLayer(), m_Diagnostics()
+	: m_MainMenuLayer()
+#ifndef LI_DIST
+	, m_Diagnostics()
+#endif
 {
 }
 
@@ -13,7 +16,9 @@ MainMenuScene::~MainMenuScene()
 {
 	li::Application* app = li::Application::Get();
 	app->PopLayer(&m_MainMenuLayer);
+#ifndef LI_DIST
 	app->PopOverlay(&m_Diagnostics);
+#endif
 }
 
 void MainMenuScene::TransitionIn()
@@ -21,7 +26,9 @@ void MainMenuScene::TransitionIn()
 	Horizons* app = li::Application::Get<Horizons>();
 	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::MainMenu);
 	app->PushLayer(&m_MainMenuLayer);
+#ifndef LI_DIST
 	app->PushOverlay(&m_Diagnostics);
+#endif
 }
 
 void MainMenuScene::TransitionOut()

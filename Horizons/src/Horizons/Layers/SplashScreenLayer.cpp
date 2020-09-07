@@ -25,11 +25,11 @@ void SplashScreenLayer::OnUpdate(float dt)
 	li::Application::Get()->GetWindow()->GetContext()->Clear();
 	li::Renderer::UISubmit(m_Texture, m_Transform);
 }
-
+#ifndef LI_DIST
 void SplashScreenLayer::OnImGuiRender()
 {
 }
-
+#endif
 void SplashScreenLayer::OnEvent(SDL_Event* event)
 {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)

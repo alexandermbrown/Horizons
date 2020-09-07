@@ -23,5 +23,7 @@ public:
 private:
 	GameLayer m_GameLayer;
 	HUDLayer m_HUDLayer;
+#ifndef LI_DIST
 	DiagnosticsLayer m_Diagnostics;
+#endif
 };

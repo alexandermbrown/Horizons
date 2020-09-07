@@ -1,4 +1,5 @@
 #include "pch.h"
+#ifndef LI_DIST
 #include "DiagnosticsLayer.h"
 
 #include "Horizons.h"
@@ -84,8 +85,8 @@ void DiagnosticsLayer::OnImGuiRender()
 
 		ImGui::Separator();
 
-		ImGui::SliderFloat("Frame Time Max", &m_ScaleMax, m_ScaleMin + 0.0001f, 1.0f, "%.8f seconds", 4.0f);
-		ImGui::SliderFloat("Frame Time Min", &m_ScaleMin, 0.0f, m_ScaleMax - 0.0001f, "%.8f seconds", 4.0f);
+		ImGui::SliderFloat("Frame Time Max", &m_ScaleMax, m_ScaleMin + 0.0001f, 1.0f, "%.8f seconds", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("Frame Time Min", &m_ScaleMin, 0.0f, m_ScaleMax - 0.0001f, "%.8f seconds", ImGuiSliderFlags_Logarithmic);
 		ImGui::Separator();
 		
 		if (m_ShowAverave)
@@ -172,3 +173,4 @@ void DiagnosticsLayer::OnEvent(SDL_Event* event)
 		}
 	}
 }
+#endif

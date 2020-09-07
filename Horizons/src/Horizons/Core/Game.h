@@ -20,10 +20,10 @@ class Game
 public:
 	static Game* Get() { return s_Instance; }
 
-	Game(const TickThreadData& data);
+	Game(const TickThreadInput& data);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	Game(const TickThreadData& data, DebugDrawCommandQueue* debugDrawQueue);
+	Game(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue);
 #endif
 
 	~Game();

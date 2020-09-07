@@ -26,6 +26,8 @@ namespace li
 		m_Window = SDL_CreateWindow(props.Title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, flags);
 		LI_CORE_ASSERT(m_Window, "Error creating window.");
 
+		m_ID = SDL_GetWindowID(m_Window);
+
 		m_Context = new OpenGLContext(m_Window, m_Width, m_Height);
 	}
 

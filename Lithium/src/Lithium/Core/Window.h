@@ -38,7 +38,7 @@ namespace li
 		virtual int GetHeight() const = 0;
 		virtual GraphicsContext* GetContext() const = 0;
 		virtual SDL_Window* GetWindow() const = 0;
-
+		virtual uint32_t GetWindowID() const = 0;
 
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;

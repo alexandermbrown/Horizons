@@ -61,17 +61,20 @@ void HUDLayer::OnUpdate(float dt)
 	li::Renderer::EndUI();
 	UIRenderSystem::RenderLabels(m_Registry);
 }
-
+#ifndef LI_DIST
 void HUDLayer::OnImGuiRender()
 {
 	
 }
-
+#endif
 void HUDLayer::OnEvent(SDL_Event* event)
 {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
-		UILayoutSystem::OnWindowResize(m_Registry, event->window.data1, event->window.data2);
+		if (event->window.windowID == li::Application::Get()->GetWindow()->GetWindowID())
+		{
+			UILayoutSystem::OnWindowResize(m_Registry, event->window.data1, event->window.data2);
+		}
 	}
 	else if (event->type == SDL_MOUSEMOTION)
 	{

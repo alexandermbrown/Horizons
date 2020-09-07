@@ -22,7 +22,7 @@ public:
 	static void UpdateCenter(glm::ivec2 center);
 
 	static void RenderFramebuffer();
-	static void RenderQuad();
+	static void SubmitQuad();
 
 	static constexpr float MetersPerChunk = 16.0f;
 

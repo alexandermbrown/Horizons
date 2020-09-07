@@ -10,7 +10,9 @@
 #include "Horizons/UI/UIClickSystem.h"
 
 #include "Horizons/Scenes/GameScene.h"
+#ifndef LI_DIST
 #include "Horizons/Scenes/LevelEditorScene.h"
+#endif
 #include "Horizons/Gameplay/RNGSystem.h"
 #include "Horizons/Rendering/FlickerSystem.h"
 
@@ -47,6 +49,7 @@ MainMenuLayer::MainMenuLayer()
 				return true;
 			};
 		}
+#ifndef LI_DIST
 		else if (name.name == "button_level_editor")
 		{
 			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
@@ -59,6 +62,7 @@ MainMenuLayer::MainMenuLayer()
 				return true;
 			};
 		}
+#endif
 	});
 }
 
@@ -92,7 +96,7 @@ void MainMenuLayer::OnUpdate(float dt)
 	{
 		// Fade to black.
 		li::Window* window = li::Application::Get()->GetWindow();
-		li::Renderer::UISubmitColored({ 0.0f, 0.0f, 0.0f, m_TransitionTimer.GetFraction() }, glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 99.0f}) *
+		li::Renderer::UISubmitColored({ 0.0f, 0.0f, 0.0f, m_TransitionTimer.GetFraction() }, glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 99.0f }) *
 			glm::scale(glm::mat4(1.0f), { window->GetWidth(), window->GetHeight(), 1.0f }));
 		m_Finished = m_TransitionTimer.Update(dt);
 	}
@@ -100,16 +104,19 @@ void MainMenuLayer::OnUpdate(float dt)
 	li::Renderer::EndUI();
 	UIRenderSystem::RenderLabels(m_Registry);
 }
-
+#ifndef LI_DIST
 void MainMenuLayer::OnImGuiRender()
 {
 }
-
+#endif
 void MainMenuLayer::OnEvent(SDL_Event* event)
 {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
-		UILayoutSystem::OnWindowResize(m_Registry, event->window.data1, event->window.data2);
+		if (event->window.windowID == li::Application::Get()->GetWindow()->GetWindowID())
+		{
+			UILayoutSystem::OnWindowResize(m_Registry, event->window.data1, event->window.data2);
+		}
 	}
 	else if (event->type == SDL_MOUSEMOTION)
 	{

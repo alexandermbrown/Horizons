@@ -301,7 +301,7 @@ void TerrainManager::RenderFramebuffer()
 	}
 }
 
-void TerrainManager::RenderQuad()
+void TerrainManager::SubmitQuad()
 {
 	// Render the framebuffer's texture to the window.
 	li::Renderer::Submit(s_Data->Framebuffer->GetTexture(), s_Data->QuadTransform);

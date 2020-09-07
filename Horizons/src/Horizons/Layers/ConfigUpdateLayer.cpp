@@ -20,11 +20,11 @@ void ConfigUpdateLayer::OnUpdate(float dt)
 {
 	Clean();
 }
-
+#ifndef LI_DIST
 void ConfigUpdateLayer::OnImGuiRender()
 {
 }
-
+#endif
 void ConfigUpdateLayer::OnEvent(SDL_Event* event)
 {
 	if (!m_OnSplashScreen)

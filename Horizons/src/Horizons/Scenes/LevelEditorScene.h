@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "Horizons/Layers/LevelEditorLayer.h"
 
 #include "Lithium.h"
@@ -20,3 +20,4 @@ public:
 private:
 	LevelEditorLayer m_LevelEditorLayer;
 };
+#endif

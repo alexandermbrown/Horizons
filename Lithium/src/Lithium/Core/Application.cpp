@@ -11,11 +11,12 @@
 #include "Lithium/UI/UI.h"
 
 #include "SDL.h"
+#ifndef LI_DIST
 #include "imgui.h"
+#endif
 
 namespace li 
 {
-
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
@@ -53,8 +54,9 @@ namespace li
 
 		m_Window = Window::Create(props);
 		m_Window->GetContext()->ResizeView(props.Width, props.Height);
-
+#ifndef LI_DIST
 		m_ImGuiRenderer = ImGuiRenderer::Create();
+#endif
 	}
 
 	Application::~Application()
@@ -145,6 +147,7 @@ namespace li
 			if (m_FocusedLayer)
 				m_Input.Disable();
 
+#ifndef LI_DIST
 			m_ImGuiRenderer->Begin();
 			for (Layer* layer : m_LayerStack)
 			{
@@ -159,7 +162,7 @@ namespace li
 					break;
 			}
 			m_ImGuiRenderer->End();
-
+#endif
 			m_Window->SwapBuffers();
 		}
 
@@ -172,9 +175,9 @@ namespace li
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_FN(Application::OnWindowEvent));
-
+#ifndef LI_DIST
 		m_ImGuiRenderer->OnEvent(event);
-
+#endif
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			if (m_EventHandled) {
@@ -241,15 +244,19 @@ namespace li
 			m_Running = false;
 			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			int w, h;
-			SDL_GetWindowSize(m_Window->GetWindow(), &w, &h);
-			LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
+			if (event->window.windowID == m_Window->GetWindowID())
+			{
+				int w, h;
+				SDL_GetWindowSize(m_Window->GetWindow(), &w, &h);
+				LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
 
-			m_Window->OnWindowResize(w, h);
-			m_Window->GetContext()->ResizeView(w, h);
-			Renderer::Resize(w, h);
-			m_ImGuiRenderer->Resize(w, h);
-
+				m_Window->OnWindowResize(w, h);
+				m_Window->GetContext()->ResizeView(w, h);
+				Renderer::Resize(w, h);
+#ifndef LI_DIST
+				m_ImGuiRenderer->Resize(w, h);
+#endif
+			}
 			break;
 		}
 	}

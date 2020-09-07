@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "Lithium.h"
 #include "entt/entt.hpp"
 
@@ -19,7 +19,11 @@ public:
 private:
 	entt::registry m_Registry;
 
+	// TODO: make config variables in a seperate file.
 	float m_BrushInnerRadius;
 	float m_BrushOuterRadius;
 	float m_BrushAmplitude;
+
+	bool m_DockspaceOpen;
 };
+#endif // !LI_DIST

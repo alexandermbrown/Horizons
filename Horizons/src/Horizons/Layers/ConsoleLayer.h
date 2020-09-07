@@ -1,16 +1,12 @@
 #pragma once
 
+#ifndef LI_DIST
 #include "Horizons/Core/Core.h"
-#ifdef HZ_CONSOLE_ENABLED
 
 #include "Lithium.h"
 #include "imgui.h"
 
 #include "Horizons/Commands/Command.h"
-
-#define HZ_CONSOLE_INPUT_BUFFER_SIZE 256
-#define HZ_CONSOLE_INPUT_HISTORY_COUNT 64
-#define HZ_CONSOLE_OUTPUT_NUM_LINES 64
 
 struct Line
 {
@@ -47,6 +43,9 @@ public:
 	int InputTextCallback(ImGuiInputTextCallbackData* data);
 
 private:
+	static constexpr int InputBufferSize = 256;
+	static constexpr int InputHistoryCount = 64;
+	static constexpr int NumOutputLines = 64;
 
 	void ExecuteCommand(const std::string& command);
 	void AddHistory(const std::string& command);
@@ -54,14 +53,14 @@ private:
 
 	std::unordered_map<std::string, li::Ref<Command>> m_Commands;
 
-	char m_InputBuffer[HZ_CONSOLE_INPUT_BUFFER_SIZE];
+	char m_InputBuffer[InputBufferSize];
 
-	std::string m_HistoryBuffer[HZ_CONSOLE_INPUT_HISTORY_COUNT];
+	std::string m_HistoryBuffer[InputHistoryCount];
 	int m_HistoryCount;
 	int m_LatestHistory;
 	int m_HistoryIndex;
 
-	Line m_Lines[HZ_CONSOLE_OUTPUT_NUM_LINES];
+	Line m_Lines[NumOutputLines];
 	int m_LineCount;
 	int m_CurrentLine;
 

@@ -15,8 +15,10 @@ public:
 	virtual void OnDetach() override;
 
 	virtual void OnUpdate(float dt) override;
-	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
+#ifndef LI_DIST
+	virtual void OnImGuiRender() override;
+#endif
 
 	inline li::Scene* GetTransitionScene() { return m_TransitionScene; }
 	inline bool IsFinished() const { return m_Finished; }

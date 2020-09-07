@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Layer.h"
 
@@ -20,3 +20,4 @@ namespace li
 		static Ref<ImGuiRenderer> Create();
 	};
 }
+#endif

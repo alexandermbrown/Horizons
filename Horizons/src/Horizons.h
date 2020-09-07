@@ -18,8 +18,6 @@ public:
 	Horizons();
 	virtual ~Horizons();
 
-	void Shutdown();
-
 	inline ConfigStore& GetConfig() { return m_ConfigStore; }
 
 #ifdef HZ_CONSOLE_ENABLED
@@ -27,7 +25,6 @@ public:
 #endif
 
 private:
-
 	void LoadConfig();
 	void SaveConfig();
 

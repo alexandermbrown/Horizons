@@ -7,7 +7,9 @@
 
 #include "Lithium/Renderer/RendererAPI.h"
 
+#ifndef LI_DIST
 #include "Lithium/ImGui/ImGuiRenderer.h"
+#endif
 
 #include <functional>
 #include <chrono>
@@ -51,9 +53,11 @@ namespace li
 		std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 
 		Window* m_Window;
-		Ref<ImGuiRenderer> m_ImGuiRenderer;
 		LayerStack m_LayerStack;
 		Input m_Input;
+#ifndef LI_DIST
+		Ref<ImGuiRenderer> m_ImGuiRenderer;
+#endif
 
 		std::function<void(SDL_Event* event)> m_EventCallbackFn;
 

@@ -92,7 +92,6 @@ project "Lithium"
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.imgui}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.zlib}",
         "%{IncludeDir.openal}",
@@ -108,7 +107,6 @@ project "Lithium"
 
     links {
         "glad",
-        "imgui",
         "zlib",
         "libvorbis",
         "openal-soft",
@@ -137,11 +135,15 @@ project "Lithium"
         defines "LI_DEBUG"
         runtime "Debug"
         symbols "on"
+        links "imgui"
+        includedirs { "%{IncludeDir.imgui}" }
 
     filter "configurations:Release"
         defines "LI_RELEASE"
         runtime "Release"
         optimize "on"
+        links "imgui"
+        includedirs { "%{IncludeDir.imgui}" }
     
     filter "configurations:Dist"
         defines "LI_DIST"
@@ -175,7 +177,6 @@ project "Horizons"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.SDL2}",
-        "%{IncludeDir.imgui}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.box2d}",
         "%{IncludeDir.readerwriterqueue}",
@@ -216,11 +217,13 @@ project "Horizons"
         }
         runtime "Debug"
         symbols "on"
+        includedirs { "%{IncludeDir.imgui}" }
 
     filter "configurations:Release"
         defines "LI_RELEASE"
         runtime "Release"
         optimize "on"
+        includedirs { "%{IncludeDir.imgui}" }
 
     filter "configurations:Dist"
         defines "LI_DIST"

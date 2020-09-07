@@ -7,7 +7,6 @@
 class ConfigStore
 {
 public:
-
 	ConfigStore();
 
 	void LoadTemplate(const char* path);
@@ -38,7 +37,6 @@ public:
 	std::unordered_map<std::string, ConfigVar>::const_iterator end()	const { return m_ConfigVars.end(); }
 
 private:
-
 	void LoadType(const char* str_type, uint32_t type, CSimpleIniA& ini);
 	void SaveValues(std::unordered_map<std::string, ConfigVar>& store, CSimpleIniA& ini);
 

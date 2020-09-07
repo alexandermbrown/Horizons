@@ -1,4 +1,5 @@
 #include "pch.h"
+#ifndef LI_DIST
 #include "LevelEditorScene.h"
 
 LevelEditorScene::LevelEditorScene()
@@ -25,3 +26,4 @@ void LevelEditorScene::TransitionOut()
 void LevelEditorScene::OnUpdate(float dt)
 {
 }
+#endif // !LI_DIST

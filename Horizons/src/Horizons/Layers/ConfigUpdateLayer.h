@@ -15,8 +15,10 @@ public:
 	virtual void OnDetach() override;
 
 	virtual void OnUpdate(float dt) override;
-	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
+#ifndef LI_DIST
+	virtual void OnImGuiRender() override;
+#endif
 
 	inline void FinishSplashScreen() { m_OnSplashScreen = false; }
 

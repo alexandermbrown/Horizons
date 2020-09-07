@@ -1,4 +1,5 @@
 #include "lipch.h"
+#ifndef LI_DIST
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
 #include "imgui.h"
@@ -63,3 +64,4 @@ namespace li
 		return nullptr;
 	}
 }
+#endif
