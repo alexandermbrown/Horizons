@@ -18,6 +18,7 @@ namespace li
 
 		virtual Ref<Texture2D> GetTexture() const = 0;
 		virtual void Resize(int width, int height) = 0;
+		virtual glm::ivec2 GetSize() const = 0;
 
 		static Ref<Framebuffer> Create(int width, int height);
 	};

@@ -2,6 +2,7 @@
 #ifndef LI_DIST
 #include "Lithium.h"
 #include "entt/entt.hpp"
+#include "glm/glm.hpp"
 
 class LevelEditorLayer : public li::Layer
 {
@@ -25,5 +26,11 @@ private:
 	float m_BrushAmplitude;
 
 	bool m_DockspaceOpen;
+
+	// Viewport
+	bool m_ViewportOpen;
+	glm::ivec2 m_ViewportSize;
+	li::Ref<li::Framebuffer> m_ViewportFB;
+
 };
 #endif // !LI_DIST

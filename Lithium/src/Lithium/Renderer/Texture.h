@@ -17,8 +17,8 @@ namespace li
 
 		virtual void Resize(int width, int height) = 0;
 		virtual void AttachToFramebuffer() const = 0;
-
 		virtual void Bind(uint32_t slot = 0) const = 0;
+		virtual void* GetInternalTexture() const = 0;
 	};
 
 	class Texture2D : public Texture

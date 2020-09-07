@@ -17,8 +17,9 @@ namespace li
 		virtual void SetClearColor(const glm::vec4& color) override { m_ClearColor = color; }
 		virtual void Clear() const override;
 
-		virtual void Resize(int width, int height) override;
 		inline virtual Ref<Texture2D> GetTexture() const override { return m_Texture; };
+		virtual void Resize(int width, int height) override;
+		virtual glm::ivec2 GetSize() const override { return m_Size; };
 
 	private:
 		void CreateBuffers(int width, int height);
@@ -34,5 +35,6 @@ namespace li
 		D3D11_VIEWPORT m_Viewport;
 
 		glm::vec4 m_ClearColor;
+		glm::ivec2 m_Size;
 	};
 }

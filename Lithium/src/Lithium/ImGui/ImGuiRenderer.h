@@ -18,6 +18,8 @@ namespace li
 		void Resize(int width, int height);
 
 		static Ref<ImGuiRenderer> Create();
+
+		static void InitImGuiStyle();
 	};
 }
 #endif

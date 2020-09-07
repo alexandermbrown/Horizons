@@ -26,9 +26,8 @@ namespace li
 
 		virtual void Resize(int width, int height) override;
 		virtual void AttachToFramebuffer() const override {};
-
 		virtual void Bind(uint32_t slot = 0) const override;
-
+		virtual void* GetInternalTexture() const override { return static_cast<void*>(m_ResourceView); }
 		ID3D11Texture2D* GetTexture() { return m_Texture; }
 
 	private:

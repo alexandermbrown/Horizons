@@ -8,7 +8,6 @@ namespace li
 	class OpenGLFramebuffer : public Framebuffer
 	{
 	public:
-
 		OpenGLFramebuffer(int width, int height);
 		virtual ~OpenGLFramebuffer();
 
@@ -16,8 +15,9 @@ namespace li
 		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void Clear() const override;
 
-		virtual void Resize(int width, int height) override;
 		inline virtual Ref<Texture2D> GetTexture() const override { return m_Texture; };
+		virtual void Resize(int width, int height) override;
+		virtual glm::ivec2 GetSize() const override { return { m_Width, m_Height }; };
 
 	private:
 

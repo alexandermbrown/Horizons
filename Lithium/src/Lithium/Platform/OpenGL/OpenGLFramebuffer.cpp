@@ -52,6 +52,9 @@ namespace li
 		GLCall( glGenFramebuffers(1, &m_RendererID) );
 		GLCall( glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID) );
 
+		m_Width = width;
+		m_Height = height;
+
 		m_Texture->Bind();
 		m_Texture->Resize(width, height);
 		m_Texture->AttachToFramebuffer();

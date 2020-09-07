@@ -10,6 +10,7 @@
 namespace li
 {
 	D3D11Framebuffer::D3D11Framebuffer(int width, int height)
+		: m_Size(width, height)
 	{
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
 		m_DeviceHandle = context->GetDevice();
@@ -44,6 +45,7 @@ namespace li
 	{
 		m_RenderTargetView->Release();
 
+		m_Size = { width, height };
 		m_Texture->Resize(width, height);
 		CreateBuffers(width, height);
 	}
