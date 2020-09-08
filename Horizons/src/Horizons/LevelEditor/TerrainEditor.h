@@ -1,7 +1,7 @@
 #pragma once
-
 #ifndef LI_DIST
-#include "Horizons/Core/Core.h"
+
+#include "glm/glm.hpp"
 #include <string>
 
 class TerrainEditor
@@ -12,10 +12,10 @@ public:
 	void OpenTerrain(const std::string& filepath);
 	void SaveToDisk();
 
-	void ApplyBrush(float inner_radius, float outer_radius, float offset);
+	void ApplyBrush(glm::vec2 position, float inner_radius, float outer_radius, float offset);
 
 private:
-
+	std::string m_CurrentPath;
 
 };
 #endif // !LI_DIST

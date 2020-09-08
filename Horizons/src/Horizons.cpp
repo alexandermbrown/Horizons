@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Horizons.h"
 
-#include "Horizons/Terrain/TerrainManager.h"
 #include "Horizons/Terrain/NoiseStore.h"
 #include "Horizons/Scenes/SplashScreenScene.h"
 #include "Horizons/Scripting/Prototypes.h"
@@ -57,7 +56,6 @@ Horizons::Horizons()
 
 Horizons::~Horizons()
 {
-	TerrainManager::Shutdown();
 	NoiseStore::Shutdown();
 	Prototypes::Shutdown();
 	SaveConfig();

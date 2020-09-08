@@ -5,7 +5,7 @@
 #include "Horizons.h"
 
 #include "Horizons/Core/AppState.h"
-#include "Horizons/Terrain/TerrainManager.h"
+#include "Horizons/Scripting/TerrainPrototypes.h"
 
 SplashScreenScene::SplashScreenScene()
 	: m_SplashScreenLayer(), m_ConfigCleanLayer()
@@ -57,7 +57,7 @@ void SplashScreenScene::OnUpdate(float dt)
 		// Instead, change the below function to set the shaders used for instancing, fonts, etc.
 		// In future, move the ResourceManager into Horizons and remove any references in Lithium.
 		li::Renderer::InitPostResourceLoad();
-		TerrainManager::Init();
+		TerrainPrototypes::InstantiatePrototypes();
 
 		// TODO: Get locale from config.
 		li::Localization::SetLocale("en-us");

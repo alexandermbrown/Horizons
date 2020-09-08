@@ -47,6 +47,7 @@ IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
 IncludeDir["steam"] = "Horizons/vendor/steam/include"
 IncludeDir["lua"] = "Horizons/vendor/lua/include"
+IncludeDir["nativefiledialog"] = "Horizons/vendor/nativefiledialog/src/include"
 
 group "vendor"
 include "Lithium/vendor/glad"
@@ -59,6 +60,7 @@ include "AssetBase/vendor/msdfgen"
 include "GameServer/vendor/yojimbo"
 include "ServerManager/vendor/libb64"
 include "Horizons/vendor/box2d"
+include "Horizons/vendor/nativefiledialog"
 group  ""
 
 ------------------------------ Lithium ----------------------------------
@@ -186,14 +188,16 @@ project "Horizons"
         "%{IncludeDir.flatbuffers}",
         "%{IncludeDir.lab_serial}",
         "%{IncludeDir.harfbuzz}",
-        "%{IncludeDir.lua}"
+        "%{IncludeDir.lua}",
+        "%{IncludeDir.nativefiledialog}"
     }
 
     links {
         "Lithium",
         "box2d",
         "lua51",
-        "luajit"
+        "luajit",
+        "nativefiledialog"
     }
 
     filter "system:windows"

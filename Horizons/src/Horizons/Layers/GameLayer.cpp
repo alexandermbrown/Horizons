@@ -3,7 +3,6 @@
 
 #include "Horizons.h"
 #include "Horizons/Gameplay/Components.h"
-#include "Horizons/Terrain/TerrainManager.h"
 #include "Horizons/Rendering/RenderingSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/TransformUpdateSystem.h"
@@ -26,7 +25,7 @@ GameLayer::GameLayer()
 
 	CameraControllerSystem::Init(m_Registry);
 
-	TerrainManager::LoadWorld("data/worlds/test.terrain", { 0, 0 });
+	m_TerrainRenderer.LoadTerrain("data/worlds/test.terrain", { 0, 0 });
 
 	m_AudioSource = li::CreateRef<li::AudioSource>();
 	m_AudioSource->SetAudio(li::ResourceManager::Get<li::Audio>("audio_wind"));
@@ -36,7 +35,7 @@ GameLayer::GameLayer()
 GameLayer::~GameLayer()
 {
 	CameraControllerSystem::Shutdown(m_Registry);
-	TerrainManager::UnloadWorld();
+	m_TerrainRenderer.UnloadTerrain();
 	m_TickThread.Finish(m_Registry);
 }
 
@@ -59,9 +58,9 @@ void GameLayer::OnUpdate(float dt)
 	{
 		cp::sync_transform& player_transform = player_view.get<cp::sync_transform>(player);
 
-		TerrainManager::UpdateCenter({
-			(int)std::floor(player_transform.position.x / TerrainManager::MetersPerChunk),
-			(int)std::floor(player_transform.position.y / TerrainManager::MetersPerChunk)
+		m_TerrainRenderer.UpdateCenter({
+			(int)std::floor(player_transform.position.x / TerrainRenderer::MetersPerChunk),
+			(int)std::floor(player_transform.position.y / TerrainRenderer::MetersPerChunk)
 		});
 		break;
 	}
@@ -72,13 +71,13 @@ void GameLayer::OnUpdate(float dt)
 
 	cp::camera& camera = m_Registry.ctx<cp::camera>();
 
-	TerrainManager::RenderFramebuffer();
+	m_TerrainRenderer.RenderFramebuffer();
 
 	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
 	li::Application::Get()->GetWindow()->GetContext()->Clear();
 	li::Renderer::BeginScene(camera.camera);
 
-	TerrainManager::SubmitQuad();
+	m_TerrainRenderer.SubmitQuad();
 	RenderingSystem::Render(m_Registry);
 
 	li::Renderer::EndScene();

@@ -3,6 +3,7 @@
 #include "LevelEditorLayer.h"
 
 #include "imgui.h"
+#include "nfd.h"
 
 LevelEditorLayer::LevelEditorLayer()
 	: m_ReturnToMainMenu(false), m_DockspaceOpen(true)
@@ -57,7 +58,19 @@ void LevelEditorLayer::OnImGuiRender()
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("New", "Ctrl+N")) {}
-			if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O"))
+			{
+				nfdchar_t* path;
+				nfdresult_t result = NFD_OpenDialog("terrain", NULL, &path);
+				if (result == NFD_OKAY)
+				{
+					m_Viewport.FileOpen(path);
+				}
+				else if (result == NFD_ERROR)
+				{
+					LI_ERROR(NFD_GetError());
+				}
+			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Save", "Ctrl+S")) {}
 			if (ImGui::MenuItem("Save As", "Ctrl+Shift+S")) {}

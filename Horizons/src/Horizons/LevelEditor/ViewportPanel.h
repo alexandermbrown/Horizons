@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "entt/entt.hpp"
 
+#include "TerrainEditor.h"
+
 class ViewportPanel
 {
 public:
@@ -15,6 +17,8 @@ public:
 	void OnUpdate(float dt);
 	void OnImGuiRender();
 	void OnEvent(SDL_Event* event);
+
+	void FileOpen(const std::string& path);
 
 private:
 	entt::registry m_Registry;
@@ -28,4 +32,6 @@ private:
 	float m_BrushInnerRadius;
 	float m_BrushOuterRadius;
 	float m_BrushAmplitude;
+
+	TerrainEditor m_Editor;
 };

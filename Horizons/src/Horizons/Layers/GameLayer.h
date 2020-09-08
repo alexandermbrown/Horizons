@@ -8,6 +8,8 @@
 #include "Horizons/Rendering/DebugPhysicsRenderer.h"
 #endif
 
+#include "Horizons/Terrain/TerrainRenderer.h"
+
 #include "Lithium.h"
 #include "glm/glm.hpp"
 #include "readerwriterqueue/readerwriterqueue.h"
@@ -40,6 +42,8 @@ private:
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	DebugPhysicsRenderer m_DebugPhysicsRenderer;
 #endif
+
+	TerrainRenderer m_TerrainRenderer;
 
 	bool m_ReturnToMainMenu;
 };

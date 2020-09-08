@@ -72,3 +72,9 @@ void ViewportPanel::OnEvent(SDL_Event* event)
 		EditorCameraSystem::OnEvent(m_Registry, event, m_ViewportFB->GetSize());
 	}
 }
+
+void ViewportPanel::FileOpen(const std::string& path)
+{
+	LI_TRACE("Opening terrain file {}", path);
+	m_Editor.OpenTerrain(path);
+}
