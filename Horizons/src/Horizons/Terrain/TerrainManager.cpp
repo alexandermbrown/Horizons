@@ -127,7 +127,7 @@ void TerrainManager::LoadWorld(const std::string& path, glm::ivec2 center)
 	s_Data->Width = width;
 	s_Data->Height = height;
 
-	LI_INFO("Opening world at {}, size is ({},{})", path, width, height);
+	LI_INFO("Opening terrain {}, size is ({},{})", path, width, height);
 
 	LoadInitialChunks(center);
 

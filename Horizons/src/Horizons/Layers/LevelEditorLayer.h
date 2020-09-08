@@ -1,5 +1,8 @@
 #pragma once
 #ifndef LI_DIST
+
+#include "Horizons/LevelEditor/ViewportPanel.h"
+
 #include "Lithium.h"
 #include "entt/entt.hpp"
 #include "glm/glm.hpp"
@@ -22,20 +25,8 @@ public:
 private:
 	bool m_ReturnToMainMenu;
 
-	entt::registry m_Registry;
-
-	float m_BrushInnerRadius;
-	float m_BrushOuterRadius;
-	float m_BrushAmplitude;
-
 	bool m_DockspaceOpen;
 
-	// Viewport
-	bool m_ViewportOpen;
-	bool m_ViewportFocused;
-	bool m_ViewportHovered;
-	glm::ivec2 m_ViewportSize;
-	li::Ref<li::Framebuffer> m_ViewportFB;
-
+	ViewportPanel m_Viewport;
 };
 #endif // !LI_DIST
