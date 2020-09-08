@@ -45,6 +45,10 @@ namespace li
 		void Transition(Scene* scene);
 		void Exit();
 
+#ifndef LI_DIST
+		const Ref<ImGuiRenderer>& GetImGuiRenderer() { return m_ImGuiRenderer; }
+#endif
+
 	private:
 		void OnWindowEvent(SDL_Event* event);
 

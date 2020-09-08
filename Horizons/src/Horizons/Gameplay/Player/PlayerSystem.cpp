@@ -20,10 +20,10 @@ void PlayerSystem::Init(entt::registry& registry, SyncEventQueue* queue)
 	sync_manager.count++;
 
 	registry.emplace<cp::sync>(player, sync_id);
-	registry.emplace<cp::sync_transform>(player, sync_id, glm::vec3{ 5.0f, 1.0f, 0.1f }  );
+	registry.emplace<cp::sync_transform>(player, sync_id, glm::vec3{ 5.0f, 1.0f, 0.0f }  );
 
 	cp::texture* texture = new cp::texture{ "test_small" }; // TODO: set player texture.
-	cp::sync_transform* transform = new cp::sync_transform{ sync_id, { 5.0f, 1.0f, 0.1f } };
+	cp::sync_transform* transform = new cp::sync_transform{ sync_id, { 5.0f, 1.0f, 0.0f } };
 
 	queue->enqueue(SyncEvent::CreateEntity(sync_id));
 	queue->enqueue(SyncEvent::AddComponent<cp::player>(sync_id, nullptr));

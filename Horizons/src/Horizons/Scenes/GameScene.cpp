@@ -18,6 +18,7 @@ void GameScene::TransitionIn()
 	app->PushLayer(&m_HUDLayer);
 #ifndef LI_DIST
 	app->PushOverlay(&m_Diagnostics);
+	app->GetImGuiRenderer()->SetBlockEvents(true);
 #endif
 }
 

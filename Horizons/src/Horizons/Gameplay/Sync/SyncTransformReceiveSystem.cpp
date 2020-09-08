@@ -11,7 +11,7 @@ void AddSyncTransform(entt::registry& registry, entt::entity entity)
 	cp::sync_transform& sync_transform = registry.get<cp::sync_transform>(entity);
 	cp::transform& transform = registry.emplace<cp::transform>(entity);
 
-	transform.position = { sync_transform.position.x, sync_transform.position.y, sync_transform.position.z };
+	transform.position = sync_transform.position;
 	transform.rotation = sync_transform.rotation;
 
 	transform.old = true;
@@ -44,11 +44,15 @@ void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQ
 
 	registry.view<cp::sync_transform, cp::transform>().each([dt](cp::sync_transform& sync, cp::transform& transform)
 	{
-		if (sync.velocity.x || sync.velocity.y || sync.angular_velocity)
+		if (sync.velocity.x || sync.velocity.y || sync.velocity.z || sync.angular_velocity != glm::identity<glm::quat>())
 		{
 			transform.position.x += sync.velocity.x * dt;
 			transform.position.y += sync.velocity.y * dt;
-			transform.rotation += sync.angular_velocity * dt;
+			transform.position.z += sync.velocity.z * dt;
+			transform.rotation;
+			
+			glm::quat rotation = glm::mix(glm::identity<glm::quat>(), sync.angular_velocity, dt);
+			transform.rotation = rotation * transform.rotation;
 
 			transform.old = true;
 		}

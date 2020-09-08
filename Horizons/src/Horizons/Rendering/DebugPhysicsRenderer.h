@@ -17,7 +17,7 @@ public:
 private:
 	constexpr static int MaxDrawVertices = 32768;
 	constexpr static int MaxDrawIndices = MaxDrawVertices * 4;
-	constexpr static float ZPos = 0.31f;
+	constexpr static float ZPos = 0.0f;
 
 	struct DebugPhysicsVertex
 	{

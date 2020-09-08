@@ -14,7 +14,7 @@ namespace li
 	{
 		s_Data = CreateScope<Renderer::RendererData>();
 
-		Application::Get()->GetWindow()->GetContext()->SetDepthTest(true);
+		Application::Get()->GetWindow()->GetContext()->SetDepthTest(false);
 		Application::Get()->GetWindow()->GetContext()->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {

@@ -272,11 +272,11 @@ namespace li
 		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 
 		// Set up the description of the stencil state.
-		depthStencilDesc.DepthEnable = true;
+		depthStencilDesc.DepthEnable = false;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-		depthStencilDesc.StencilEnable = true;
+		depthStencilDesc.StencilEnable = false;
 		depthStencilDesc.StencilReadMask = 0xFF;
 		depthStencilDesc.StencilWriteMask = 0xFF;
 

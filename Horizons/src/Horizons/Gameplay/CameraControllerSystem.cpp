@@ -14,10 +14,12 @@ void CameraControllerSystem::Init(entt::registry& registry)
 	camera.current_zoom = 10.0f;
 	camera.target_zoom = 10.0f;
 	camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-		/ (float)li::Application::Get()->GetWindow()->GetHeight() * 0.5f;
+		/ (float)li::Application::Get()->GetWindow()->GetHeight();
 
-	camera.camera = new li::OrthographicCamera(-camera.aspect_ratio * camera.current_zoom,
-		camera.aspect_ratio * camera.current_zoom, -camera.current_zoom, camera.current_zoom);
+	const float half_zoom = camera.current_zoom * 0.5f;
+	camera.camera = new li::OrthographicCamera(-camera.aspect_ratio * half_zoom,
+		camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
+	camera.camera->SetLookAt({ 0.0f, -3.0f, std::sqrt(3.0f) }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 }
 
 void CameraControllerSystem::Shutdown(entt::registry& registry)
@@ -33,9 +35,15 @@ void CameraControllerSystem::Update(entt::registry& registry, float dt)
 
 	for (auto&& [entity, transform, player] : registry.view<cp::transform, cp::player>().proxy())
 	{
-		if (camera.camera->GetPosition() != transform.position)
-			camera.camera->SetPosition(transform.position);
-
+		glm::vec3 camera_pos = {
+			transform.position.x,
+			transform.position.y - 3.0f,
+			transform.position.z + std::sqrt(3.0f),
+		};
+		if (camera.camera->GetPosition() != camera_pos)
+		{
+			camera.camera->SetLookAt(camera_pos, transform.position, { 0.0f, 0.0f, 1.0f });
+		}
 		break;
 	}
 	
@@ -43,12 +51,13 @@ void CameraControllerSystem::Update(entt::registry& registry, float dt)
 	{
 		float delta = camera.current_zoom - camera.target_zoom;
 		if (dt < 0.99f)
-			camera.current_zoom -= delta * dt * 10.0f;
+			camera.current_zoom -= delta * dt * camera.zoom_speed;
 		else
 			camera.current_zoom = camera.target_zoom;
 
-		camera.camera->SetProjection(-camera.aspect_ratio * camera.current_zoom,
-			camera.aspect_ratio * camera.current_zoom, -camera.current_zoom, camera.current_zoom);
+		const float half_zoom = camera.current_zoom * 0.5f;
+		camera.camera->SetProjection(-camera.aspect_ratio * half_zoom,
+			camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
 
 		if (camera.current_zoom == camera.target_zoom)
 			camera.finished_zoom = true;
@@ -78,9 +87,10 @@ void CameraControllerSystem::OnEvent(entt::registry& registry, SDL_Event* event)
 			cp::camera& camera = registry.ctx<cp::camera>();
 
 			camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-				/ (float)li::Application::Get()->GetWindow()->GetHeight() * 0.5f;
-			camera.camera->SetProjection(-camera.aspect_ratio * camera.current_zoom,
-				camera.aspect_ratio * camera.current_zoom, -camera.current_zoom, camera.current_zoom);
+				/ (float)li::Application::Get()->GetWindow()->GetHeight();
+			const float half_zoom = camera.current_zoom * 0.5f;
+			camera.camera->SetProjection(-camera.aspect_ratio * half_zoom,
+				camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
 		}
 	}
 }

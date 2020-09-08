@@ -10,10 +10,10 @@ void SyncTransformSendSystem::Update(entt::registry& registry, SyncTransformQueu
 		cp::sync_transform transform;
 
 		transform.position = { body.body->GetPosition().x, body.body->GetPosition().y, sync_transform.position.z };
-		transform.velocity = { body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y };
-
-		transform.rotation = body.body->GetAngle();
-		transform.angular_velocity = body.body->GetAngularVelocity();
+		transform.velocity = { body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y, 0.0f };
+		
+		transform.rotation = glm::quat(glm::vec3{ 0.0f, 0.0f, body.body->GetAngle() });
+		transform.angular_velocity = glm::quat(glm::vec3{ 0.0f, 0.0f, body.body->GetAngularVelocity() });
 
 		if (transform != sync_transform)
 		{

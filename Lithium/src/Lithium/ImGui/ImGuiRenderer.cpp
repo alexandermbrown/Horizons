@@ -16,30 +16,39 @@
 
 namespace li 
 {
+	ImGuiRenderer::ImGuiRenderer()
+		: m_BlockEvents(true)
+	{
+	}
+
 	void ImGuiRenderer::OnEvent(SDL_Event* event)
 	{
 		ImGui_ImplSDL2_ProcessEvent(event);
-		ImGuiIO& io = ImGui::GetIO();
 
-		if (io.WantCaptureKeyboard) {
-			if (event->type == SDL_KEYDOWN ||
-				event->type == SDL_KEYUP ||
-				event->type == SDL_TEXTEDITING ||
-				event->type == SDL_TEXTINPUT)
-			{
-				Application::Get()->EventHandled();
+		if (m_BlockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureKeyboard) {
+				if (event->type == SDL_KEYDOWN ||
+					event->type == SDL_KEYUP ||
+					event->type == SDL_TEXTEDITING ||
+					event->type == SDL_TEXTINPUT)
+				{
+					Application::Get()->EventHandled();
+				}
+			}
+
+			if (io.WantCaptureMouse) {
+				if (event->type == SDL_MOUSEBUTTONDOWN ||
+					event->type == SDL_MOUSEBUTTONUP ||
+					event->type == SDL_MOUSEMOTION ||
+					event->type == SDL_MOUSEWHEEL)
+				{
+					Application::Get()->EventHandled();
+				}
 			}
 		}
 		
-		if (io.WantCaptureMouse) {
-			if (event->type == SDL_MOUSEBUTTONDOWN ||
-				event->type == SDL_MOUSEBUTTONUP ||
-				event->type == SDL_MOUSEMOTION ||
-				event->type == SDL_MOUSEWHEEL)
-			{
-				Application::Get()->EventHandled();
-			}
-		}
 	}
 
 	void ImGuiRenderer::Resize(int width, int height)

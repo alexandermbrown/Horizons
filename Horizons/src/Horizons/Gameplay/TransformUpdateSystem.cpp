@@ -10,8 +10,8 @@ void TransformUpdateSystem::Update(entt::registry& registry)
 		{
 			transform.transform = glm::translate(glm::mat4(1.0f), transform.position);
 
-			if (transform.rotation != 0.0f)
-				transform.transform *= glm::rotate(glm::mat4(1.0f), transform.rotation, { 0.0f, 0.0f, 1.0f });
+			if (transform.rotation != glm::quat{ 1.0f, 0.0f, 0.0f, 0.0f })
+				transform.transform *= glm::toMat4(transform.rotation);
 
 			transform.transform *= glm::scale(glm::mat4(1.0f), transform.scale);
 

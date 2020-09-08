@@ -31,7 +31,8 @@ namespace cp
 		float target_zoom = 10.0f;
 
 		float min_zoom = 2.0f;
-		float max_zoom = 100.0f;//15.0f;
+		float max_zoom = 100.0f;
+		float zoom_speed = 10.0f;
 
 		bool finished_zoom = false;
 	};

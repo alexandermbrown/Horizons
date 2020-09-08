@@ -18,6 +18,9 @@ void LevelEditorScene::TransitionIn()
 {
 	li::Application* app = li::Application::Get();
 	app->PushLayer(&m_LevelEditorLayer);
+#ifndef LI_DIST
+	app->GetImGuiRenderer()->SetBlockEvents(false);
+#endif
 }
 
 void LevelEditorScene::TransitionOut()

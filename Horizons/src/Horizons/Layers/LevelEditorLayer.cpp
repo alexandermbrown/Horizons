@@ -2,6 +2,8 @@
 #ifndef LI_DIST
 #include "LevelEditorLayer.h"
 
+#include "Horizons/LevelEditor/EditorCameraSystem.h"
+#include "Horizons/Rendering/RenderingComponents.h"
 #include "imgui.h"
 
 LevelEditorLayer::LevelEditorLayer()
@@ -10,34 +12,41 @@ LevelEditorLayer::LevelEditorLayer()
 {
 	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
 	m_ViewportFB->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+
+	EditorCameraSystem::Init(m_Registry);
 }
 
 LevelEditorLayer::~LevelEditorLayer()
 {
-
+	EditorCameraSystem::Shutdown(m_Registry);
 }
 
 void LevelEditorLayer::OnAttach()
 {
-	
 }
 
 void LevelEditorLayer::OnDetach()
 {
-
 }
 
 void LevelEditorLayer::OnUpdate(float dt)
 {
+	EditorCameraSystem::Update(m_Registry, dt);
+
 	if (m_ViewportFB->GetSize() != m_ViewportSize)
 	{
 		m_ViewportFB->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		EditorCameraSystem::Resize(m_Registry, m_ViewportSize.x, m_ViewportSize.y);
 	}
 
 	if (m_ViewportOpen)
 	{
 		m_ViewportFB->Bind();
 		m_ViewportFB->Clear();
+
+		li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
+		li::Renderer::SubmitColored({ 0.4f, 0.5f, 0.7f, 1.0f }, glm::mat4(1.0f));
+		li::Renderer::EndScene();
 	}
 
 	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
@@ -107,10 +116,17 @@ void LevelEditorLayer::OnImGuiRender()
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
 		if (ImGui::Begin("Viewport", &m_ViewportOpen))
 		{
+			m_ViewportFocused = ImGui::IsWindowFocused();
+			m_ViewportHovered = ImGui::IsWindowHovered();
+
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 			
-			ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+			// Account for OpenGL's flipped framebuffer texture.
+			if (li::Application::Get()->GetAPI() == li::RendererAPI::OpenGL)
+				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+			else
+				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewportPanelSize, { 0, 0 }, { 1, 1 });
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -119,6 +135,9 @@ void LevelEditorLayer::OnImGuiRender()
 
 void LevelEditorLayer::OnEvent(SDL_Event* event)
 {
-
+	if (m_ViewportFocused && m_ViewportHovered)
+	{
+		EditorCameraSystem::OnEvent(m_Registry, event, m_ViewportFB->GetSize());
+	}
 }
 #endif

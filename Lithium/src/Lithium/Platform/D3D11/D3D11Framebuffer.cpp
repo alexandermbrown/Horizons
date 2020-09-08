@@ -91,6 +91,5 @@ namespace li
 		m_Viewport.MaxDepth = 1.0f;
 		m_Viewport.TopLeftX = 0.0f;
 		m_Viewport.TopLeftY = 0.0f;
-		m_ContextHandle->RSSetViewports(1, &m_Viewport);
 	}
 }

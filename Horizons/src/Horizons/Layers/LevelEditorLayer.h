@@ -32,6 +32,8 @@ private:
 
 	// Viewport
 	bool m_ViewportOpen;
+	bool m_ViewportFocused;
+	bool m_ViewportHovered;
 	glm::ivec2 m_ViewportSize;
 	li::Ref<li::Framebuffer> m_ViewportFB;
 

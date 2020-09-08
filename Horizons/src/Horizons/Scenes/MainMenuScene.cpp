@@ -28,6 +28,7 @@ void MainMenuScene::TransitionIn()
 	app->PushLayer(&m_MainMenuLayer);
 #ifndef LI_DIST
 	app->PushOverlay(&m_Diagnostics);
+	app->GetImGuiRenderer()->SetBlockEvents(true);
 #endif
 }
 
