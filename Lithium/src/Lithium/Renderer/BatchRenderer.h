@@ -22,11 +22,10 @@ namespace li
 	class BatchRenderer
 	{
 	public:
-		BatchRenderer(glm::vec2 quadOrigin = glm::vec2(1.0f));
+		BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer);
 		virtual ~BatchRenderer() = default;
 
 		void AddTextureAtlas(Ref<TextureAtlas> atlas);
-		void SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer);
 
 		void BeginScene();
 		void EndScene();
@@ -56,5 +55,8 @@ namespace li
 		std::array<BatchData, MaxBatchInstances> m_InstanceData;
 		Ref<VertexBuffer> m_InstanceBuffer;
 		Ref<VertexArray> m_InstanceVA;
+
+		Ref<UniformBuffer> m_ViewProjUB;
+		Ref<UniformBuffer> m_TransformUB;
 	};
 }

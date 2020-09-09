@@ -11,7 +11,6 @@ namespace li
 	class OpenGLUniformBuffer : public UniformBuffer
 	{
 	public:
-
 		OpenGLUniformBuffer(const std::string& name, uint32_t bindingSlot, const UniformBufferLayout& layout);
 		virtual ~OpenGLUniformBuffer();
 
@@ -23,6 +22,7 @@ namespace li
 
 		virtual void UploadData() override;
 		virtual void BindToSlot() const override;
+		virtual void Bind() const override {};
 
 		virtual inline const std::string& GetName() const override { return m_Name; }
 		virtual ShaderType GetShaderType() const override;

@@ -52,6 +52,7 @@ namespace li
 
 		virtual void UploadData() = 0;
 		virtual void BindToSlot() const = 0;
+		virtual void Bind() const = 0;
 
 		virtual const std::string& GetName() const = 0;
 		virtual ShaderType GetShaderType() const = 0;

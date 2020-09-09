@@ -2,7 +2,7 @@
 
 #include "Lithium/Renderer/Shader.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <unordered_map>
 
 namespace li 
@@ -18,8 +18,6 @@ namespace li
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
-
-		virtual void AddUniformBuffer(const Ref<UniformBuffer>& buffer) override {};
 
 		virtual void SetTexture(const std::string& name, int slot) override
 		{

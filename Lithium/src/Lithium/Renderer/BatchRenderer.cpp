@@ -8,8 +8,9 @@
 
 namespace li
 {
-	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin)
-		: m_QuadOrigin(quadOrigin), m_AtlasIndices(), m_InstanceCount(0), m_InstanceData()
+	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer)
+		: m_QuadOrigin(quadOrigin), m_AtlasIndices(), m_InstanceCount(0), m_InstanceData(),
+		m_ViewProjUB(viewProjBuffer), m_TransformUB(transformBuffer)
 	{
 		m_Shader = ResourceManager::Get<Shader>("shader_instance");
 
@@ -57,11 +58,6 @@ namespace li
 			m_AtlasIndices[texture] = (int)m_Atlases.size();
 		}
 		m_Atlases.push_back(atlas);
-	}
-
-	void BatchRenderer::SetUniformBuffer(Ref<UniformBuffer> viewProjBuffer)
-	{
-		m_Shader->AddUniformBuffer(viewProjBuffer);
 	}
 
 	void BatchRenderer::BeginScene()
@@ -163,6 +159,8 @@ namespace li
 				0, true
 			);
 
+			m_ViewProjUB->Bind();
+			m_TransformUB->Bind();
 			m_InstanceVA->Bind();
 			Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
 			Application::Get()->GetWindow()->GetContext()->DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);

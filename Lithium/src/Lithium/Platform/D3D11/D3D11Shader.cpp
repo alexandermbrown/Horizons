@@ -81,38 +81,7 @@ namespace li
 
 	void D3D11Shader::Bind() const
 	{
-		m_ContextHandle->VSSetConstantBuffers(0, (UINT)m_VSUniformBuffers.size(), m_VSUniformBuffers.data());
 		m_ContextHandle->VSSetShader(m_VertexShader, NULL, 0);
-
-		if (m_PSUniformBuffers.size() > 0)
-		{
-			m_ContextHandle->PSSetConstantBuffers(m_PSStartSlot, (UINT)m_PSUniformBuffers.size(), m_PSUniformBuffers.data());
-		}
-		
 		m_ContextHandle->PSSetShader(m_PixelShader, NULL, 0);
-	}
-
-	void D3D11Shader::AddUniformBuffer(const Ref<UniformBuffer>& buffer)
-	{
-		switch (buffer->GetShaderType())
-		{
-		case ShaderType::Vertex:
-			m_VSUniformBuffers.push_back(((D3D11UniformBuffer*)buffer.get())->GetInternalBuffer());
-			break;
-		case ShaderType::Fragment:
-			if (m_PSUniformBuffers.size() == 0)
-			{
-				m_PSStartSlot = buffer->GetSlot();
-			}
-			m_PSUniformBuffers.push_back(((D3D11UniformBuffer*)buffer.get())->GetInternalBuffer());
-			break;
-		default:
-			LI_CORE_ASSERT(false, "Unknown shader type!");
-			break;
-		}
-	}
-
-	void D3D11Shader::SetTexture(const std::string& name, int slot)
-	{
 	}
 }

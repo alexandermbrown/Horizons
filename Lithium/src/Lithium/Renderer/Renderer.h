@@ -52,9 +52,9 @@ namespace li
 
 		static void Resize(int width, int height);
 
-		inline static Ref<UniformBuffer> GetViewProjUniformBuffer() { return s_Data->ViewProjUB; }
-		inline static Ref<UniformBuffer> GetTransformUniformBuffer() { return s_Data->TransformMatrixUB; }
-		inline static Ref<Shader> GetFontShader() { return s_Data->FontShader; }
+		inline static const Ref<UniformBuffer>& GetViewProjUniformBuffer() { return s_Data->ViewProjUB; }
+		inline static const Ref<UniformBuffer>& GetTransformUniformBuffer() { return s_Data->TransformMatrixUB; }
+		inline static const Ref<Shader>& GetFontShader() { return s_Data->FontShader; }
 
 	private:
 		static void RenderQuad(const Ref<Texture>& texture, const glm::mat4& transform, const glm::mat4& view_projection);

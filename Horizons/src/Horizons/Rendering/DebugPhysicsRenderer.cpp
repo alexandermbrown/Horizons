@@ -26,8 +26,6 @@ DebugPhysicsRenderer::DebugPhysicsRenderer()
 	m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 	m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 	m_VertexArray->Finalize(m_Shader);
-
-	m_Shader->AddUniformBuffer(li::Renderer::GetViewProjUniformBuffer());
 }
 
 void DebugPhysicsRenderer::Render(DebugDrawCommandQueue* queue)
@@ -160,6 +158,7 @@ void DebugPhysicsRenderer::Render(DebugDrawCommandQueue* queue)
 	// Render the lines.
 	if (m_IndexCount > 0)
 	{
+		li::Renderer::GetViewProjUniformBuffer()->Bind();
 		m_Shader->Bind();
 		m_VertexArray->Bind();
 		li::Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Lines);

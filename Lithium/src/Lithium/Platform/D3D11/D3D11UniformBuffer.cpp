@@ -110,4 +110,20 @@ namespace li
 		// Reenable GPU access to the data.
 		m_ContextHandle->Unmap(m_Buffer, 0);
 	}
+
+	void D3D11UniformBuffer::Bind() const
+	{
+		switch (m_Type)
+		{
+		case ShaderType::Vertex:
+			m_ContextHandle->VSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			break;
+		case ShaderType::Geometry:
+			m_ContextHandle->GSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			break;
+		case ShaderType::Fragment:
+			m_ContextHandle->PSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			break;
+		}
+	}
 }

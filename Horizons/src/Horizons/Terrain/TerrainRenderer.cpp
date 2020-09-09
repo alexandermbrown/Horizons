@@ -24,9 +24,6 @@ TerrainRenderer::TerrainRenderer()
 	m_AtlasBoundsUB->BindToSlot();
 
 	m_TerrainShader = li::ResourceManager::Get<li::Shader>("shader_terrain");
-	m_TerrainShader->AddUniformBuffer(li::Renderer::GetViewProjUniformBuffer());
-	m_TerrainShader->AddUniformBuffer(li::Renderer::GetTransformUniformBuffer());
-	m_TerrainShader->AddUniformBuffer(m_AtlasBoundsUB);
 
 	struct ChunkVertex
 	{
@@ -102,6 +99,9 @@ void TerrainRenderer::LoadTerrain(const std::string& path, glm::ivec2 center)
 {
 	m_ReloadRenderChunks = true;
 
+	m_Center = center;
+	m_PrevCenter = center;
+
 	m_Store.LoadTerrain(path, center);
 
 	m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-1.0f + (float)center.x) * MetersPerChunk, (-1.0f + (float)center.y) * MetersPerChunk, 0.0f })
@@ -119,6 +119,7 @@ void TerrainRenderer::UpdateCenter(glm::ivec2 center)
 	{
 		m_RenderCenterChanged = true;
 		m_PrevCenter = m_Center;
+		m_Center = center;
 
 		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-1.0f + (float)center.x) * MetersPerChunk, (-1.0f + (float)center.y) * MetersPerChunk, 0.0f })
 			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * RenderWidth, MetersPerChunk * RenderWidth, 1.0f });
@@ -172,6 +173,9 @@ void TerrainRenderer::RenderFramebuffer()
 		m_TerrainShader->SetTexture("u_Noise2", 2);
 		m_TerrainShader->SetTexture("u_Noise3", 3);
 
+		li::Renderer::GetViewProjUniformBuffer()->Bind();
+		li::Renderer::GetTransformUniformBuffer()->Bind();
+		m_AtlasBoundsUB->Bind();
 		chunk.VertexArray->Bind();
 		li::Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
 		li::Application::Get()->GetWindow()->GetContext()->DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());

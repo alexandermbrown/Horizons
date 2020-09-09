@@ -36,8 +36,6 @@ namespace li
 		s_Data->Camera = nullptr;
 
 		s_Data->TextureShader = li::ResourceManager::Get<Shader>("shader_splash");
-		s_Data->TextureShader->AddUniformBuffer(s_Data->ViewProjUB);
-		s_Data->TextureShader->AddUniformBuffer(s_Data->TransformMatrixUB);
 
 		Window* window = Application::Get()->GetWindow();
 		float width = (float)window->GetWidth();
@@ -76,9 +74,6 @@ namespace li
 	void Renderer::InitPostResourceLoad()
 	{
 		s_Data->FontShader = ResourceManager::Get<Shader>("shader_label");
-		s_Data->FontShader->AddUniformBuffer(s_Data->ViewProjUB);
-		s_Data->FontShader->AddUniformBuffer(s_Data->TransformMatrixUB);
-		s_Data->FontShader->AddUniformBuffer(s_Data->FontUB);
 
 		// SETUP WHITE TEXTURE
 		uint32_t data = 0xffffffff;
@@ -89,14 +84,11 @@ namespace li
 			{ "texture_white", glm::vec4(0.5f) }
 		}));
 
-		s_Data->SceneRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.5f, 0.5f });
-		s_Data->UIRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.0f, 0.0f });
+		s_Data->SceneRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.5f, 0.5f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
+		s_Data->UIRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.0f, 0.0f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
 
 		s_Data->SceneRenderer->AddTextureAtlas(flatColorAtlas);
 		s_Data->UIRenderer->AddTextureAtlas(flatColorAtlas);
-
-		s_Data->SceneRenderer->SetUniformBuffer(s_Data->ViewProjUB);
-		s_Data->UIRenderer->SetUniformBuffer(s_Data->ViewProjUB);
 		s_Data->ResourcesLoaded = true;
 	}
 
@@ -213,6 +205,8 @@ namespace li
 
 		s_Data->TextureShader->SetTexture("u_Texture", 0);
 
+		s_Data->ViewProjUB->Bind();
+		s_Data->TransformMatrixUB->Bind();
 		texture->Bind();
 		s_Data->QuadVA->Bind();
 		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);
@@ -233,6 +227,9 @@ namespace li
 
 		s_Data->FontShader->SetTexture("u_Texture", 0);
 
+		s_Data->ViewProjUB->Bind();
+		s_Data->TransformMatrixUB->Bind();
+		s_Data->FontUB->Bind();
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
 		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);

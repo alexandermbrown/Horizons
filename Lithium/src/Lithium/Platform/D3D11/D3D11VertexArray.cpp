@@ -29,7 +29,6 @@ namespace li
 	}
 
 	D3D11VertexArray::D3D11VertexArray()
-		: m_D3DVertexBuffers(), m_VertexBufferStrides(), m_VertexBufferOffsets()
 	{
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
 		m_DeviceHandle = context->GetDevice();
@@ -59,7 +58,6 @@ namespace li
 			m_D3DVertexBuffers.push_back(vb->GetBuffer());
 			m_VertexBufferStrides.push_back(vb->GetLayout().GetStride());
 			m_VertexBufferOffsets.push_back(0);
-
 
 			for (const BufferElement& element : vb->GetLayout().GetElements())
 			{

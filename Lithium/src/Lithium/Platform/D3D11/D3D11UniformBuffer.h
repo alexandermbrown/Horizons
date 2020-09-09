@@ -12,7 +12,6 @@ namespace li
 	class D3D11UniformBuffer : public UniformBuffer
 	{
 	public:
-
 		D3D11UniformBuffer(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout);
 		virtual ~D3D11UniformBuffer();
 
@@ -24,12 +23,11 @@ namespace li
 
 		virtual void UploadData() override;
 		virtual void BindToSlot() const override {};
+		virtual void Bind() const override;
 
 		virtual inline const std::string& GetName() const override { return m_Name; }
 		virtual ShaderType GetShaderType() const override { return m_Type; }
 		virtual inline uint32_t GetSlot() const override { return m_Slot; }
-
-		inline ID3D11Buffer* GetInternalBuffer() const { return m_Buffer; }
 
 	private:
 		std::string m_Name;
