@@ -9,6 +9,7 @@
 #endif
 
 #include "Horizons/Terrain/TerrainRenderer.h"
+#include "Horizons/Terrain/DefaultTerrainStore.h"
 
 #include "Lithium.h"
 #include "glm/glm.hpp"
@@ -43,6 +44,7 @@ private:
 	DebugPhysicsRenderer m_DebugPhysicsRenderer;
 #endif
 
+	DefaultTerrainStore m_TerrainStore;
 	TerrainRenderer m_TerrainRenderer;
 
 	bool m_ReturnToMainMenu;

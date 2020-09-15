@@ -9,11 +9,10 @@
 namespace li
 {
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer)
-		: m_QuadOrigin(quadOrigin), m_AtlasIndices(), m_InstanceCount(0), m_InstanceData(),
+		: m_QuadOrigin(quadOrigin), m_InstanceCount(0),
 		m_ViewProjUB(viewProjBuffer), m_TransformUB(transformBuffer)
 	{
 		m_Shader = ResourceManager::Get<Shader>("shader_instance");
-
 		m_InstanceVA = VertexArray::Create();
 
 		float quadVertices[16] = {
@@ -22,7 +21,6 @@ namespace li
 			-quadOrigin.x + 1.0f, -quadOrigin.y + 1.0f	, 1.0f, 1.0f,
 			-quadOrigin.x		, -quadOrigin.y + 1.0f	, 0.0f, 1.0f
 		};
-
 		Ref<VertexBuffer> quadVB = VertexBuffer::Create(quadVertices, sizeof(quadVertices), BufferUsage::StaticDraw);
 
 		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
@@ -47,13 +45,12 @@ namespace li
 			{ ShaderDataType::Float, "I_TEXINDEX", 6, false, 1 }
 			});
 		m_InstanceVA->AddVertexBuffer(m_InstanceBuffer);
-
 		m_InstanceVA->Finalize(m_Shader);
 	}
 
 	void BatchRenderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
 	{
-		for (auto& [texture, bounds] : atlas->GetEntries())
+		for (auto&& [texture, bounds] : atlas->GetEntries())
 		{
 			m_AtlasIndices[texture] = (int)m_Atlases.size();
 		}
@@ -142,11 +139,11 @@ namespace li
 
 	void BatchRenderer::Flush()
 	{
-		m_Shader->Bind();
-		m_Shader->SetTexture("u_Texture", 0);
-
 		if (m_InstanceCount > 0)
 		{
+			m_Shader->Bind();
+			m_Shader->SetTexture("u_Texture", 0);
+
 			// Bind all batch atlas textures.
 			for (int slot = 0; slot < m_BatchAtlasCount; slot++)
 			{

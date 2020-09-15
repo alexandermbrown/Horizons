@@ -5,6 +5,11 @@
 #include "imgui.h"
 #include "nfd.h"
 
+#ifdef LI_PLATFORM_WINDOWS
+#include <Windows.h>
+#include <tchar.h>
+#endif
+
 LevelEditorLayer::LevelEditorLayer()
 	: m_ReturnToMainMenu(false), m_DockspaceOpen(true)
 {
@@ -16,10 +21,12 @@ LevelEditorLayer::~LevelEditorLayer()
 
 void LevelEditorLayer::OnAttach()
 {
+	SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons Level Editor");
 }
 
 void LevelEditorLayer::OnDetach()
 {
+	SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons");
 }
 
 void LevelEditorLayer::OnUpdate(float dt)
@@ -89,7 +96,26 @@ void LevelEditorLayer::OnImGuiRender()
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::MenuItem("Viewport")) m_Viewport.Open();
+			if (ImGui::MenuItem("Viewport")) m_Viewport.OpenWindow();
+			if (ImGui::MenuItem("Open Scripts in VS Code"))
+			{
+#ifdef LI_PLATFORM_WINDOWS
+				STARTUPINFO si;
+				ZeroMemory(&si, sizeof(si));
+				si.cb = sizeof(si);
+
+				PROCESS_INFORMATION pi;
+				ZeroMemory(&pi, sizeof(pi));
+				LPWSTR cmd = _tcsdup(TEXT("code.cmd .\\data\\scripts"));
+				if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+				{
+					LI_RUN_ASSERT(CloseHandle(pi.hProcess), "Failed to close process handle.");
+					LI_RUN_ASSERT(CloseHandle(pi.hThread), "Failed to close thread handle.");
+					LI_INFO("Successfully launched Visual Studio Code.");
+				}
+				else LI_ERROR("Failed to launch vs code: error {}", GetLastError());
+#endif
+			}
 
 			ImGui::EndMenu();
 		}

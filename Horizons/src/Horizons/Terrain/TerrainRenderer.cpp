@@ -1,18 +1,17 @@
 #include "pch.h"
 #include "TerrainRenderer.h"
 
+#include "Horizons/Core/Math.h"
 #include "Horizons/Scripting/TerrainPrototypes.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-static int positive_mod(int a, int b)
+TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
+	: m_Store(store), m_RenderWidth(render_width)
 {
-	return ((a % b) + b) % b;
-}
+	m_RenderChunks = new RenderChunk[m_RenderWidth * m_RenderWidth];
 
-TerrainRenderer::TerrainRenderer()
-{
-	m_Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * RenderWidth, ChunkHeightInPixels * RenderWidth);
-
+	m_Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * m_RenderWidth, ChunkHeightInPixels * m_RenderWidth);
+	
 	m_AtlasBoundsUB = li::UniformBuffer::Create("Terrain", 3, li::ShaderType::Fragment, {
 		{ "u_AtlasBounds0", li::ShaderDataType::Float4 },
 		{ "u_AtlasBounds1", li::ShaderDataType::Float4 },
@@ -20,7 +19,7 @@ TerrainRenderer::TerrainRenderer()
 		{ "u_AtlasBounds3", li::ShaderDataType::Float4 },
 		{ "u_NoiseWeights", li::ShaderDataType::Float3 },
 		{ "u_BlendWidths", li::ShaderDataType::Float3 }
-		});
+	});
 	m_AtlasBoundsUB->BindToSlot();
 
 	m_TerrainShader = li::ResourceManager::Get<li::Shader>("shader_terrain");
@@ -46,7 +45,7 @@ TerrainRenderer::TerrainRenderer()
 	positionBuffer->SetLayout({
 		{ li::ShaderDataType::Float2, "POSITION", 0 },
 		{ li::ShaderDataType::Float2, "TEXCOORD", 1 }
-		});
+	});
 
 	// Triangulate chunk.
 	uint32_t indices[ChunkHeight * ChunkWidth * 6];
@@ -66,15 +65,15 @@ TerrainRenderer::TerrainRenderer()
 	}
 	li::Ref<li::IndexBuffer> indexBuffer = li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, li::BufferUsage::StaticDraw);
 
-	for (int c = 0; c < m_RenderChunks.size(); c++)
+	for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
 	{
-		auto& chunk = m_RenderChunks[c];
+		auto& chunk = m_RenderChunks[i];
 		chunk.VertexArray = li::VertexArray::Create();
 
-		chunk.AlphaVB = li::VertexBuffer::Create(sizeof(TerrainStore::StoreChunk::AlphaValues), li::BufferUsage::DynamicDraw);
+		chunk.AlphaVB = li::VertexBuffer::Create(sizeof(TerrainStore::AlphaValuesArray), li::BufferUsage::DynamicDraw);
 		chunk.AlphaVB->SetLayout({
 			{ li::ShaderDataType::Float3, "ALPHAVALUES", 2 }
-			});
+		});
 
 		chunk.VertexArray->AddVertexBuffer(positionBuffer);
 		chunk.VertexArray->AddVertexBuffer(chunk.AlphaVB);
@@ -82,8 +81,7 @@ TerrainRenderer::TerrainRenderer()
 		chunk.VertexArray->Finalize(m_TerrainShader);
 	}
 
-	constexpr int HalfRenderWidth = RenderWidth / 2;
-
+	int HalfRenderWidth = m_RenderWidth / 2;
 	switch (li::Application::Get()->GetAPI())
 	{
 	case li::RendererAPI::OpenGL:
@@ -95,22 +93,30 @@ TerrainRenderer::TerrainRenderer()
 	}
 }
 
-void TerrainRenderer::LoadTerrain(const std::string& path, glm::ivec2 center)
+TerrainRenderer::~TerrainRenderer()
 {
-	m_ReloadRenderChunks = true;
+	delete[] m_RenderChunks;
+}
 
-	m_Center = center;
-	m_PrevCenter = center;
+bool TerrainRenderer::LoadTerrain(const std::string& path, glm::ivec2 center)
+{
+	if (m_Store->LoadTerrain(path, center))
+	{
+		m_ReloadRenderChunks = true;
+		m_Center = center;
+		m_PrevCenter = center;
 
-	m_Store.LoadTerrain(path, center);
-
-	m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-1.0f + (float)center.x) * MetersPerChunk, (-1.0f + (float)center.y) * MetersPerChunk, 0.0f })
-		* glm::scale(glm::mat4(1.0f), { MetersPerChunk * RenderWidth, MetersPerChunk * RenderWidth, 1.0f });
+		float HalfRenderWidth = (float)(m_RenderWidth / 2);
+		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-HalfRenderWidth + (float)center.x) * MetersPerChunk, (-HalfRenderWidth + (float)center.y) * MetersPerChunk, 0.0f })
+			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * m_RenderWidth, MetersPerChunk * m_RenderWidth, 1.0f });
+		return true;
+	}
+	else return false;
 }
 
 void TerrainRenderer::UnloadTerrain()
 {
-	m_Store.UnloadTerrain();
+	m_Store->UnloadTerrain();
 }
 
 void TerrainRenderer::UpdateCenter(glm::ivec2 center)
@@ -121,10 +127,11 @@ void TerrainRenderer::UpdateCenter(glm::ivec2 center)
 		m_PrevCenter = m_Center;
 		m_Center = center;
 
-		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-1.0f + (float)center.x) * MetersPerChunk, (-1.0f + (float)center.y) * MetersPerChunk, 0.0f })
-			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * RenderWidth, MetersPerChunk * RenderWidth, 1.0f });
+		float HalfRenderWidth = (float)(m_RenderWidth / 2);
+		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-HalfRenderWidth + (float)center.x) * MetersPerChunk, (-HalfRenderWidth + (float)center.y) * MetersPerChunk, 0.0f })
+			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * m_RenderWidth, MetersPerChunk * m_RenderWidth, 1.0f });
 
-		m_Store.UpdateCenter(center);
+		m_Store->UpdateCenter(center);
 	}
 }
 
@@ -136,8 +143,9 @@ void TerrainRenderer::RenderFramebuffer()
 	m_Framebuffer->Bind();
 	m_Framebuffer->Clear();
 
-	for (auto& chunk : m_RenderChunks)
+	for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
 	{
+		auto& chunk = m_RenderChunks[i];
 		const TerrainPrototype& terrain0 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[0]);
 		const TerrainPrototype& terrain1 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[1]);
 		const TerrainPrototype& terrain2 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[2]);
@@ -192,7 +200,7 @@ void TerrainRenderer::PrepareRenderChunks()
 {
 	if (m_ReloadRenderChunks)
 	{
-		constexpr int HalfRenderWidth = RenderWidth / 2;
+		int HalfRenderWidth = m_RenderWidth / 2;
 		for (int y = -HalfRenderWidth; y <= HalfRenderWidth; y++)
 		{
 			for (int x = -HalfRenderWidth; x <= HalfRenderWidth; x++)
@@ -200,17 +208,17 @@ void TerrainRenderer::PrepareRenderChunks()
 				glm::ivec2 display_coord = m_Center + glm::ivec2{ x, y };
 				// Account for any overflow past world bounds.
 				glm::ivec2 store_coord = {
-					positive_mod(display_coord.x, m_Store.GetWorldWidth()),
-					positive_mod(display_coord.y, m_Store.GetWorldHeight())
+					Math::PositiveMod(display_coord.x, m_Store->GetWorldWidth()),
+					Math::PositiveMod(display_coord.y, m_Store->GetWorldHeight())
 				};
 
-				auto& chunk = m_RenderChunks[(x + HalfRenderWidth) + (y + HalfRenderWidth) * (size_t)RenderWidth];
+				auto& chunk = m_RenderChunks[(x + HalfRenderWidth) + (y + HalfRenderWidth) * (size_t)m_RenderWidth];
 				chunk.CenterOffset = { x, y };
 				chunk.Transform = glm::translate(glm::mat4(1.0f), {
 					(float)chunk.CenterOffset.x,
 					(float)chunk.CenterOffset.y, 0.0f
 					});
-				m_Store.LoadRenderChunkData(store_coord, &chunk);
+				m_Store->LoadRenderChunkData(store_coord, &chunk);
 			}
 		}
 		m_ReloadRenderChunks = false;
@@ -218,17 +226,18 @@ void TerrainRenderer::PrepareRenderChunks()
 	else if (m_RenderCenterChanged)
 	{
 		// test if current chunk is within radius of center.
-		constexpr int radius = RenderWidth / 2;
+		int radius = m_RenderWidth / 2;
 
-		int left_bound = positive_mod(m_Center.x - radius, m_Store.GetWorldWidth());
-		int right_bound = positive_mod(m_Center.x + radius, m_Store.GetWorldWidth());
+		int left_bound = Math::PositiveMod(m_Center.x - radius, m_Store->GetWorldWidth());
+		int right_bound = Math::PositiveMod(m_Center.x + radius, m_Store->GetWorldWidth());
 
-		int bottom_bound = positive_mod(m_Center.y - radius, m_Store.GetWorldHeight());
-		int top_bound = positive_mod(m_Center.y + radius, m_Store.GetWorldHeight());
+		int bottom_bound = Math::PositiveMod(m_Center.y - radius, m_Store->GetWorldHeight());
+		int top_bound = Math::PositiveMod(m_Center.y + radius, m_Store->GetWorldHeight());
 
 		// Remove chunks which are no longer near the center.
-		for (auto& chunk : m_RenderChunks)
+		for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
 		{
+			auto& chunk = m_RenderChunks[i];
 			bool in_x;
 			bool in_y;
 
@@ -254,12 +263,12 @@ void TerrainRenderer::PrepareRenderChunks()
 
 				// Account for any overflow past world bounds.
 				glm::ivec2 store_coord = {
-					positive_mod(display_coord.x, m_Store.GetWorldWidth()),
-					positive_mod(display_coord.y, m_Store.GetWorldHeight())
+					Math::PositiveMod(display_coord.x, m_Store->GetWorldWidth()),
+					Math::PositiveMod(display_coord.y, m_Store->GetWorldHeight())
 				};
 
 				// Load RenderChunk From Store
-				m_Store.LoadRenderChunkData(store_coord, &chunk);
+				m_Store->LoadRenderChunkData(store_coord, &chunk);
 			}
 			else
 			{

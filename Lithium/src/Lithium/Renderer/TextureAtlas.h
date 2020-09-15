@@ -3,7 +3,8 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/Texture.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
+#include <string>
 
 namespace li
 {
@@ -18,11 +19,10 @@ namespace li
 		TextureAtlas(Ref<Texture2D> texture, const std::unordered_map<std::string, glm::vec4>& entries);
 
 		void Bind(uint32_t slot = 0);
-		inline const glm::vec4& GetBounds(const std::string& textureAlias) const { return m_Entries.at(textureAlias); }
+		const glm::vec4& GetBounds(const std::string& texture_alias) const;
 		inline const std::unordered_map<std::string, glm::vec4>& GetEntries() const { return m_Entries; }
 
 	private:
-
 		std::string m_TextureAlias;
 		Ref<Texture2D> m_Texture;
 		std::unordered_map<std::string, glm::vec4> m_Entries;

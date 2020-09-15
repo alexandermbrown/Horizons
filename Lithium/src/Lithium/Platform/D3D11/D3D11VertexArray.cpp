@@ -42,7 +42,7 @@ namespace li
 
 		m_ContextHandle->IASetInputLayout(m_InputLayout);
 		m_ContextHandle->IASetVertexBuffers(0, (UINT)m_D3DVertexBuffers.size(), m_D3DVertexBuffers.data(), m_VertexBufferStrides.data(), m_VertexBufferOffsets.data());
-		m_IndexBuffer->Bind();
+		if (m_IndexBuffer) m_IndexBuffer->Bind();
 	}
 
 	void D3D11VertexArray::Finalize(const Ref<Shader>& shader)

@@ -28,18 +28,18 @@ public:
 
 	static inline const TerrainPrototype& GetTerrainPrototype(uint16_t id)
 	{
-#ifdef LI_ENABLE_ASSERTS
-		LI_ASSERT(id < s_Data->Prototypes.size(), "ID out of range!");
-		if (id == 0)
+		if (id < s_Data->Prototypes.size())
 		{
-			LI_WARN("Accessing terrain id 0. Are you sure you want this?");
+			return s_Data->Prototypes.at(id);
 		}
-#endif
-		return s_Data->Prototypes[id];
+		else
+		{
+			LI_ERROR("ID out of range!");
+			return s_Data->Prototypes.at(0);
+		}
 	}
 
 private:
-
 	struct TerrainData
 	{
 		std::vector<TerrainPrototype> Prototypes;

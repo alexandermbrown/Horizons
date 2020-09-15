@@ -40,7 +40,7 @@ namespace li
 	void OpenGLVertexArray::Bind() const
 	{
 		GLCall( glBindVertexArray(m_RendererID) );
-		m_IndexBuffer->Bind();
+		if (m_IndexBuffer) m_IndexBuffer->Bind();
 	}
 
 	void OpenGLVertexArray::Unbind() const

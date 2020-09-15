@@ -5,12 +5,14 @@
 #include "Horizons/LevelEditor/EditorCameraSystem.h"
 #include "imgui.h"
 
+#include <filesystem>
+
 ViewportPanel::ViewportPanel()
-	: m_BrushInnerRadius(0.5f), m_BrushOuterRadius(2.0f), m_BrushAmplitude(1.0f),
-	m_ViewportOpen(true), m_ViewportSize(512, 256)
+	: m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
+	m_TerrainStore(), m_TerrainRenderer(&m_TerrainStore, 7)
 {
 	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
-	m_ViewportFB->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+	m_ViewportFB->SetClearColor({ 0.25f, 0.25f, 0.25f, 1.0f });
 
 	EditorCameraSystem::Init(m_Registry);
 }
@@ -18,11 +20,24 @@ ViewportPanel::ViewportPanel()
 ViewportPanel::~ViewportPanel()
 {
 	EditorCameraSystem::Shutdown(m_Registry);
+	if (m_TerrainOpen)
+	{
+		m_TerrainRenderer.UnloadTerrain();
+	}
 }
 
 void ViewportPanel::OnUpdate(float dt)
 {
 	EditorCameraSystem::Update(m_Registry, dt);
+
+	if (m_TerrainOpen)
+	{
+		auto& camera_pos = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
+		m_TerrainRenderer.UpdateCenter({
+			(int)std::floor(camera_pos.x / TerrainRenderer::MetersPerChunk),
+			(int)std::floor(camera_pos.y / TerrainRenderer::MetersPerChunk)
+		});
+	}
 
 	if (m_ViewportFB->GetSize() != m_ViewportSize)
 	{
@@ -30,23 +45,26 @@ void ViewportPanel::OnUpdate(float dt)
 		EditorCameraSystem::Resize(m_Registry, m_ViewportSize.x, m_ViewportSize.y);
 	}
 
-	if (m_ViewportOpen)
+	if (m_WindowOpen && m_TerrainOpen)
 	{
+		m_TerrainRenderer.RenderFramebuffer();
+
 		m_ViewportFB->Bind();
 		m_ViewportFB->Clear();
 
 		li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
-		li::Renderer::SubmitColored({ 0.4f, 0.5f, 0.7f, 1.0f }, glm::mat4(1.0f));
+		m_TerrainRenderer.SubmitQuad();
 		li::Renderer::EndScene();
+
 	}
 }
 
 void ViewportPanel::OnImGuiRender()
 {
-	if (m_ViewportOpen)
+	if (m_WindowOpen)
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
-		if (ImGui::Begin("Viewport", &m_ViewportOpen))
+		if (ImGui::Begin("Viewport", &m_WindowOpen))
 		{
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
@@ -76,5 +94,20 @@ void ViewportPanel::OnEvent(SDL_Event* event)
 void ViewportPanel::FileOpen(const std::string& path)
 {
 	LI_TRACE("Opening terrain file {}", path);
-	m_Editor.OpenTerrain(path);
+	m_TerrainOpen = true;
+	auto& pos = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
+	
+	if (m_TerrainRenderer.LoadTerrain(path, {
+		(int)std::floor(pos.x / TerrainRenderer::MetersPerChunk),
+		(int)std::floor(pos.y / TerrainRenderer::MetersPerChunk)
+		}))
+	{
+		std::filesystem::path sys_path = path;
+		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), ("Horizons Level Editor - " + sys_path.filename().string()).c_str());
+	}
+	else
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open terrain file.", li::Application::Get()->GetWindow()->GetWindow());
+	}
+
 }

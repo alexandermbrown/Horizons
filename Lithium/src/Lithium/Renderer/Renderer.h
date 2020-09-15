@@ -7,6 +7,7 @@
 #include "Lithium/Renderer/Shader.h"
 #include "Lithium/Renderer/RendererAPI.h"
 #include "Lithium/Renderer/BatchRenderer.h"
+#include "Lithium/Renderer/LineBatchRenderer.h"
 #include "Lithium/Renderer/RenderStage.h"
 #include "Lithium/Renderer/Font.h"
 
@@ -38,6 +39,10 @@ namespace li
 
 		static void SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color);
 
+		static void SubmitLine(const glm::vec4& color, const glm::vec3& point1, const glm::vec3& point2);
+
+		static void SubmitCircle(const glm::vec4& color, const glm::vec3& center, float radius);
+
 		static void Submit(const Ref<Texture>& texture, const glm::mat4& transform);
 
 		static void UISubmitTextured(const std::string& texture_alias, const glm::mat4& transform, bool crop = false);
@@ -64,6 +69,7 @@ namespace li
 		{
 			Scope<BatchRenderer> SceneRenderer = nullptr;
 			Scope<BatchRenderer> UIRenderer = nullptr;
+			Scope<LineBatchRenderer> SceneLineRenderer = nullptr;
 
 			Ref<Shader> FontShader;
 

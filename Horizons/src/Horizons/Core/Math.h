@@ -2,8 +2,9 @@
 
 #include "glm/glm.hpp"
 
-class Math
+namespace Math
 {
-public:
-	static bool TransformContainsPoint(const glm::mat4& transform, int x, int y);
+	bool TransformContainsPoint(const glm::mat4& transform, int x, int y);
+	int PositiveMod(int a, int b);
+	float PositiveMod(float a, float b);
 };

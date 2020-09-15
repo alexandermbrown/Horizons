@@ -11,14 +11,6 @@
 
 namespace li
 {
-	struct BatchData
-	{
-		glm::mat4 Transform;
-		glm::vec4 AtlasBounds;
-		glm::vec4 Color;
-		float TextureIndex;
-	};
-
 	class BatchRenderer
 	{
 	public:
@@ -38,12 +30,25 @@ namespace li
 	private:
 		void Flush();
 
-		glm::vec2 m_QuadOrigin;
-		
-		Ref<Shader> m_Shader;
+		struct BatchData
+		{
+			glm::mat4 Transform;
+			glm::vec4 AtlasBounds;
+			glm::vec4 Color;
+			float TextureIndex;
+		};
 
 		static constexpr int MaxBatchInstances = 16384;
 		static constexpr int MaxBatchTextures = 8;
+
+		glm::vec2 m_QuadOrigin;
+		
+		Ref<Shader> m_Shader;
+		Ref<VertexBuffer> m_InstanceBuffer;
+		Ref<VertexArray> m_InstanceVA;
+
+		Ref<UniformBuffer> m_ViewProjUB;
+		Ref<UniformBuffer> m_TransformUB;
 
 		uint32_t m_InstanceCount;
 		int m_BatchAtlasCount;
@@ -53,10 +58,6 @@ namespace li
 
 		std::array<Ref<TextureAtlas>, MaxBatchTextures> m_BatchAtlases;
 		std::array<BatchData, MaxBatchInstances> m_InstanceData;
-		Ref<VertexBuffer> m_InstanceBuffer;
-		Ref<VertexArray> m_InstanceVA;
-
-		Ref<UniformBuffer> m_ViewProjUB;
-		Ref<UniformBuffer> m_TransformUB;
+		
 	};
 }

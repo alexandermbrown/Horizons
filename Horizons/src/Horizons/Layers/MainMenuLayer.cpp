@@ -31,8 +31,6 @@ MainMenuLayer::MainMenuLayer()
 	cp::ui_context& context = m_Registry.get<cp::ui_context>(context_ent);
 	context.rebuild = true;
 
-	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("space_scene_1"));
-
 	RNGSystem::Init(m_Registry);
 
 	m_Registry.view<cp::ui_name>().each([this](entt::entity entity, cp::ui_name& name)

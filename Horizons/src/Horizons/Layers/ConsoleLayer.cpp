@@ -178,10 +178,11 @@ void ConsoleLayer::ExecuteCommand(const std::string& command)
 
 	std::string token = command.substr(0, first_space);
 
-	if (m_Commands.find(token) != m_Commands.end())
+	auto iter = m_Commands.find(token);
+	if (iter != m_Commands.end())
 	{
 		std::string error = "";
-		m_Commands.at(token)->Execute(command.substr(first_space + 1), &error);
+		iter->second->Execute(command.substr(first_space + 1), &error);
 
 		if (!error.empty())
 		{

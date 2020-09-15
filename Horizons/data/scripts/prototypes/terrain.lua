@@ -1,5 +1,3 @@
-
-
 local terrain = {
 	{
 		id = 1,
@@ -54,5 +52,4 @@ local terrain = {
 		}
 	}
 }
-
 return terrain

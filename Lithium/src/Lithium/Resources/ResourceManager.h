@@ -17,7 +17,6 @@ namespace li
 	class ResourceManager
 	{
 	public:
-
 		static void Shutdown();
 
 		static void Load(const std::string& labFilePath);
@@ -70,7 +69,6 @@ namespace li
 		}
 
 	private:
-
 		template<class T>
 		using VecIterator = flatbuffers::VectorIterator<flatbuffers::Offset<T>, const T*>;
 

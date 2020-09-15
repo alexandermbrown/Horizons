@@ -11,6 +11,7 @@ namespace EditorCameraSystem
 	void Update(entt::registry& registry, float dt);
 	void OnEvent(entt::registry& registry, SDL_Event* event, glm::ivec2 view_size);
 	void Resize(entt::registry& registry, int width, int height);
+	glm::vec2 GetCameraFocusPoint(entt::registry& registry);
 }
 
 #endif

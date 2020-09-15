@@ -36,7 +36,7 @@ void TerrainPrototypes::InstantiatePrototypes()
 
 	s_Data->Prototypes.clear();
 	s_Data->Prototypes.reserve(terrain_list.size());
-	s_Data->Prototypes.push_back({ 0, "test_small", "texture_default", 0.1f, 0.0f, nullptr });
+	s_Data->Prototypes.push_back({ 0, "test_small", "atlas_test", 0.1f, 0.0f, nullptr });
 
 	for (int index = 1; index <= terrain_list.size(); index++)
 	{

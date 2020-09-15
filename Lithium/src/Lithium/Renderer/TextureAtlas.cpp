@@ -34,4 +34,18 @@ namespace li
 		}
 		m_Texture->Bind(slot);
 	}
+
+	const glm::vec4& TextureAtlas::GetBounds(const std::string& texture_alias) const
+	{
+		auto iter = m_Entries.find(texture_alias);
+		if (iter != m_Entries.end())
+		{
+			return iter->second;
+		}
+		else
+		{
+			LI_ERROR("alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
+			return glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		}
+	}
 }

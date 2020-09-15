@@ -28,15 +28,21 @@ namespace li
 
 	glm::vec2 Font::GetTextureOffset(int16_t character) const
 	{
-		if (m_TextureOffsets.find(character) != m_TextureOffsets.end())
-			return m_TextureOffsets.at(character);
+		auto iter = m_TextureOffsets.find(character);
+		if (iter != m_TextureOffsets.end())
+			return iter->second;
 		else
 			return { 0.0f, 0.0f };
 	}
 
 	hb_font_t* Font::GetHBFont(int pointSize)
 	{
-		if (m_Fonts.find(pointSize) == m_Fonts.end())
+		auto iter = m_Fonts.find(pointSize);
+		if (iter != m_Fonts.end())
+		{
+			return iter->second;
+		}
+		else
 		{
 			hb_font_t* font = hb_font_create(m_Face);
 			hb_ot_font_set_funcs(font);
@@ -44,7 +50,6 @@ namespace li
 			m_Fonts[pointSize] = font;
 			return font;
 		}
-		return m_Fonts.at(pointSize);
 	}
 
 	Label::Label(const char* utf8_text, int pointSize, Ref<Font> font, bool dynamic, int excess)

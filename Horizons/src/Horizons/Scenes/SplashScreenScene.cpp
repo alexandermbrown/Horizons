@@ -57,6 +57,10 @@ void SplashScreenScene::OnUpdate(float dt)
 		// Instead, change the below function to set the shaders used for instancing, fonts, etc.
 		// In future, move the ResourceManager into Horizons and remove any references in Lithium.
 		li::Renderer::InitPostResourceLoad();
+		li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
+		li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("space_scene_1"));
+		li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_terrain_earth"));
+
 		TerrainPrototypes::InstantiatePrototypes();
 
 		// TODO: Get locale from config.

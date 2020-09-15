@@ -11,17 +11,13 @@
 #include "Horizons/Gameplay/Player/PlayerComponents.h"
 #include "Horizons/Gameplay/Components.h"
 
-#include "Horizons/Terrain/SimplexNoise.h"
-
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 
 GameLayer::GameLayer()
-	: Layer("GameLayer"), m_Registry(), m_ReturnToMainMenu(false)
+	: Layer("GameLayer"), m_TerrainStore(11), m_TerrainRenderer(&m_TerrainStore, 3), m_Registry(), m_ReturnToMainMenu(false)
 {
 	m_TickThread.Begin(m_Registry);
-
-	li::Renderer::AddTextureAtlas(li::ResourceManager::Get<li::TextureAtlas>("atlas_test"));
 
 	CameraControllerSystem::Init(m_Registry);
 
@@ -80,13 +76,10 @@ void GameLayer::OnUpdate(float dt)
 	m_TerrainRenderer.SubmitQuad();
 	RenderingSystem::Render(m_Registry);
 
-	li::Renderer::EndScene();
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	li::Renderer::BeginScene(camera.camera);
-	m_DebugPhysicsRenderer.Render(m_TickThread.GetDebugDrawQueue());
-	li::Renderer::EndScene();
+	m_DebugPhysicsRenderer.SubmitLines(m_TickThread.GetDebugDrawQueue());
 #endif
+	li::Renderer::EndScene();
 }
 
 void GameLayer::OnEvent(SDL_Event* event)

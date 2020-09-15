@@ -10,9 +10,15 @@
 class TerrainRenderer
 {
 public:
-	TerrainRenderer();
+	TerrainRenderer(TerrainStore* store, int render_width);
+	~TerrainRenderer();
 
-	void LoadTerrain(const std::string& path, glm::ivec2 center);
+	TerrainRenderer() = delete;
+	TerrainRenderer(const TerrainRenderer&) = delete;
+	TerrainRenderer(TerrainRenderer&&) = delete;
+	TerrainRenderer& operator=(const TerrainRenderer&) = delete;
+
+	bool LoadTerrain(const std::string& path, glm::ivec2 center);
 	void UnloadTerrain();
 	void UpdateCenter(glm::ivec2 center);
 
@@ -25,17 +31,17 @@ public:
 	static constexpr int ChunkHeight = Terrain::ChunkHeight;
 	static constexpr int NumTilesPerChunk = Terrain::NumTilesPerChunk;
 
-	static constexpr int RenderWidth = 3;
 	static constexpr int ChunkWidthInPixels = 512;
 	static constexpr int ChunkHeightInPixels = 256;
 
 private:
 	void PrepareRenderChunks();
 
+	const int m_RenderWidth;
 	glm::ivec2 m_Center;
 	glm::ivec2 m_PrevCenter;
 
-	std::array<RenderChunk, RenderWidth * RenderWidth> m_RenderChunks;
+	RenderChunk* m_RenderChunks;
 	bool m_ReloadRenderChunks;
 	bool m_RenderCenterChanged;
 
@@ -46,5 +52,5 @@ private:
 	glm::mat4 m_QuadTransform;
 	li::Scope<li::OrthographicCamera> m_TerrainCamera;
 
-	TerrainStore m_Store;
+	TerrainStore* m_Store;
 };

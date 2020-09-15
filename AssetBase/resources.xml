@@ -11,6 +11,11 @@
 			<glsl>./res/shaders/Label.glsl</glsl>
 			<hlsl>./res/shaders/Label.hlsl</hlsl>
 		</shader>
+
+		<shader name="shader_line">
+			<glsl>./res/shaders/Line.glsl</glsl>
+			<hlsl>./res/shaders/Line.hlsl</hlsl>
+		</shader>
     
 		<shader name="shader_debug_physics">
 			<glsl>./res/shaders/DebugPhysics.glsl</glsl>

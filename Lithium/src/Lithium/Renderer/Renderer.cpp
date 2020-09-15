@@ -41,7 +41,6 @@ namespace li
 		float width = (float)window->GetWidth();
 		float height = (float)window->GetHeight();
 		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
-
 		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
@@ -86,6 +85,7 @@ namespace li
 
 		s_Data->SceneRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.5f, 0.5f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
 		s_Data->UIRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.0f, 0.0f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
+		s_Data->SceneLineRenderer = CreateScope<LineBatchRenderer>(s_Data->ViewProjUB);
 
 		s_Data->SceneRenderer->AddTextureAtlas(flatColorAtlas);
 		s_Data->UIRenderer->AddTextureAtlas(flatColorAtlas);
@@ -111,11 +111,13 @@ namespace li
 		s_Data->ViewProjUB->UploadData();
 
 		s_Data->SceneRenderer->BeginScene();
+		s_Data->SceneLineRenderer->BeginScene();
 	}
 
 	void Renderer::EndScene()
 	{
 		s_Data->SceneRenderer->EndScene();
+		s_Data->SceneLineRenderer->EndScene();
 	}
 
 	void Renderer::BeginUI()
@@ -152,6 +154,34 @@ namespace li
 	void Renderer::SubmitLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
 	{
 		RenderLabel(label, transform, color);
+	}
+
+	void li::Renderer::SubmitLine(const glm::vec4& color, const glm::vec3& point1, const glm::vec3& point2)
+	{
+		s_Data->SceneLineRenderer->Submit(color, point1, point2);
+	}
+
+	void li::Renderer::SubmitCircle(const glm::vec4& color, const glm::vec3& center, float radius)
+	{
+		glm::vec3 prev_point = {
+				center.x + radius,
+				center.y,
+				center.z
+		};
+
+		constexpr int resolution = 32;
+		for (int i = 1; i <= resolution; i++)
+		{
+			float angle = (float)i / (float)resolution * 2.0f * (float)M_PI;
+
+			glm::vec3 current_point = {
+				center.x + std::cos(angle) * radius,
+				center.y + std::sin(angle) * radius,
+				center.z
+			};
+			li::Renderer::SubmitLine(color, prev_point, current_point);
+			prev_point = current_point;
+		}
 	}
 
 	void Renderer::Submit(const Ref<Texture>& texture, const glm::mat4& transform)

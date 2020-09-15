@@ -5,7 +5,9 @@
 #include "glm/glm.hpp"
 #include "entt/entt.hpp"
 
-#include "TerrainEditor.h"
+#include "Horizons/Terrain/TerrainRenderer.h"
+#include "EditorTerrainStore.h"
+#include "Brush.h"
 
 class ViewportPanel
 {
@@ -13,7 +15,7 @@ public:
 	ViewportPanel();
 	~ViewportPanel();
 
-	inline void Open() { m_ViewportOpen = true; }
+	inline void OpenWindow() { m_WindowOpen = true; }
 	void OnUpdate(float dt);
 	void OnImGuiRender();
 	void OnEvent(SDL_Event* event);
@@ -23,15 +25,16 @@ public:
 private:
 	entt::registry m_Registry;
 
-	bool m_ViewportOpen;
+	bool m_WindowOpen;
 	bool m_ViewportFocused;
 	bool m_ViewportHovered;
 	glm::ivec2 m_ViewportSize;
 	li::Ref<li::Framebuffer> m_ViewportFB;
 
-	float m_BrushInnerRadius;
-	float m_BrushOuterRadius;
-	float m_BrushAmplitude;
+	Brush m_Brush;
 
-	TerrainEditor m_Editor;
+	bool m_TerrainOpen;
+
+	EditorTerrainStore m_TerrainStore;
+	TerrainRenderer m_TerrainRenderer;
 };

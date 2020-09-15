@@ -124,4 +124,11 @@ void EditorCameraSystem::Resize(entt::registry& registry, int width, int height)
 	camera.camera->SetProjection(-camera.aspect_ratio * half_zoom,
 		camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
 }
+
+glm::vec2 EditorCameraSystem::GetCameraFocusPoint(entt::registry& registry)
+{
+	cp::camera& camera = registry.ctx<cp::camera>();
+	const glm::vec3& camera_pos = camera.camera->GetPosition();
+	return { camera_pos.x, camera_pos.y + 3.0f };
+}
 #endif

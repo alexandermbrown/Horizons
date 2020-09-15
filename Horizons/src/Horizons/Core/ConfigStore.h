@@ -30,19 +30,18 @@ public:
 		return m_ConfigVars.at(name);
 	}
 
-	std::unordered_map<std::string, ConfigVar>::iterator begin() { return m_ConfigVars.begin(); }
-	std::unordered_map<std::string, ConfigVar>::iterator end() { return m_ConfigVars.end(); }
+	using ConfigMap = std::unordered_map<std::string, ConfigVar>;
 
-	std::unordered_map<std::string, ConfigVar>::const_iterator begin() const { return m_ConfigVars.begin(); }
-	std::unordered_map<std::string, ConfigVar>::const_iterator end()	const { return m_ConfigVars.end(); }
+	ConfigMap::iterator begin() { return m_ConfigVars.begin(); }
+	ConfigMap::iterator end() { return m_ConfigVars.end(); }
+	ConfigMap::const_iterator begin() const { return m_ConfigVars.begin(); }
+	ConfigMap::const_iterator end()	const { return m_ConfigVars.end(); }
 
 private:
 	void LoadType(const char* str_type, uint32_t type, CSimpleIniA& ini);
 	void SaveValues(std::unordered_map<std::string, ConfigVar>& store, CSimpleIniA& ini);
-
 	void SetAllDefault();
 
-	std::unordered_map<std::string, ConfigVar> m_ConfigVars;
-
-	std::unordered_map<std::string, ConfigVar> m_Templates;
+	ConfigMap m_ConfigVars;
+	ConfigMap m_Templates;
 };
