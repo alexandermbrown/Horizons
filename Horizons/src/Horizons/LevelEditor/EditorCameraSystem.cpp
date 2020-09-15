@@ -3,16 +3,7 @@
 #include "EditorCameraSystem.h"
 
 #include "Horizons/Rendering/RenderingComponents.h"
-
-namespace cp
-{
-	struct camera_pan
-	{
-		int button = 3;
-		bool started = false;
-		glm::ivec2 start_pos{ 0, 0 };
-	};
-}
+#include "EditorComponents.h"
 
 void EditorCameraSystem::Init(entt::registry& registry)
 {

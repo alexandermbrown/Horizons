@@ -7,7 +7,6 @@
 
 #include "Horizons/Terrain/TerrainRenderer.h"
 #include "EditorTerrainStore.h"
-#include "Brush.h"
 
 class ViewportPanel
 {
@@ -28,10 +27,9 @@ private:
 	bool m_WindowOpen;
 	bool m_ViewportFocused;
 	bool m_ViewportHovered;
+	glm::ivec2 m_MousePos;
 	glm::ivec2 m_ViewportSize;
 	li::Ref<li::Framebuffer> m_ViewportFB;
-
-	Brush m_Brush;
 
 	bool m_TerrainOpen;
 

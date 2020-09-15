@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "ViewportPanel.h"
 
+#include "EditorComponents.h"
+#include "BrushSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/LevelEditor/EditorCameraSystem.h"
+
 #include "imgui.h"
 
 #include <filesystem>
@@ -15,6 +18,12 @@ ViewportPanel::ViewportPanel()
 	m_ViewportFB->SetClearColor({ 0.25f, 0.25f, 0.25f, 1.0f });
 
 	EditorCameraSystem::Init(m_Registry);
+
+	auto& brush = m_Registry.set<cp::brush>();
+	brush.brush.Amplitude = 1.0f;
+	brush.brush.InnerRadius = 1.0f;
+	brush.brush.OuterRadius = 4.0f;
+	brush.brush.Subtract = false;
 }
 
 ViewportPanel::~ViewportPanel()
@@ -54,8 +63,10 @@ void ViewportPanel::OnUpdate(float dt)
 
 		li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
 		m_TerrainRenderer.SubmitQuad();
-		li::Renderer::EndScene();
 
+		BrushSystem::SubmitBrush(m_Registry, m_MousePos, m_ViewportFB->GetSize());
+
+		li::Renderer::EndScene();
 	}
 }
 
@@ -68,15 +79,20 @@ void ViewportPanel::OnImGuiRender()
 		{
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
+			
+			ImVec2 mouse_pos = ImGui::GetMousePos();
+			ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
 
-			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+			m_MousePos = { mouse_pos.x - cursor_pos.x, mouse_pos.y - cursor_pos.y };
 
+			ImVec2 viewport_size = ImGui::GetContentRegionAvail();
+			m_ViewportSize = { viewport_size.x, viewport_size.y };
+			
 			// Account for OpenGL's flipped framebuffer texture.
 			if (li::Application::Get()->GetAPI() == li::RendererAPI::OpenGL)
-				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewportPanelSize, { 0, 1 }, { 1, 0 });
+				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewport_size, { 0, 1 }, { 1, 0 });
 			else
-				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewportPanelSize, { 0, 0 }, { 1, 1 });
+				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewport_size, { 0, 0 }, { 1, 1 });
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -109,5 +125,4 @@ void ViewportPanel::FileOpen(const std::string& path)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open terrain file.", li::Application::Get()->GetWindow()->GetWindow());
 	}
-
 }

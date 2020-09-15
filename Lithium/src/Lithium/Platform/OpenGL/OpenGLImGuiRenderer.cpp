@@ -19,6 +19,7 @@ namespace li
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
 		ImGuiRenderer::InitImGuiStyle();
 
 		Application* app = Application::Get();
