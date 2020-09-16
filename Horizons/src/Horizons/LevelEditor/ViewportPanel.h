@@ -11,10 +11,10 @@
 class ViewportPanel
 {
 public:
-	ViewportPanel();
+	ViewportPanel(Brush* brush);
 	~ViewportPanel();
 
-	inline void OpenWindow() { m_WindowOpen = true; }
+	inline void ShowPanel() { m_WindowOpen = true; }
 	void OnUpdate(float dt);
 	void OnImGuiRender();
 	void OnEvent(SDL_Event* event);

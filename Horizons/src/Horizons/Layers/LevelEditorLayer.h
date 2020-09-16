@@ -2,6 +2,7 @@
 #ifndef LI_DIST
 
 #include "Horizons/LevelEditor/ViewportPanel.h"
+#include "Horizons/LevelEditor/TerrainEditingPanel.h"
 
 #include "Lithium.h"
 #include "entt/entt.hpp"
@@ -27,6 +28,8 @@ private:
 
 	bool m_DockspaceOpen;
 
+	Brush m_Brush;
 	ViewportPanel m_Viewport;
+	TerrainEditingPanel m_TerrainEditingPanel;
 };
 #endif // !LI_DIST

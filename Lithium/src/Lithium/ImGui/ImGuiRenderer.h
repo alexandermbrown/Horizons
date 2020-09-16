@@ -3,6 +3,7 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Layer.h"
 
+#include "imgui.h"
 #include "SDL.h"
 
 namespace li 

@@ -11,8 +11,13 @@
 #endif
 
 LevelEditorLayer::LevelEditorLayer()
-	: m_ReturnToMainMenu(false), m_DockspaceOpen(true)
+	: m_ReturnToMainMenu(false), m_DockspaceOpen(true), m_Viewport(&m_Brush), m_TerrainEditingPanel(&m_Brush)
 {
+	m_Brush.Enabled = true;
+	m_Brush.Subtract = false;
+	m_Brush.Strength = 0.25f;
+	m_Brush.InnerRadius = 1.0f;
+	m_Brush.OuterRadius = 4.0f;
 }
 
 LevelEditorLayer::~LevelEditorLayer()
@@ -62,7 +67,7 @@ void LevelEditorLayer::OnImGuiRender()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu(u8"File"))
 		{
 			if (ImGui::MenuItem("New", "Ctrl+N")) {}
 			if (ImGui::MenuItem("Open", "Ctrl+O"))
@@ -96,7 +101,8 @@ void LevelEditorLayer::OnImGuiRender()
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::MenuItem("Viewport")) m_Viewport.OpenWindow();
+			if (ImGui::MenuItem("Viewport")) m_Viewport.ShowPanel();
+			if (ImGui::MenuItem("Terrain Editing")) m_TerrainEditingPanel.ShowPanel();
 			if (ImGui::MenuItem("Open Scripts in VS Code"))
 			{
 #ifdef LI_PLATFORM_WINDOWS
@@ -124,6 +130,7 @@ void LevelEditorLayer::OnImGuiRender()
 	}
 	ImGui::End();
 
+	m_TerrainEditingPanel.OnImGuiRender();
 	m_Viewport.OnImGuiRender();
 }
 

@@ -73,13 +73,13 @@ void EditorTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk
 	}
 }
 
-void EditorTerrainStore::ApplyBrush(const Brush& brush, glm::vec2 brush_pos, float dt)
+void EditorTerrainStore::ApplyBrush(Brush* brush, glm::vec2 brush_pos, float dt)
 {
-	const float left_bound = Math::PositiveMod(brush_pos.x - brush.OuterRadius, (float)m_WorldWidth);
-	const float right_bound = Math::PositiveMod(brush_pos.x + brush.OuterRadius, (float)m_WorldWidth);
+	const float left_bound = Math::PositiveMod(brush_pos.x - brush->OuterRadius, (float)m_WorldWidth);
+	const float right_bound = Math::PositiveMod(brush_pos.x + brush->OuterRadius, (float)m_WorldWidth);
 
-	const float bottom_bound = Math::PositiveMod(brush_pos.y - brush.OuterRadius, (float)m_WorldHeight);
-	const float top_bound = Math::PositiveMod(brush_pos.y + brush.OuterRadius, (float)m_WorldHeight);
+	const float bottom_bound = Math::PositiveMod(brush_pos.y - brush->OuterRadius, (float)m_WorldHeight);
+	const float top_bound = Math::PositiveMod(brush_pos.y + brush->OuterRadius, (float)m_WorldHeight);
 
 	for (int i = 0; i < m_WorldWidth * m_WorldHeight; i++)
 	{
@@ -191,7 +191,7 @@ void EditorTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destina
 	}
 }
 
-void EditorTerrainStore::ApplyBrushToChunk(const Brush& brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk)
+void EditorTerrainStore::ApplyBrushToChunk(Brush* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk)
 {
 	for (int y = 0; y < ChunkHeight; y++)
 	{

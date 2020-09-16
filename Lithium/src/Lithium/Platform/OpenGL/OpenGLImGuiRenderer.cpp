@@ -13,15 +13,6 @@ namespace li
 {
 	OpenGLImGuiRenderer::OpenGLImGuiRenderer()
 	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-		io.ConfigWindowsMoveFromTitleBarOnly = true;
-		ImGuiRenderer::InitImGuiStyle();
-
 		Application* app = Application::Get();
 
 		ImGui_ImplSDL2_InitForOpenGL(app->GetWindow()->GetWindow(), ((OpenGLContext*)app->GetWindow()->GetContext())->GetGLContext());

@@ -13,7 +13,7 @@ namespace cp
 
 	struct brush
 	{
-		glm::vec3 world_pos;
-		Brush brush;
+		Brush* brush;
+		glm::vec2 world_pos;
 	};
 }

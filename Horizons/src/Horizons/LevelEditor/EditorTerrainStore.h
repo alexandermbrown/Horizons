@@ -19,7 +19,7 @@ public:
 	virtual int GetWorldWidth() const override { return m_WorldWidth; }
 	virtual int GetWorldHeight() const override { return m_WorldHeight; }
 
-	void ApplyBrush(const Brush& brush, glm::vec2 brush_pos, float dt);
+	void ApplyBrush(Brush* brush, glm::vec2 brush_pos, float dt);
 
 private:
 	struct StoreChunk
@@ -30,7 +30,7 @@ private:
 	};
 
 	void LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destination);
-	void ApplyBrushToChunk(const Brush& brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk);
+	void ApplyBrushToChunk(Brush* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk);
 
 	bool m_Open;
 	std::string m_TerrainPath;

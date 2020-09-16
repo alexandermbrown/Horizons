@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-ViewportPanel::ViewportPanel()
+ViewportPanel::ViewportPanel(Brush* brush)
 	: m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
 	m_TerrainStore(), m_TerrainRenderer(&m_TerrainStore, 7)
 {
@@ -19,11 +19,7 @@ ViewportPanel::ViewportPanel()
 
 	EditorCameraSystem::Init(m_Registry);
 
-	auto& brush = m_Registry.set<cp::brush>();
-	brush.brush.Amplitude = 1.0f;
-	brush.brush.InnerRadius = 1.0f;
-	brush.brush.OuterRadius = 4.0f;
-	brush.brush.Subtract = false;
+	m_Registry.set<cp::brush>(brush);
 }
 
 ViewportPanel::~ViewportPanel()
@@ -52,6 +48,16 @@ void ViewportPanel::OnUpdate(float dt)
 	{
 		m_ViewportFB->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		EditorCameraSystem::Resize(m_Registry, m_ViewportSize.x, m_ViewportSize.y);
+	}
+
+	if (m_ViewportHovered)
+	{
+		int mouse_x, mouse_y;
+		if (SDL_GetMouseState(&mouse_x, &mouse_y) & SDL_BUTTON(SDL_BUTTON_LEFT))
+		{
+			auto& brush = m_Registry.ctx<cp::brush>();
+			m_TerrainStore.ApplyBrush(brush.brush, brush.world_pos, dt);
+		}
 	}
 
 	if (m_WindowOpen && m_TerrainOpen)
@@ -101,7 +107,7 @@ void ViewportPanel::OnImGuiRender()
 
 void ViewportPanel::OnEvent(SDL_Event* event)
 {
-	if (m_ViewportFocused && m_ViewportHovered)
+	if (m_ViewportHovered)
 	{
 		EditorCameraSystem::OnEvent(m_Registry, event, m_ViewportFB->GetSize());
 	}

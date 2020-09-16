@@ -13,15 +13,6 @@ namespace li
 {
 	D3D11ImGuiRenderer::D3D11ImGuiRenderer()
 	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-		io.ConfigWindowsMoveFromTitleBarOnly = true;
-		ImGuiRenderer::InitImGuiStyle();
-
 		Application* app = Application::Get();
 
 		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
