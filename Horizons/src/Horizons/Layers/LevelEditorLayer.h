@@ -28,7 +28,7 @@ private:
 
 	bool m_DockspaceOpen;
 
-	Brush m_Brush;
+	EditorSettings m_Settings;
 	ViewportPanel m_Viewport;
 	TerrainEditingPanel m_TerrainEditingPanel;
 };

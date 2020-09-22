@@ -1,19 +1,19 @@
 #pragma once
 #ifndef LI_DIST
 
-#include "Brush.h"
+#include "EditorSettings.h"
 
 class TerrainEditingPanel
 {
 public:
-	TerrainEditingPanel(Brush* brush);
+	TerrainEditingPanel(EditorSettings* settings);
 
 	void OnImGuiRender();
 	inline void ShowPanel() { m_WindowOpen = true; }
 
 private:
-	Brush* m_Brush;
 	bool m_WindowOpen;
+	EditorSettings* m_Settings;
 };
 
 #endif

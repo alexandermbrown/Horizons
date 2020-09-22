@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Brush.h"
+#include "EditorSettings.h"
 
 namespace cp
 {
@@ -13,7 +13,7 @@ namespace cp
 
 	struct brush
 	{
-		Brush* brush;
+		BrushSettings* brush;
 		glm::vec2 world_pos;
 	};
 }

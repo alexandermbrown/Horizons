@@ -17,8 +17,8 @@ void EditorCameraSystem::Init(entt::registry& registry)
 	camera.camera = new li::OrthographicCamera(-camera.aspect_ratio * half_zoom,
 		camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
 	camera.camera->SetLookAt({ 0.0f, -3.0f, std::sqrt(3.0f) }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
-	camera.min_zoom = 0.001f;
-	camera.max_zoom = 2048.0f;
+	camera.min_zoom = 0.01f;
+	camera.max_zoom = 100.0f;
 	camera.zoom_speed = 20.0f;
 
 	registry.set<cp::camera_pan>();
@@ -64,6 +64,8 @@ void EditorCameraSystem::OnEvent(entt::registry& registry, SDL_Event* event, glm
 
 		if (camera.target_zoom < camera.min_zoom)
 			camera.target_zoom = camera.min_zoom;
+		else if (camera.target_zoom > camera.max_zoom)
+			camera.target_zoom = camera.max_zoom;
 
 		camera.finished_zoom = false;
 	}

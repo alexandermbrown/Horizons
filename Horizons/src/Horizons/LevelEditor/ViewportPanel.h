@@ -7,11 +7,12 @@
 
 #include "Horizons/Terrain/TerrainRenderer.h"
 #include "EditorTerrainStore.h"
+#include "EditorSettings.h"
 
 class ViewportPanel
 {
 public:
-	ViewportPanel(Brush* brush);
+	ViewportPanel(EditorSettings* settings);
 	~ViewportPanel();
 
 	inline void ShowPanel() { m_WindowOpen = true; }
@@ -24,6 +25,7 @@ public:
 private:
 	entt::registry m_Registry;
 
+	EditorSettings* m_Settings;
 	bool m_WindowOpen;
 	bool m_ViewportFocused;
 	bool m_ViewportHovered;
@@ -35,4 +37,7 @@ private:
 
 	EditorTerrainStore m_TerrainStore;
 	TerrainRenderer m_TerrainRenderer;
+
+	glm::ivec2 m_ChunkCenter;
+	glm::vec2 m_CameraFocus;
 };

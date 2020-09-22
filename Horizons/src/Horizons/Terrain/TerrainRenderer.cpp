@@ -6,11 +6,11 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
-	: m_Store(store), m_RenderWidth(render_width)
+	: m_Store(store), RenderWidth(render_width)
 {
-	m_RenderChunks = new RenderChunk[m_RenderWidth * m_RenderWidth];
+	m_RenderChunks = new RenderChunk[RenderWidth * RenderWidth];
 
-	m_Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * m_RenderWidth, ChunkHeightInPixels * m_RenderWidth);
+	m_Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * RenderWidth, ChunkHeightInPixels * RenderWidth);
 	
 	m_AtlasBoundsUB = li::UniformBuffer::Create("Terrain", 3, li::ShaderType::Fragment, {
 		{ "u_AtlasBounds0", li::ShaderDataType::Float4 },
@@ -65,7 +65,7 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 	}
 	li::Ref<li::IndexBuffer> indexBuffer = li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, li::BufferUsage::StaticDraw);
 
-	for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
+	for (int i = 0; i < RenderWidth * RenderWidth; i++)
 	{
 		auto& chunk = m_RenderChunks[i];
 		chunk.VertexArray = li::VertexArray::Create();
@@ -81,7 +81,7 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 		chunk.VertexArray->Finalize(m_TerrainShader);
 	}
 
-	int HalfRenderWidth = m_RenderWidth / 2;
+	int HalfRenderWidth = RenderWidth / 2;
 	switch (li::Application::Get()->GetAPI())
 	{
 	case li::RendererAPI::OpenGL:
@@ -106,9 +106,9 @@ bool TerrainRenderer::LoadTerrain(const std::string& path, glm::ivec2 center)
 		m_Center = center;
 		m_PrevCenter = center;
 
-		float HalfRenderWidth = (float)(m_RenderWidth / 2);
+		float HalfRenderWidth = (float)(RenderWidth / 2);
 		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-HalfRenderWidth + (float)center.x) * MetersPerChunk, (-HalfRenderWidth + (float)center.y) * MetersPerChunk, 0.0f })
-			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * m_RenderWidth, MetersPerChunk * m_RenderWidth, 1.0f });
+			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * RenderWidth, MetersPerChunk * RenderWidth, 1.0f });
 		return true;
 	}
 	else return false;
@@ -127,9 +127,9 @@ void TerrainRenderer::UpdateCenter(glm::ivec2 center)
 		m_PrevCenter = m_Center;
 		m_Center = center;
 
-		float HalfRenderWidth = (float)(m_RenderWidth / 2);
+		float HalfRenderWidth = (float)(RenderWidth / 2);
 		m_QuadTransform = glm::translate(glm::mat4(1.0f), { (-HalfRenderWidth + (float)center.x) * MetersPerChunk, (-HalfRenderWidth + (float)center.y) * MetersPerChunk, 0.0f })
-			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * m_RenderWidth, MetersPerChunk * m_RenderWidth, 1.0f });
+			* glm::scale(glm::mat4(1.0f), { MetersPerChunk * RenderWidth, MetersPerChunk * RenderWidth, 1.0f });
 
 		m_Store->UpdateCenter(center);
 	}
@@ -143,7 +143,7 @@ void TerrainRenderer::RenderFramebuffer()
 	m_Framebuffer->Bind();
 	m_Framebuffer->Clear();
 
-	for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
+	for (int i = 0; i < RenderWidth * RenderWidth; i++)
 	{
 		auto& chunk = m_RenderChunks[i];
 		const TerrainPrototype& terrain0 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[0]);
@@ -200,7 +200,7 @@ void TerrainRenderer::PrepareRenderChunks()
 {
 	if (m_ReloadRenderChunks)
 	{
-		int HalfRenderWidth = m_RenderWidth / 2;
+		int HalfRenderWidth = RenderWidth / 2;
 		for (int y = -HalfRenderWidth; y <= HalfRenderWidth; y++)
 		{
 			for (int x = -HalfRenderWidth; x <= HalfRenderWidth; x++)
@@ -212,7 +212,7 @@ void TerrainRenderer::PrepareRenderChunks()
 					Math::PositiveMod(display_coord.y, m_Store->GetWorldHeight())
 				};
 
-				auto& chunk = m_RenderChunks[(x + HalfRenderWidth) + (y + HalfRenderWidth) * (size_t)m_RenderWidth];
+				auto& chunk = m_RenderChunks[(x + HalfRenderWidth) + (y + HalfRenderWidth) * (size_t)RenderWidth];
 				chunk.CenterOffset = { x, y };
 				chunk.Transform = glm::translate(glm::mat4(1.0f), {
 					(float)chunk.CenterOffset.x,
@@ -226,7 +226,7 @@ void TerrainRenderer::PrepareRenderChunks()
 	else if (m_RenderCenterChanged)
 	{
 		// test if current chunk is within radius of center.
-		int radius = m_RenderWidth / 2;
+		int radius = RenderWidth / 2;
 
 		int left_bound = Math::PositiveMod(m_Center.x - radius, m_Store->GetWorldWidth());
 		int right_bound = Math::PositiveMod(m_Center.x + radius, m_Store->GetWorldWidth());
@@ -235,7 +235,7 @@ void TerrainRenderer::PrepareRenderChunks()
 		int top_bound = Math::PositiveMod(m_Center.y + radius, m_Store->GetWorldHeight());
 
 		// Remove chunks which are no longer near the center.
-		for (int i = 0; i < m_RenderWidth * m_RenderWidth; i++)
+		for (int i = 0; i < RenderWidth * RenderWidth; i++)
 		{
 			auto& chunk = m_RenderChunks[i];
 			bool in_x;

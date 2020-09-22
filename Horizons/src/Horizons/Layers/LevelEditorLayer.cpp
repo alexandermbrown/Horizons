@@ -11,13 +11,15 @@
 #endif
 
 LevelEditorLayer::LevelEditorLayer()
-	: m_ReturnToMainMenu(false), m_DockspaceOpen(true), m_Viewport(&m_Brush), m_TerrainEditingPanel(&m_Brush)
+	: m_ReturnToMainMenu(false), m_DockspaceOpen(true), m_Viewport(&m_Settings), m_TerrainEditingPanel(&m_Settings)
 {
-	m_Brush.Enabled = true;
-	m_Brush.Subtract = false;
-	m_Brush.Strength = 0.25f;
-	m_Brush.InnerRadius = 1.0f;
-	m_Brush.OuterRadius = 4.0f;
+	m_Settings.Brush.Enabled = true;
+	m_Settings.Brush.Subtract = false;
+	m_Settings.Brush.Strength = 0.25f;
+	m_Settings.Brush.InnerRadius = 1.0f;
+	m_Settings.Brush.OuterRadius = 4.0f;
+	m_Settings.Display.ShowChunkBorders = true;
+	m_Settings.Display.VertexDisplayMode = VertexDisplayMode::ShowInBrush;
 }
 
 LevelEditorLayer::~LevelEditorLayer()

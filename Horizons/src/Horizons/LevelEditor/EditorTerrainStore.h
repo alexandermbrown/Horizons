@@ -1,7 +1,7 @@
 #pragma once
 #ifndef LI_DIST
 #include "Horizons/Terrain/TerrainStore.h"
-#include "Brush.h"
+#include "EditorSettings.h"
 
 #include "glm/glm.hpp"
 #include <fstream>
@@ -19,7 +19,7 @@ public:
 	virtual int GetWorldWidth() const override { return m_WorldWidth; }
 	virtual int GetWorldHeight() const override { return m_WorldHeight; }
 
-	void ApplyBrush(Brush* brush, glm::vec2 brush_pos, float dt);
+	void ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, float dt);
 
 private:
 	struct StoreChunk
@@ -30,7 +30,7 @@ private:
 	};
 
 	void LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destination);
-	void ApplyBrushToChunk(Brush* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk);
+	void ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk);
 
 	bool m_Open;
 	std::string m_TerrainPath;

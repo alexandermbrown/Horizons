@@ -24,6 +24,7 @@ public:
 
 	void RenderFramebuffer();
 	void SubmitQuad();
+	inline glm::ivec2 GetCenter() const { return m_Center; }
 
 	static constexpr float MetersPerChunk = 16.0f;
 
@@ -34,10 +35,10 @@ public:
 	static constexpr int ChunkWidthInPixels = 512;
 	static constexpr int ChunkHeightInPixels = 256;
 
+	const int RenderWidth;
 private:
 	void PrepareRenderChunks();
-
-	const int m_RenderWidth;
+	
 	glm::ivec2 m_Center;
 	glm::ivec2 m_PrevCenter;
 

@@ -5,13 +5,15 @@
 #include "BrushSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/LevelEditor/EditorCameraSystem.h"
+#include "TerrainVerticeSystem.h"
+#include "ChunkBorderSystem.h"
 
 #include "imgui.h"
 
 #include <filesystem>
 
-ViewportPanel::ViewportPanel(Brush* brush)
-	: m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
+ViewportPanel::ViewportPanel(EditorSettings* settings)
+	: m_Settings(settings), m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
 	m_TerrainStore(), m_TerrainRenderer(&m_TerrainStore, 7)
 {
 	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
@@ -19,7 +21,7 @@ ViewportPanel::ViewportPanel(Brush* brush)
 
 	EditorCameraSystem::Init(m_Registry);
 
-	m_Registry.set<cp::brush>(brush);
+	m_Registry.set<cp::brush>(&settings->Brush);
 }
 
 ViewportPanel::~ViewportPanel()
@@ -37,11 +39,12 @@ void ViewportPanel::OnUpdate(float dt)
 
 	if (m_TerrainOpen)
 	{
-		auto& camera_pos = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
-		m_TerrainRenderer.UpdateCenter({
-			(int)std::floor(camera_pos.x / TerrainRenderer::MetersPerChunk),
-			(int)std::floor(camera_pos.y / TerrainRenderer::MetersPerChunk)
-		});
+		m_CameraFocus = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
+		m_ChunkCenter = {
+			(int)std::floor(m_CameraFocus.x / TerrainRenderer::MetersPerChunk),
+			(int)std::floor(m_CameraFocus.y / TerrainRenderer::MetersPerChunk)
+		};
+		m_TerrainRenderer.UpdateCenter(m_ChunkCenter);
 	}
 
 	if (m_ViewportFB->GetSize() != m_ViewportSize)
@@ -69,6 +72,20 @@ void ViewportPanel::OnUpdate(float dt)
 
 		li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
 		m_TerrainRenderer.SubmitQuad();
+
+		switch (m_Settings->Display.VertexDisplayMode)
+		{
+		case VertexDisplayMode::Show:
+			TerrainVerticeSystem::SubmitVerticesShow(m_Registry, m_ChunkCenter, m_TerrainRenderer.RenderWidth);
+			break;
+		case VertexDisplayMode::ShowInBrush:
+			TerrainVerticeSystem::SubmitVerticesShowInBrush(m_Registry, m_ChunkCenter, m_TerrainRenderer.RenderWidth);
+		}
+
+		if (m_Settings->Display.ShowChunkBorders)
+		{
+			ChunkBorderSystem::SubmitBorders(m_Registry, m_CameraFocus);
+		}
 
 		BrushSystem::SubmitBrush(m_Registry, m_MousePos, m_ViewportFB->GetSize());
 
@@ -117,11 +134,11 @@ void ViewportPanel::FileOpen(const std::string& path)
 {
 	LI_TRACE("Opening terrain file {}", path);
 	m_TerrainOpen = true;
-	auto& pos = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
+	m_CameraFocus = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
 	
 	if (m_TerrainRenderer.LoadTerrain(path, {
-		(int)std::floor(pos.x / TerrainRenderer::MetersPerChunk),
-		(int)std::floor(pos.y / TerrainRenderer::MetersPerChunk)
+		(int)std::floor(m_CameraFocus.x / TerrainRenderer::MetersPerChunk),
+		(int)std::floor(m_CameraFocus.y / TerrainRenderer::MetersPerChunk)
 		}))
 	{
 		std::filesystem::path sys_path = path;
