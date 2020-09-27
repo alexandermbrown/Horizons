@@ -20,8 +20,8 @@ public:
 	virtual void UpdateCenter(glm::ivec2 center) override;
 	virtual void LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk* destination) override;
 
-	virtual int GetWorldWidth() const override { return m_WorldWidth; }
-	virtual int GetWorldHeight() const override { return m_WorldHeight; }
+	virtual glm::ivec2 GetWorldSize() const override { return { m_WorldWidth, m_WorldHeight }; }
+	virtual bool ReloadRenderChunks() override { return false; }
 
 private:
 	struct StoreChunk

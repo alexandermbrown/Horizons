@@ -10,8 +10,6 @@
 
 #include "imgui.h"
 
-#include <filesystem>
-
 ViewportPanel::ViewportPanel(EditorSettings* settings)
 	: m_Settings(settings), m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
 	m_TerrainStore(), m_TerrainRenderer(&m_TerrainStore, 7)
@@ -59,7 +57,7 @@ void ViewportPanel::OnUpdate(float dt)
 		if (SDL_GetMouseState(&mouse_x, &mouse_y) & SDL_BUTTON(SDL_BUTTON_LEFT))
 		{
 			auto& brush = m_Registry.ctx<cp::brush>();
-			m_TerrainStore.ApplyBrush(brush.brush, brush.world_pos, dt);
+			m_TerrainStore.ApplyBrush(brush.brush, brush.world_pos, m_Settings->Layer, dt);
 		}
 	}
 
@@ -93,7 +91,7 @@ void ViewportPanel::OnUpdate(float dt)
 	}
 }
 
-void ViewportPanel::OnImGuiRender()
+void ViewportPanel::RenderPanel()
 {
 	if (m_WindowOpen)
 	{
@@ -130,22 +128,36 @@ void ViewportPanel::OnEvent(SDL_Event* event)
 	}
 }
 
-void ViewportPanel::FileOpen(const std::string& path)
+bool ViewportPanel::FileOpen(const std::string& path)
 {
+	LI_ASSERT(!m_TerrainOpen, "Terrain must not be open.");
 	LI_TRACE("Opening terrain file {}", path);
-	m_TerrainOpen = true;
 	m_CameraFocus = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
 	
-	if (m_TerrainRenderer.LoadTerrain(path, {
+	m_TerrainOpen = m_TerrainRenderer.LoadTerrain(path, {
 		(int)std::floor(m_CameraFocus.x / TerrainRenderer::MetersPerChunk),
 		(int)std::floor(m_CameraFocus.y / TerrainRenderer::MetersPerChunk)
-		}))
+	});
+
+	return m_TerrainOpen;
+}
+
+void ViewportPanel::FileSave()
+{
+	m_TerrainStore.Save();
+}
+
+void ViewportPanel::FileSaveAs(const std::string& path)
+{
+	// TODO: handle error in editor layer.
+	if (!m_TerrainStore.SaveAs(path))
 	{
-		std::filesystem::path sys_path = path;
-		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), ("Horizons Level Editor - " + sys_path.filename().string()).c_str());
+		LI_ERROR("Failed to save terrain as {}", path);
 	}
-	else
-	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open terrain file.", li::Application::Get()->GetWindow()->GetWindow());
-	}
+}
+
+void ViewportPanel::CloseTerrain()
+{
+	m_TerrainStore.UnloadTerrain();
+	m_TerrainOpen = false;
 }

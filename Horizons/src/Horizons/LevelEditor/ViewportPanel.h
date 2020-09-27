@@ -17,10 +17,18 @@ public:
 
 	inline void ShowPanel() { m_WindowOpen = true; }
 	void OnUpdate(float dt);
-	void OnImGuiRender();
+	void RenderPanel();
 	void OnEvent(SDL_Event* event);
 
-	void FileOpen(const std::string& path);
+	bool FileOpen(const std::string& path);
+	void FileSave();
+	void FileSaveAs(const std::string& path);
+
+	void CloseTerrain();
+
+	inline bool IsTerrainOpen() const { return m_TerrainOpen; }
+	inline glm::ivec2 GetWorldSize() const { return m_TerrainStore.GetWorldSize(); }
+	inline bool IsTerrainModified() const { return m_TerrainStore.IsModified(); }
 
 private:
 	entt::registry m_Registry;

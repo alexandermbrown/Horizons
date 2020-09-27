@@ -16,29 +16,41 @@ public:
 	virtual void UpdateCenter(glm::ivec2 center) override {};
 	virtual void LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk* destination) override;
 
-	virtual int GetWorldWidth() const override { return m_WorldWidth; }
-	virtual int GetWorldHeight() const override { return m_WorldHeight; }
+	virtual glm::ivec2 GetWorldSize() const override { return { m_WorldWidth, m_WorldHeight }; }
 
-	void ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, float dt);
+	void ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt);
+	void Save();
+	bool SaveAs(const std::string& path);
+
+	inline bool IsModified() const { return m_Modified; }
+	virtual bool ReloadRenderChunks() override;
 
 private:
 	struct StoreChunk
 	{
 		glm::ivec2 Coord;
+		bool Modified;
 		uint16_t Tiles[Terrain::NumTilesPerChunk];
 		AlphaValuesArray AlphaValues;
 	};
 
 	void LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destination);
-	void ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk);
+	void ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt, StoreChunk& chunk);
+	void OverwriteWorld();
+
+	// Assumes we are already in the correct file position.
+	void SaveChunk(StoreChunk& chunk);
 
 	bool m_Open;
+	bool m_Modified;
 	std::string m_TerrainPath;
-	std::ifstream m_TerrainFile;
+	std::fstream m_TerrainFile;
 
 	int m_WorldWidth;
 	int m_WorldHeight;
 
 	StoreChunk* m_StoreChunks;
+
+	bool m_ReloadRenderChunks;
 };
 #endif

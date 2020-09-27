@@ -27,8 +27,6 @@
 
 #include "Lithium/Resources/ResourceManager.h"
 
-#include "Lithium/Events/EventDispatcher.h"
-
 #include "Lithium/Localization/Localization.h"
 
 #include "Lithium/UI/UI.h"

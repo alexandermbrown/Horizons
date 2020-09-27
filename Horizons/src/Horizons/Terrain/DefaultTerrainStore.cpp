@@ -196,7 +196,7 @@ void DefaultTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destin
 		{
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[y][x][i] = (float)temp_chunk.AlphaValues[y][x][i] / 255.0f;
+				destination->AlphaValues[y][x][i] = (float)temp_chunk.AlphaValues[y][x][i] / 256.0f;
 			}
 		}
 	}
@@ -220,7 +220,7 @@ void DefaultTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destin
 
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[y][ChunkWidth][i] = (float)bytes[i] / 255.0f;
+				destination->AlphaValues[y][ChunkWidth][i] = (float)bytes[i] / 256.0f;
 			}
 		}
 	}
@@ -239,7 +239,7 @@ void DefaultTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destin
 		{
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[ChunkHeight][x][i] = (float)row[x][i] / 255.0f;
+				destination->AlphaValues[ChunkHeight][x][i] = (float)row[x][i] / 256.0f;
 			}
 		}
 	}
@@ -256,7 +256,7 @@ void DefaultTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destin
 
 		for (int i = 0; i < NumTilesPerChunk - 1; i++)
 		{
-			destination->AlphaValues[ChunkHeight][ChunkWidth][i] = (float)bytes[i] / 255.0f;
+			destination->AlphaValues[ChunkHeight][ChunkWidth][i] = (float)bytes[i] / 256.0f;
 		}
 	}
 }

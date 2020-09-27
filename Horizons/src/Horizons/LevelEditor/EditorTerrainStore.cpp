@@ -1,11 +1,15 @@
 #include "pch.h"
+#ifndef LI_DIST
 #include "EditorTerrainStore.h"
 
 #include "Horizons/Core/Math.h"
 #include "Horizons/Terrain/TerrainRenderer.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+#include <cmath>
+
 EditorTerrainStore::EditorTerrainStore()
-	: m_Open(false), m_WorldWidth(0), m_WorldHeight(0), m_StoreChunks(nullptr)
+	: m_Open(false), m_Modified(false), m_ReloadRenderChunks(false), m_WorldWidth(0), m_WorldHeight(0), m_StoreChunks(nullptr)
 {
 }
 
@@ -16,7 +20,7 @@ EditorTerrainStore::~EditorTerrainStore()
 bool EditorTerrainStore::LoadTerrain(const std::string& path, glm::ivec2 center)
 {
 	// Load terrain file.
-	m_TerrainFile.open(path, std::ios::in | std::ios::binary);
+	m_TerrainFile.open(path, std::ios::in | std::ios::out | std::ios::binary);
 	if (!m_TerrainFile.is_open())
 	{
 		LI_ERROR("Failed to open terrain file {}", path);
@@ -73,35 +77,195 @@ void EditorTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk
 	}
 }
 
-void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, float dt)
+void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt)
 {
-	const float left_bound = Math::PositiveMod(brush_pos.x - brush->OuterRadius, (float)m_WorldWidth);
-	const float right_bound = Math::PositiveMod(brush_pos.x + brush->OuterRadius, (float)m_WorldWidth);
+	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
+	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
 
-	const float bottom_bound = Math::PositiveMod(brush_pos.y - brush->OuterRadius, (float)m_WorldHeight);
-	const float top_bound = Math::PositiveMod(brush_pos.y + brush->OuterRadius, (float)m_WorldHeight);
+	const float brush_left = Math::PositiveMod(brush_pos.x - brush->OuterRadius, world_width);
+	const float brush_right = Math::PositiveMod(brush_pos.x + brush->OuterRadius, world_width);
+	const float brush_bottom = Math::PositiveMod(brush_pos.y - brush->OuterRadius, world_height);
+	const float brush_top = Math::PositiveMod(brush_pos.y + brush->OuterRadius, world_height);
+
+	brush_pos = {
+		Math::PositiveMod(brush_pos.x, world_width),
+		Math::PositiveMod(brush_pos.y, world_height)
+	};
 
 	for (int i = 0; i < m_WorldWidth * m_WorldHeight; i++)
 	{
 		StoreChunk& chunk = m_StoreChunks[i];
 		bool in_x;
 		bool in_y;
+		
+		const float chunk_left = chunk.Coord.x * TerrainRenderer::MetersPerChunk;
+		const float chunk_bottom = chunk.Coord.y * TerrainRenderer::MetersPerChunk;
+		const float chunk_right = chunk_left + TerrainRenderer::MetersPerChunk;
+		const float chunk_top = chunk_bottom + TerrainRenderer::MetersPerChunk;
 
-		const float chunk_x = chunk.Coord.x * TerrainRenderer::MetersPerChunk;
-		const float chunk_y = chunk.Coord.y * TerrainRenderer::MetersPerChunk;
-		if (left_bound < right_bound)
-			in_x = chunk_x >= left_bound && chunk_x <= right_bound;
+		if (brush_left <= brush_right)
+			in_x = brush_right >= chunk_left && brush_left <= chunk_right;
 		else
-			in_x = chunk_x >= left_bound || chunk_x <= right_bound;
+			in_x = brush_right >= chunk_left || brush_left <= chunk_right;
 
-		if (bottom_bound < top_bound)
-			in_y = chunk_y >= bottom_bound && chunk_y <= top_bound;
+		if (brush_bottom <= brush_top)
+			in_y = brush_top >= chunk_bottom && brush_bottom <= chunk_top;
 		else
-			in_y = chunk_y >= bottom_bound || chunk_y <= top_bound;
-
+			in_y = brush_top >= chunk_bottom || brush_bottom <= chunk_top;
+		
 		if (in_x && in_y)
 		{
-			ApplyBrushToChunk(brush, brush_pos, dt, chunk);
+			ApplyBrushToChunk(brush, brush_pos, layer, dt, chunk);
+		}
+	}
+}
+
+void EditorTerrainStore::Save()
+{
+	for (int y = 0; y < m_WorldHeight; y++)
+	{
+		for (int x = 0; x < m_WorldWidth; x++)
+		{
+			StoreChunk& chunk = m_StoreChunks[x + y * m_WorldWidth];
+			if (chunk.Modified)
+			{
+				m_TerrainFile.seekg(sizeof(TerrainFileHeader)
+					+ (size_t)chunk.Coord.x * sizeof(TerrainFileChunk)
+					+ (size_t)chunk.Coord.y * (size_t)m_WorldWidth * sizeof(TerrainFileChunk), std::ios::beg);
+				SaveChunk(chunk);
+			}
+		}
+	}
+	m_Modified = false;
+}
+
+bool EditorTerrainStore::SaveAs(const std::string& path)
+{
+	{
+		std::fstream new_file(path, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
+		if (!new_file.is_open())
+		{
+			LI_ERROR("Failed to open terrain file {}", path);
+			return false;
+		}
+		m_TerrainFile.clear();
+		m_TerrainFile.close();
+		m_TerrainFile = std::move(new_file);
+	}
+	LI_ASSERT(m_TerrainFile.is_open() && m_TerrainFile.good(), "Terrain file should be open.");
+	m_TerrainPath = path;
+	OverwriteWorld();
+	m_Modified = false;
+	return true;
+}
+
+bool EditorTerrainStore::ReloadRenderChunks()
+{
+	bool value = m_ReloadRenderChunks;
+	m_ReloadRenderChunks = false;
+	return value;
+}
+
+void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt, StoreChunk& chunk)
+{
+	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
+	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
+
+	bool reverse = li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_LSHIFT);
+
+	for (int y = 0; y <= ChunkHeight; y++)
+	{
+		for (int x = 0; x <= ChunkWidth; x++)
+		{
+			constexpr float vertex_distance_x = TerrainRenderer::MetersPerChunk / (float)ChunkWidth;
+			constexpr float vertex_distance_y = TerrainRenderer::MetersPerChunk / (float)ChunkHeight;
+			glm::vec2 vert = {
+				chunk.Coord.x * TerrainRenderer::MetersPerChunk + x * vertex_distance_x,
+				chunk.Coord.y * TerrainRenderer::MetersPerChunk + y * vertex_distance_y
+			};
+
+			// Calculate shortest distance from the vertex to the brush.
+			float dx1 = vert.x - brush_pos.x;
+			float dx2;
+			if (brush_pos.x >= vert.x)
+				dx2 = dx1 + world_width;
+			else
+				dx2 = dx1 - world_width;
+
+			float dy1 = vert.y - brush_pos.y;
+			float dy2;
+			if (brush_pos.y >= vert.y)
+				dy2 = dy1 + world_height;
+			else
+				dy2 = dy1 - world_height;
+
+			float distance = glm::length(glm::vec2{
+				std::abs(dx1) <= std::abs(dx2) ? dx1 : dx2,
+				std::abs(dy1) <= std::abs(dy2) ? dy1 : dy2
+			});
+
+			float brush_power = 1.0f - std::clamp((distance - brush->InnerRadius) / (brush->OuterRadius - brush->InnerRadius), 0.0f, 1.0f);
+
+			float prev_value = chunk.AlphaValues[y][x][layer];
+			float new_value;
+			if (brush->Subtract != reverse)
+			{
+				new_value = std::max(prev_value - brush_power * brush->Strength * dt, 0.0f);
+			}
+			else
+			{
+				new_value = std::min(prev_value + brush_power * brush->Strength * dt, 1.0f);
+			}
+
+			if (new_value != prev_value)
+			{
+				chunk.AlphaValues[y][x][layer] = new_value;
+				chunk.Modified = true;
+				m_ReloadRenderChunks = true;
+				m_Modified = true;
+			}
+		}
+	}
+}
+
+void EditorTerrainStore::OverwriteWorld()
+{
+	// We should already be at the start of the file.
+	uint16_t world_width = (uint16_t)m_WorldWidth;
+	uint16_t world_height = (uint16_t)m_WorldHeight;
+	m_TerrainFile.write((const char*)&world_width, sizeof(world_width));
+	m_TerrainFile.write((const char*)&world_height, sizeof(world_height));
+
+	for (int y = 0; y < m_WorldHeight; y++)
+	{
+		for (int x = 0; x < m_WorldWidth; x++)
+		{
+			SaveChunk(m_StoreChunks[x + y * m_WorldWidth]);
+		}
+	}
+}
+
+void EditorTerrainStore::SaveChunk(StoreChunk& chunk)
+{
+	// Assumes we are already in the correct file position.
+
+	for (int i = 0; i < NumTilesPerChunk; i++)
+	{
+		m_TerrainFile.write((const char*)&chunk.Tiles[i], sizeof(chunk.Tiles[i]));
+	}
+
+	for (int y = 0; y < ChunkHeight; y++)
+	{
+		for (int x = 0; x < ChunkWidth; x++)
+		{
+			auto& alphas = chunk.AlphaValues[y][x];
+			for (int i = 0; i < NumTilesPerChunk - 1; i++)
+			{
+				float alpha = alphas[i];
+				uint8_t byte = (uint8_t)std::floor(alpha >= 1.0f ? 255 : alpha * 256.0f);
+
+				m_TerrainFile.write((const char*)&byte, sizeof(byte));
+			}
 		}
 	}
 }
@@ -126,7 +290,7 @@ void EditorTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destina
 		{
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[y][x][i] = (float)temp_chunk.AlphaValues[y][x][i] / 255.0f;
+				destination->AlphaValues[y][x][i] = (float)temp_chunk.AlphaValues[y][x][i] / 256.0f;
 			}
 		}
 	}
@@ -150,7 +314,7 @@ void EditorTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destina
 
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[y][ChunkWidth][i] = (float)bytes[i] / 255.0f;
+				destination->AlphaValues[y][ChunkWidth][i] = (float)bytes[i] / 256.0f;
 			}
 		}
 	}
@@ -169,7 +333,7 @@ void EditorTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destina
 		{
 			for (int i = 0; i < NumTilesPerChunk - 1; i++)
 			{
-				destination->AlphaValues[ChunkHeight][x][i] = (float)row[x][i] / 255.0f;
+				destination->AlphaValues[ChunkHeight][x][i] = (float)row[x][i] / 256.0f;
 			}
 		}
 	}
@@ -186,18 +350,8 @@ void EditorTerrainStore::LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destina
 
 		for (int i = 0; i < NumTilesPerChunk - 1; i++)
 		{
-			destination->AlphaValues[ChunkHeight][ChunkWidth][i] = (float)bytes[i] / 255.0f;
+			destination->AlphaValues[ChunkHeight][ChunkWidth][i] = (float)bytes[i] / 256.0f;
 		}
 	}
 }
-
-void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, float dt, StoreChunk& chunk)
-{
-	for (int y = 0; y < ChunkHeight; y++)
-	{
-		for (int x = 0; x < ChunkWidth; x++)
-		{
-			// TODO
-		}
-	}
-}
+#endif

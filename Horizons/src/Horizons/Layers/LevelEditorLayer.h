@@ -7,6 +7,9 @@
 #include "Lithium.h"
 #include "entt/entt.hpp"
 #include "glm/glm.hpp"
+#include "SDL.h"
+
+#include <filesystem>
 
 class LevelEditorLayer : public li::Layer
 {
@@ -24,12 +27,40 @@ public:
 	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
 
 private:
-	bool m_ReturnToMainMenu;
+	void FileOpen();
+	void FileOpenDialog();
+	void FileSave();
+	void FileSaveAs();
 
+	void UnsavedChangesDialog(int* button_id);
+
+	bool m_ReturnToMainMenu;
 	bool m_DockspaceOpen;
+	bool m_TitleHasAsterisk;
 
 	EditorSettings m_Settings;
 	ViewportPanel m_Viewport;
 	TerrainEditingPanel m_TerrainEditingPanel;
+
+	std::filesystem::path m_TerrainPath;
+
+	const SDL_MessageBoxColorScheme m_MsgBoxColorScheme = { {
+			/* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+			{ 255,   0,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_TEXT] */
+			{   0, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+			{ 255, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+			{   0,   0, 255 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+			{ 255,   0, 255 }
+	} };
+
+	const SDL_MessageBoxButtonData m_OverwriteButtons[3] = {
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 0, "Save" },
+		{                                       0, 1, "Don't Save" },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "Cancel" }
+	};
 };
 #endif // !LI_DIST

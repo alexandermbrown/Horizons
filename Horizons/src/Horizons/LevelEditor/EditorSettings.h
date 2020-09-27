@@ -28,6 +28,7 @@ struct EditorSettings
 {
 	BrushSettings Brush;
 	DisplaySettings Display;
+	int Layer;
 };
 
 #endif

@@ -8,7 +8,7 @@ class TerrainEditingPanel
 public:
 	TerrainEditingPanel(EditorSettings* settings);
 
-	void OnImGuiRender();
+	void RenderPanel(float max_brush_radius);
 	inline void ShowPanel() { m_WindowOpen = true; }
 
 private:

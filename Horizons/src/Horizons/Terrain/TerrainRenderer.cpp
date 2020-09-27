@@ -198,7 +198,7 @@ void TerrainRenderer::SubmitQuad()
 
 void TerrainRenderer::PrepareRenderChunks()
 {
-	if (m_ReloadRenderChunks)
+	if (m_ReloadRenderChunks || m_Store->ReloadRenderChunks())
 	{
 		int HalfRenderWidth = RenderWidth / 2;
 		for (int y = -HalfRenderWidth; y <= HalfRenderWidth; y++)
@@ -207,9 +207,10 @@ void TerrainRenderer::PrepareRenderChunks()
 			{
 				glm::ivec2 display_coord = m_Center + glm::ivec2{ x, y };
 				// Account for any overflow past world bounds.
+				glm::ivec2 world_size = m_Store->GetWorldSize();
 				glm::ivec2 store_coord = {
-					Math::PositiveMod(display_coord.x, m_Store->GetWorldWidth()),
-					Math::PositiveMod(display_coord.y, m_Store->GetWorldHeight())
+					Math::PositiveMod(display_coord.x, world_size.x),
+					Math::PositiveMod(display_coord.y, world_size.y)
 				};
 
 				auto& chunk = m_RenderChunks[(x + HalfRenderWidth) + (y + HalfRenderWidth) * (size_t)RenderWidth];
@@ -227,12 +228,12 @@ void TerrainRenderer::PrepareRenderChunks()
 	{
 		// test if current chunk is within radius of center.
 		int radius = RenderWidth / 2;
+		glm::ivec2 world_size = m_Store->GetWorldSize();
+		int left_bound = Math::PositiveMod(m_Center.x - radius, world_size.x);
+		int right_bound = Math::PositiveMod(m_Center.x + radius, world_size.x);
 
-		int left_bound = Math::PositiveMod(m_Center.x - radius, m_Store->GetWorldWidth());
-		int right_bound = Math::PositiveMod(m_Center.x + radius, m_Store->GetWorldWidth());
-
-		int bottom_bound = Math::PositiveMod(m_Center.y - radius, m_Store->GetWorldHeight());
-		int top_bound = Math::PositiveMod(m_Center.y + radius, m_Store->GetWorldHeight());
+		int bottom_bound = Math::PositiveMod(m_Center.y - radius, world_size.y);
+		int top_bound = Math::PositiveMod(m_Center.y + radius, world_size.y);
 
 		// Remove chunks which are no longer near the center.
 		for (int i = 0; i < RenderWidth * RenderWidth; i++)
@@ -263,8 +264,8 @@ void TerrainRenderer::PrepareRenderChunks()
 
 				// Account for any overflow past world bounds.
 				glm::ivec2 store_coord = {
-					Math::PositiveMod(display_coord.x, m_Store->GetWorldWidth()),
-					Math::PositiveMod(display_coord.y, m_Store->GetWorldHeight())
+					Math::PositiveMod(display_coord.x, world_size.x),
+					Math::PositiveMod(display_coord.y, world_size.y)
 				};
 
 				// Load RenderChunk From Store

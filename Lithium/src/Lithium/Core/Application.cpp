@@ -3,7 +3,6 @@
 
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"
-#include "Lithium/Events/EventDispatcher.h"
 #include "Lithium/Renderer/Renderer.h"
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
@@ -173,19 +172,23 @@ namespace li
 	{
 		m_Input.OnEvent(event);
 
-		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch(SDL_WINDOWEVENT, LI_BIND_FN(Application::OnWindowEvent));
+		if (event->type == SDL_WINDOWEVENT)
+			OnWindowEvent(event);
+
 #ifndef LI_DIST
 		m_ImGuiRenderer->OnEvent(event);
 #endif
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			if (m_EventHandled) {
-				m_EventHandled = false;
+			if (m_EventHandled)
 				break;
-			}
 			(*it)->OnEvent(event);
 		}
+
+		if (!m_EventHandled && event->window.event == SDL_WINDOWEVENT_CLOSE)
+			m_Running = false;
+
+		m_EventHandled = false;
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -245,9 +248,6 @@ namespace li
 	{
 		switch(event->window.event)
 		{
-		case SDL_WINDOWEVENT_CLOSE:
-			m_Running = false;
-			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			if (event->window.windowID == m_Window->GetWindowID())
 			{

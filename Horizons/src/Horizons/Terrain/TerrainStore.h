@@ -33,8 +33,8 @@ public:
 	virtual void UpdateCenter(glm::ivec2 center) = 0;
 	virtual void LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk* destination) = 0;
 
-	virtual int GetWorldWidth() const = 0;
-	virtual int GetWorldHeight() const = 0;
+	virtual glm::ivec2 GetWorldSize() const = 0;
+	virtual bool ReloadRenderChunks() = 0;
 
 	static constexpr int NumTilesPerChunk = Terrain::NumTilesPerChunk;
 	static constexpr int ChunkWidth = Terrain::ChunkWidth;
