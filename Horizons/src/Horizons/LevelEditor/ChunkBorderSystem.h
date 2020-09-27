@@ -6,6 +6,6 @@
 
 namespace ChunkBorderSystem
 {
-	void SubmitBorders(entt::registry& registry, glm::vec2 camera_focus);
+	void SubmitBorders(entt::registry& registry, glm::vec2 camera_focus, glm::ivec2 world_size);
 }
 #endif

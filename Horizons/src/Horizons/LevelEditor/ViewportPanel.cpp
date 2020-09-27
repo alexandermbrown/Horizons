@@ -82,7 +82,7 @@ void ViewportPanel::OnUpdate(float dt)
 
 		if (m_Settings->Display.ShowChunkBorders)
 		{
-			ChunkBorderSystem::SubmitBorders(m_Registry, m_CameraFocus);
+			ChunkBorderSystem::SubmitBorders(m_Registry, m_CameraFocus, m_TerrainStore.GetWorldSize());
 		}
 
 		BrushSystem::SubmitBrush(m_Registry, m_MousePos, m_ViewportFB->GetSize());
