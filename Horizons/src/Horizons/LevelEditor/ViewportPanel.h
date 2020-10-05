@@ -20,6 +20,7 @@ public:
 	void RenderPanel();
 	void OnEvent(SDL_Event* event);
 
+	bool FileNew(const std::string& path, glm::ivec2 world_size);
 	bool FileOpen(const std::string& path);
 	void FileSave();
 	void FileSaveAs(const std::string& path);

@@ -12,7 +12,7 @@
 
 ViewportPanel::ViewportPanel(EditorSettings* settings)
 	: m_Settings(settings), m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
-	m_TerrainStore(), m_TerrainRenderer(&m_TerrainStore, 7)
+		m_TerrainRenderer(&m_TerrainStore, 7)
 {
 	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
 	m_ViewportFB->SetClearColor({ 0.25f, 0.25f, 0.25f, 1.0f });
@@ -126,6 +126,14 @@ void ViewportPanel::OnEvent(SDL_Event* event)
 	{
 		EditorCameraSystem::OnEvent(m_Registry, event, m_ViewportFB->GetSize());
 	}
+}
+
+bool ViewportPanel::FileNew(const std::string& path, glm::ivec2 world_size)
+{
+	if (!m_TerrainStore.CreateEmptyTerrainFile(path, world_size))
+		return false;
+
+	return FileOpen(path);
 }
 
 bool ViewportPanel::FileOpen(const std::string& path)

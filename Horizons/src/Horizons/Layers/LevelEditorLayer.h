@@ -3,6 +3,7 @@
 
 #include "Horizons/LevelEditor/ViewportPanel.h"
 #include "Horizons/LevelEditor/TerrainEditingPanel.h"
+#include "Horizons/LevelEditor/NewTerrainModal.h"
 
 #include "Lithium.h"
 #include "entt/entt.hpp"
@@ -27,6 +28,7 @@ public:
 	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
 
 private:
+	void FileNew();
 	void FileOpen();
 	void FileOpenDialog();
 	void FileSave();
@@ -41,6 +43,7 @@ private:
 	EditorSettings m_Settings;
 	ViewportPanel m_Viewport;
 	TerrainEditingPanel m_TerrainEditingPanel;
+	NewTerrainModal m_NewTerrainModal;
 
 	std::filesystem::path m_TerrainPath;
 

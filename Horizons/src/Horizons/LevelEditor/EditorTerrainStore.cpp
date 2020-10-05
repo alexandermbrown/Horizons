@@ -166,6 +166,46 @@ bool EditorTerrainStore::ReloadRenderChunks()
 	return value;
 }
 
+bool EditorTerrainStore::CreateEmptyTerrainFile(const std::string& path, glm::ivec2 world_size)
+{
+	// Load terrain file.
+	std::ofstream new_file(path, std::ios::out | std::ios::binary | std::ios::trunc);
+	if (!new_file.is_open())
+	{
+		LI_ERROR("Failed to open terrain file {}", path);
+		return false;
+	}
+
+	uint16_t width = world_size.x;
+	uint16_t height = world_size.y;
+	new_file.write((char*)&width, sizeof(width));
+	new_file.write((char*)&height, sizeof(height));
+
+	for (int y = 0; y < world_size.y; y++)
+	{
+		for (int x = 0; x < world_size.x; x++)
+		{
+			for (int i = 0; i < NumTilesPerChunk; i++)
+			{
+				uint16_t tile = i + 1;
+				new_file.write((const char*)&tile, sizeof(tile));
+			}
+			for (int y = 0; y < ChunkHeight; y++)
+			{
+				for (int x = 0; x < ChunkWidth; x++)
+				{
+					// Layers 1-3 are fully transparent.
+					uint8_t value = 0;
+					new_file.write((const char*)&value, sizeof(value));
+					new_file.write((const char*)&value, sizeof(value));
+					new_file.write((const char*)&value, sizeof(value));
+				}
+			}
+		}
+	}
+	return true;
+}
+
 void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt, StoreChunk& chunk)
 {
 	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;

@@ -25,6 +25,8 @@ public:
 	inline bool IsModified() const { return m_Modified; }
 	virtual bool ReloadRenderChunks() override;
 
+	static bool CreateEmptyTerrainFile(const std::string& path, glm::ivec2 world_size);
+
 private:
 	struct StoreChunk
 	{

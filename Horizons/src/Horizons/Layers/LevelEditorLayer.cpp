@@ -42,12 +42,12 @@ void LevelEditorLayer::OnUpdate(float dt)
 	m_Viewport.OnUpdate(dt);
 	if (!m_TitleHasAsterisk && m_Viewport.IsTerrainModified())
 	{
-		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), ("Horizons Level Editor - " + m_TerrainPath.filename().string() + "*").c_str());
+		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + "* - Horizons Level Editor").c_str());
 		m_TitleHasAsterisk = true;
 	}
 	else if (m_TitleHasAsterisk && !m_Viewport.IsTerrainModified())
 	{
-		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), ("Horizons Level Editor - " + m_TerrainPath.filename().string()).c_str());
+		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
 		m_TitleHasAsterisk = false;
 	}
 
@@ -80,16 +80,50 @@ void LevelEditorLayer::OnImGuiRender()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu(u8"File"))
+		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New", "Ctrl+N")) {}
+			if (ImGui::MenuItem("New", "Ctrl+N")) FileNew();
 			if (ImGui::MenuItem("Open", "Ctrl+O")) FileOpen();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Save", "Ctrl+S")) FileSave();
 			if (ImGui::MenuItem("Save As", "Ctrl+Shift+S")) FileSaveAs();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Return to Main Menu")) m_ReturnToMainMenu = true;
-			if (ImGui::MenuItem("Exit", "Alt+F4")) li::Application::Get()->Exit(); 
+			if (ImGui::MenuItem("Return to Main Menu"))
+			{
+				if (m_Viewport.IsTerrainOpen() && m_Viewport.IsTerrainModified())
+				{
+					int button_id;
+					UnsavedChangesDialog(&button_id);
+					// If save is clicked.
+					if (button_id == 0)
+					{
+						FileSave();
+						m_ReturnToMainMenu = true;
+					}
+					// If cancel is clicked.
+					else if (button_id == 1)
+						m_ReturnToMainMenu = true;
+				}
+				else m_ReturnToMainMenu = true;
+			}
+			if (ImGui::MenuItem("Exit", "Alt+F4"))
+			{
+				if (m_Viewport.IsTerrainOpen() && m_Viewport.IsTerrainModified())
+				{
+					int button_id;
+					UnsavedChangesDialog(&button_id);
+					// If save is clicked.
+					if (button_id == 0)
+					{
+						FileSave();
+						li::Application::Get()->Exit();
+					}
+					// If cancel is clicked.
+					else if (button_id == 1)
+						li::Application::Get()->Exit();
+				}
+				else li::Application::Get()->Exit();
+			}
 
 			ImGui::EndMenu();
 		}
@@ -143,6 +177,25 @@ void LevelEditorLayer::OnImGuiRender()
 	}
 
 	m_Viewport.RenderPanel();
+
+	m_NewTerrainModal.RenderModal();
+	if (m_NewTerrainModal.IsDone())
+	{
+		if (m_Viewport.IsTerrainOpen())
+			m_Viewport.CloseTerrain();
+
+		const std::string& path = m_NewTerrainModal.GetPath();
+		if (m_Viewport.FileNew(path, m_NewTerrainModal.GetWorldSize()))
+		{
+			m_TerrainPath = path;
+			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
+		}
+		else
+		{
+			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons Level Editor");
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open new terrain file.", li::Application::Get()->GetWindow()->GetWindow());
+		}
+	}
 }
 
 void LevelEditorLayer::OnEvent(SDL_Event* event)
@@ -156,6 +209,9 @@ void LevelEditorLayer::OnEvent(SDL_Event* event)
 		{
 			switch (event->key.keysym.scancode)
 			{
+			case SDL_SCANCODE_N:
+				FileNew();
+				break;
 			case SDL_SCANCODE_O:
 				FileOpen();
 				break;
@@ -173,16 +229,31 @@ void LevelEditorLayer::OnEvent(SDL_Event* event)
 	{
 		int button_id;
 		UnsavedChangesDialog(&button_id);
-
 		// If open is cancelled.
 		if (button_id < 0 || button_id >= 2)
 			li::Application::Get()->EventHandled();
 		// If save is clicked.
 		if (button_id == 0)
 			FileSave();
-
 		// If don't save, ie. button_id == 1, do nothing.
 	}
+}
+
+void LevelEditorLayer::FileNew()
+{
+	if (m_Viewport.IsTerrainOpen() && m_Viewport.IsTerrainModified())
+	{
+		int button_id;
+		UnsavedChangesDialog(&button_id);
+		// If open is cancelled.
+		if (button_id < 0 || button_id >= 2)
+			return;
+		// If save is clicked.
+		if (button_id == 0)
+			FileSave();
+		// If don't save, ie. button_id == 1, do nothing.
+	}
+	m_NewTerrainModal.Open();
 }
 
 void LevelEditorLayer::FileOpen()
@@ -193,14 +264,12 @@ void LevelEditorLayer::FileOpen()
 		{
 			int button_id;
 			UnsavedChangesDialog(&button_id);
-
 			// If open is cancelled.
 			if (button_id < 0 || button_id >= 2)
 				return;
 			// If save is clicked.
 			if (button_id == 0)
 				FileSave();
-
 			// If don't save, ie. button_id == 1, do nothing.
 		}
 		m_Viewport.CloseTerrain();
@@ -217,7 +286,7 @@ void LevelEditorLayer::FileOpenDialog()
 		if (m_Viewport.FileOpen(path))
 		{
 			m_TerrainPath = path;
-			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), ("Horizons Level Editor - " + m_TerrainPath.filename().string()).c_str());
+			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
 			m_TitleHasAsterisk = false;
 		}
 		else
