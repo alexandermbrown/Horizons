@@ -12,6 +12,7 @@
 #include "Horizons/Scenes/GameScene.h"
 #ifndef LI_DIST
 #include "Horizons/Scenes/LevelEditorScene.h"
+#include "Horizons/Scenes/VideoPlayerScene.h"
 #endif
 #include "Horizons/Gameplay/RNGSystem.h"
 #include "Horizons/Rendering/FlickerSystem.h"
@@ -21,7 +22,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 MainMenuLayer::MainMenuLayer()
-	: Layer("MainMenuLayer"), m_Registry(), m_TransitionTimer(0.25f, true)
+	: Layer("MainMenuLayer"), m_Registry(), m_TransitionTimer(li::duration::ms(250), true)
 {
 	UILayoutSystem::Init(m_Registry);
 
@@ -39,7 +40,7 @@ MainMenuLayer::MainMenuLayer()
 		{
 			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
 			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
-				if (button == 1)
+				if (button == 1 && !m_StartedTransition)
 				{
 					m_StartedTransition = true;
 					m_TransitionScene = new GameScene();
@@ -52,10 +53,22 @@ MainMenuLayer::MainMenuLayer()
 		{
 			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
 			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
-				if (button == 1)
+				if (button == 1 && !m_StartedTransition)
 				{
 					m_StartedTransition = true;
 					m_TransitionScene = new LevelEditorScene();
+				}
+				return true;
+			};
+		}
+		else if (name.name == "button_example_video")
+		{
+			cp::ui_click& click = m_Registry.emplace<cp::ui_click>(entity);
+			click.OnClickFn = [this](entt::registry& registry, entt::entity entity, int button) -> bool {
+				if (button == 1 && !m_StartedTransition)
+				{
+					m_StartedTransition = true;
+					m_TransitionScene = new VideoPlayerScene();
 				}
 				return true;
 			};
@@ -77,7 +90,7 @@ void MainMenuLayer::OnDetach()
 {
 }
 
-void MainMenuLayer::OnUpdate(float dt)
+void MainMenuLayer::OnUpdate(li::duration::us dt)
 {
 	UILayoutSystem::Update(m_Registry);
 	UITransformSortSystem::SortTransforms(m_Registry);
@@ -98,7 +111,7 @@ void MainMenuLayer::OnUpdate(float dt)
 			glm::scale(glm::mat4(1.0f), { window->GetWidth(), window->GetHeight(), 1.0f }));
 		m_Finished = m_TransitionTimer.Update(dt);
 	}
-
+	
 	li::Renderer::EndUI();
 	UIRenderSystem::RenderLabels(m_Registry);
 }

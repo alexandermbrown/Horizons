@@ -9,19 +9,17 @@
 class SplashScreenScene : public li::Scene
 {
 public:
-
 	SplashScreenScene();
 	virtual ~SplashScreenScene() = default;
 
 	virtual void TransitionIn() override;
 	virtual void TransitionOut() override;
 
-	virtual void OnUpdate(float dt) override;
+	virtual void OnUpdate(li::duration::us dt) override;
 
 	virtual bool Finished() override { return true; }
 
 private:
-
 	SplashScreenLayer m_SplashScreenLayer;
 	ConfigUpdateLayer m_ConfigCleanLayer;
 };

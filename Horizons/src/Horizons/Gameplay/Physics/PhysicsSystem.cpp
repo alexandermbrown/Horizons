@@ -17,7 +17,7 @@ void PhysicsSystem::Shutdown(entt::registry& registry)
 	delete registry.ctx<cp::physics_world>().world;
 }
 
-void PhysicsSystem::Step(entt::registry& registry, float dt)
+void PhysicsSystem::Step(entt::registry& registry, li::duration::us dt)
 {
-	registry.ctx<cp::physics_world>().world->Step(dt, HZ_PHYS_VELOCITY_ITERATIONS, HZ_PHYS_POSITION_ITERATIONS);
+	registry.ctx<cp::physics_world>().world->Step(li::duration::fsec(dt).count(), HZ_PHYS_VELOCITY_ITERATIONS, HZ_PHYS_POSITION_ITERATIONS);
 }

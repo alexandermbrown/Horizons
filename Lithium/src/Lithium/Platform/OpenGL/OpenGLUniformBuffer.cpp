@@ -18,15 +18,15 @@ namespace li
 			m_Elements[element.Name] = element;
 		}
 
-		GLCall( glGenBuffers(1, &m_RendererID) );
-		GLCall( glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID) );
+		glGenBuffers(1, &m_RendererID);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
 
-		GLCall( glBufferData(GL_UNIFORM_BUFFER, m_DataSize, nullptr, GL_DYNAMIC_DRAW) );
+		glBufferData(GL_UNIFORM_BUFFER, m_DataSize, nullptr, GL_DYNAMIC_DRAW);
 	}
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
-		GLCall( glDeleteBuffers(1, &m_RendererID) );
+		glDeleteBuffers(1, &m_RendererID);
 		delete[] m_GlslData;
 	}
 
@@ -89,10 +89,14 @@ namespace li
 	void OpenGLUniformBuffer::UploadData()
 	{
 		LI_CORE_ASSERT(m_Changed, "Data not changed");
+		
+		constexpr GLbitfield access = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
 
-		// TODO: Orphan buffer or use multiple buffers.
-		GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID));
-		GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, (GLsizeiptr)m_DataSize, m_GlslData));
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		void* dest = glMapBufferRange(GL_UNIFORM_BUFFER, 0, (GLsizeiptr)m_DataSize, access);
+		LI_CORE_ASSERT(dest, "Failed to map buffer.");
+		memcpy(dest, m_GlslData, m_DataSize);
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 
 	void OpenGLUniformBuffer::BindToSlot() const

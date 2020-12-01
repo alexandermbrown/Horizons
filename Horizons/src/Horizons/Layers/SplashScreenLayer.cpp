@@ -19,7 +19,7 @@ void SplashScreenLayer::OnDetach()
 {
 }
 
-void SplashScreenLayer::OnUpdate(float dt)
+void SplashScreenLayer::OnUpdate(li::duration::us dt)
 {
 	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
 	li::Application::Get()->GetWindow()->GetContext()->Clear();

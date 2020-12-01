@@ -19,10 +19,9 @@ namespace li
 	class Application
 	{
 	public:
-		inline static Application* Get() { return s_Instance; }
-
 		template<typename T>
 		inline static T* Get() { return static_cast<T*>(s_Instance); }
+		inline static Application* Get() { return s_Instance; } 
 
 		Application(const WindowProps& props);
 		virtual ~Application();

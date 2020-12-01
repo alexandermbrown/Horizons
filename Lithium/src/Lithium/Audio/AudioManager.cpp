@@ -6,35 +6,49 @@
 
 namespace li
 {
-	Scope<AudioManager> AudioManager::s_Instance = CreateScope<AudioManager>();
-
-	AudioManager::AudioManager()
-		: m_Device(NULL), m_Context(NULL)
+	struct AudioData
 	{
-	}
+		AudioData(ALCdevice* device, ALCcontext* context)
+			: Device(device), Context(context) {}
+		ALCdevice* Device;
+		ALCcontext* Context;
+	};
 
-	void AudioManager::InitImpl()
+	Scope<AudioData> s_Data = nullptr;
+
+	bool AudioManager::Init(const char* device_name)
 	{
 		// TODO: Enumerate through devices and allow user to change the device.
-		m_Device = alcOpenDevice(nullptr);
-		// TODO: Handle error without crashing.
-		LI_CORE_ASSERT(m_Device, "Failed to create audio device!");
-
-		m_Context = alcCreateContext(static_cast<ALCdevice*>(m_Device), NULL);
-		LI_CORE_ASSERT(m_Context, "Failed to create audio context!");
-
-		if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_Context))) {
-			LI_CORE_ERROR("Failed to make audio context current!");
+		ALCdevice* device = alcOpenDevice(device_name);
+		if (device == nullptr)
+		{
+			LI_CORE_ERROR("Failed to open audio device.");
+			return false;
 		}
+		ALCcontext* context = alcCreateContext(device, nullptr);
+		if (context == nullptr)
+		{
+			LI_CORE_ERROR("Failed to create audio context.");
+			alcCloseDevice(device);
+			return false;
+		}
+		if (alcMakeContextCurrent(context) == false)
+		{
+			LI_CORE_ERROR("Failed to make audio context current!");
+			alcDestroyContext(context);
+			alcCloseDevice(device);
+			return false;
+		}
+
+		s_Data = CreateScope<AudioData>(device, context);
+		return true;
 	}
 
-	void AudioManager::ShutdownImpl()
+	void AudioManager::Shutdown()
 	{
 		alcMakeContextCurrent(nullptr);
-		alcDestroyContext(static_cast<ALCcontext*>(m_Context));
-		m_Context = nullptr;
-
-		alcCloseDevice(static_cast<ALCdevice*>(m_Device));
-		m_Device = nullptr;
+		alcDestroyContext(s_Data->Context);
+		alcCloseDevice(s_Data->Device);
+		s_Data.reset();
 	}
 }

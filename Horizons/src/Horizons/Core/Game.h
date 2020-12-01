@@ -21,15 +21,12 @@ public:
 	static Game* Get() { return s_Instance; }
 
 	Game(const TickThreadInput& data);
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	Game(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue);
 #endif
-
 	~Game();
 
 	void Run();
-
 	void OnEvent(SDL_Event* event);
 
 	ConfigStore& GetConfig() { return m_ConfigStore; }
@@ -37,7 +34,7 @@ public:
 private:
 
 	void Init();
-	void Update(float dt);
+	void Update(li::duration::us dt);
 	void Shutdown();
 
 	bool m_Running;

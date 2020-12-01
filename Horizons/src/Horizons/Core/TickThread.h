@@ -33,7 +33,7 @@ public:
 	void Begin(entt::registry& registry);
 	void Finish(entt::registry& registry);
 
-	void UpdateSync(entt::registry& registry, float dt);
+	void UpdateSync(entt::registry& registry, li::duration::us dt);
 	void OnEvent(SDL_Event* event);
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW

@@ -122,21 +122,21 @@ namespace li
 			GLuint shader = glCreateShader(type);
 
 			const GLchar* sourceCStr = source.c_str();
-			GLCall( glShaderSource(shader, 1, &sourceCStr, 0) );
+			glShaderSource(shader, 1, &sourceCStr, 0);
 
-			GLCall( glCompileShader(shader) );
+			glCompileShader(shader);
 
 			GLint isCompiled = 0;
-			GLCall( glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled) );
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
 			if (isCompiled == GL_FALSE)
 			{
 				GLint maxLength = 0;
-				GLCall( glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength) );
+				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
 
 				std::vector<GLchar> infoLog(maxLength);
-				GLCall( glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]) );
+				glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
 
-				GLCall( glDeleteShader(shader) );
+				glDeleteShader(shader);
 
 				LI_CORE_ERROR("{0}", infoLog.data());
 				LI_CORE_ASSERT(false, "Shader compilation failure!");
@@ -154,11 +154,11 @@ namespace li
 
 		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
-		GLCall( glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked) );
+		glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			GLCall( glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength) );
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
 			// The maxLength includes the NULL character
 			std::vector<GLchar> infoLog(maxLength);
@@ -168,7 +168,7 @@ namespace li
 			glDeleteProgram(program);
 			
 			for (auto id : glShaderIDs) {
-				GLCall( glDeleteShader(id) );
+				glDeleteShader(id);
 			}
 
 			LI_CORE_ERROR("{0}", infoLog.data());
@@ -178,55 +178,55 @@ namespace li
 
 		for (auto id : glShaderIDs)
 		{
-			GLCall( glDetachShader(program, id) );
-			GLCall( glDeleteShader(id) );
+			glDetachShader(program, id);
+			glDeleteShader(id);
 		}
 	}
 
 	void OpenGLShader::Bind() const
 	{
-		GLCall( glUseProgram(m_RendererID) );
+		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniform1i(location, value) );
+		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniform1f(location, value) );
+		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniform2f(location, value.x, value.y) );
+		glUniform2f(location, value.x, value.y);
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniform3f(location, value.x, value.y, value.z) );
+		glUniform3f(location, value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniform4f(location, value.x, value.y, value.z, value.w) );
+		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix)) );
+		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		GLCall( glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix)) );
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 }

@@ -16,7 +16,7 @@ void ConfigUpdateLayer::OnDetach()
 {
 }
 
-void ConfigUpdateLayer::OnUpdate(float dt)
+void ConfigUpdateLayer::OnUpdate(li::duration::us dt)
 {
 	Clean();
 }

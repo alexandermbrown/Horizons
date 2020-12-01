@@ -6,23 +6,22 @@
 
 #include "imgui.h"
 
-DiagnosticsLayer::DiagnosticsLayer()
-	: m_Timer(0.1f, false, true)
-{
+using namespace std::chrono_literals;
 
+DiagnosticsLayer::DiagnosticsLayer()
+	: m_Timer(100ms, false, true), m_CurrentDelta(0), m_AverageTotal(0), m_Min(0), m_Max(0)
+{
 }
 
 void DiagnosticsLayer::OnAttach()
 {
-
 }
 
 void DiagnosticsLayer::OnDetach()
 {
-
 }
 
-void DiagnosticsLayer::OnUpdate(float dt)
+void DiagnosticsLayer::OnUpdate(li::duration::us dt)
 {
 	m_CurrentDelta = dt;
 
@@ -37,16 +36,16 @@ void DiagnosticsLayer::OnUpdate(float dt)
 
 	if (m_Timer.Update(dt))
 	{
-		m_Average = m_AverageTotal / (float)m_AverageCount;
-		m_AverageTotal = 0.0f;
+		m_Average = li::duration::fsec(m_AverageTotal).count() / (float)m_AverageCount;
+		m_AverageTotal = li::duration::us(0);
 		m_AverageCount = 0ULL;
 
-		m_DisplayMin = m_Min;
-		m_DisplayMax = m_Max;
+		m_DisplayMin = li::duration::fsec(m_Min).count();
+		m_DisplayMax = li::duration::fsec(m_Max).count();
 
 		m_Averages[m_EntryIndex] = m_Average;
-		m_Maximums[m_EntryIndex] = m_Max;
-		m_Minimums[m_EntryIndex] = m_Min;
+		m_Maximums[m_EntryIndex] = li::duration::fsec(m_Max).count();
+		m_Minimums[m_EntryIndex] = li::duration::fsec(m_Min).count();
 
 		m_EntryIndex = (m_EntryIndex + 1) % DiagnosticsMaxEntries;
 

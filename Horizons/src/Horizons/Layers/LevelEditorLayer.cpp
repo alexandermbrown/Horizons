@@ -37,7 +37,7 @@ void LevelEditorLayer::OnDetach()
 	SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons");
 }
 
-void LevelEditorLayer::OnUpdate(float dt)
+void LevelEditorLayer::OnUpdate(li::duration::us dt)
 {
 	m_Viewport.OnUpdate(dt);
 	if (!m_TitleHasAsterisk && m_Viewport.IsTerrainModified())

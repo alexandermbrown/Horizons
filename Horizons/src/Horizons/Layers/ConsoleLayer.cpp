@@ -23,17 +23,14 @@ ConsoleLayer::ConsoleLayer()
 
 void ConsoleLayer::OnAttach()
 {
-
 }
 
 void ConsoleLayer::OnDetach()
 {
-
 }
 
-void ConsoleLayer::OnUpdate(float dt)
+void ConsoleLayer::OnUpdate(li::duration::us dt)
 {
-
 }
 
 void ConsoleLayer::OnImGuiRender()

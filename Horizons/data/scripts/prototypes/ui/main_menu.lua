@@ -39,7 +39,8 @@ local bg_nebula = {  -- Background nebula
 	texture_crop = true,
 	children = {
 		CreateMainMenuButton("button_play", "Play"),
-		CreateMainMenuButton("button_level_editor", "Level Editor")
+		CreateMainMenuButton("button_level_editor", "Level Editor"),
+		CreateMainMenuButton("button_example_video", "Video")
 	}
 }
 

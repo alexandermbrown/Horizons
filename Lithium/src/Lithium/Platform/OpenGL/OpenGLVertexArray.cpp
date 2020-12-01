@@ -29,7 +29,7 @@ namespace li
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		GLCall( glGenVertexArrays(1, &m_RendererID) );
+		glGenVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
@@ -39,65 +39,65 @@ namespace li
 
 	void OpenGLVertexArray::Bind() const
 	{
-		GLCall( glBindVertexArray(m_RendererID) );
+		glBindVertexArray(m_RendererID);
 		if (m_IndexBuffer) m_IndexBuffer->Bind();
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
-		GLCall( glBindVertexArray(0) );
+		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertex_buffer)
 	{
-		LI_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
+		LI_CORE_ASSERT(vertex_buffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
-		vertexBuffer->Bind();
-		GLCall( glBindVertexArray(m_RendererID) );
+		vertex_buffer->Bind();
+		glBindVertexArray(m_RendererID);
 
-		const auto& layout = vertexBuffer->GetLayout();
+		const auto& layout = vertex_buffer->GetLayout();
 		for (const auto& element : layout)
 		{
 			if (element.Type == ShaderDataType::Mat4)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					GLCall( glEnableVertexAttribArray(element.Location + i) );
-					GLCall( glVertexAttribPointer(element.Location + i,
+					glEnableVertexAttribArray(element.Location + i);
+					glVertexAttribPointer(element.Location + i,
 						element.GetComponentCount() / 4,
 						ShaderDataTypeToOpenGLBaseType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.GetStride(),
-						(const void*)(element.Offset + i * sizeof(glm::vec4))) );
+						(const void*)(element.Offset + i * sizeof(glm::vec4)));
 					
 					if (element.Divisor > 0) {
-						GLCall( glVertexAttribDivisor(element.Location + i, element.Divisor) );
+						glVertexAttribDivisor(element.Location + i, element.Divisor);
 					}
 				}
 			}
 			else
 			{
-				GLCall( glEnableVertexAttribArray(element.Location) );
-				GLCall( glVertexAttribPointer(element.Location,
+				glEnableVertexAttribArray(element.Location);
+				glVertexAttribPointer(element.Location,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
 					layout.GetStride(),
-					(const void*)(element.Offset)) );
+					(const void*)(element.Offset));
 
 				if (element.Divisor > 0) {
-					GLCall( glVertexAttribDivisor(element.Location, element.Divisor) );
+					glVertexAttribDivisor(element.Location, element.Divisor);
 				}
 			}
 		}
-		m_VertexBuffers.push_back(vertexBuffer);
+		m_VertexBuffers.push_back(vertex_buffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& index_buffer)
 	{
-		GLCall( glBindVertexArray(m_RendererID) );
-		indexBuffer->Bind();
+		glBindVertexArray(m_RendererID);
+		index_buffer->Bind();
 
-		m_IndexBuffer = indexBuffer;
+		m_IndexBuffer = index_buffer;
 	}
 }

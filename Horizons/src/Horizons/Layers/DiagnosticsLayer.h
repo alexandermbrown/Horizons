@@ -12,27 +12,26 @@ public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 
-	virtual void OnUpdate(float dt) override;
+	virtual void OnUpdate(li::duration::us dt) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
 
 private:
-
 	constexpr static int DiagnosticsMaxEntries = 2048;
 
 	bool m_PerformanceOpen = false;
 	bool m_CVarsOpen = false;
 
-	float m_CurrentDelta = 0.0f;
+	li::duration::us m_CurrentDelta;
 
-	li::Timer<float> m_Timer;
+	li::Timer m_Timer;
 
 	float m_Average = 0.0f;
-	float m_AverageTotal = 0.0f;
+	li::duration::us m_AverageTotal;
 	size_t m_AverageCount = 0ULL;
 
-	float m_Min = 0.0f;
-	float m_Max = 0.0f;
+	li::duration::us m_Min;
+	li::duration::us m_Max;
 
 	float m_DisplayMin = 0.0f;
 	float m_DisplayMax = 0.0f;

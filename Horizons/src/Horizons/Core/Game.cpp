@@ -46,42 +46,48 @@ void Game::Run()
 	Init();
 
 	using namespace std::chrono_literals;
-	constexpr float dt = 1.0f / HZ_TICKS_PER_SECOND;
-	constexpr std::chrono::nanoseconds dtNano(16666666ns);
-	constexpr std::chrono::nanoseconds sleepMargin(5ms);
+	constexpr li::duration::ns dt_target(16666666ns);
+	constexpr li::duration::ns sleep_margin(5ms);
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
 	while (m_Running && m_AppRun->load())
 	{
-		std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
-		std::chrono::nanoseconds diff = currentTime - m_LastUpdateTime;
+		std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
+		li::duration::ns current_delta = current_time - m_LastUpdateTime;
 
 #ifdef HZ_SLEEP_BETWEEN_TICKS
-		std::chrono::nanoseconds waitNano = dtNano - diff - sleepMargin;
-		if (waitNano.count() > 0LL) {
-			
+		li::duration::ns waitNano = dt_target - current_delta - sleep_margin;
+		if (waitNano > li::duration::ns::zero())
 			std::this_thread::sleep_for(waitNano);
-		}
 #endif
+		do {
+			current_time = std::chrono::steady_clock::now();
+			current_delta = current_time - m_LastUpdateTime;
+		} while (current_delta < dt_target);
 
-		currentTime = std::chrono::steady_clock::now();
-		diff = currentTime - m_LastUpdateTime;
-
-		while (diff < dtNano)
+		li::duration::ns dt;
+		if (current_delta - dt_target > 16ms)
 		{
-			currentTime = std::chrono::steady_clock::now();
-			diff = currentTime - m_LastUpdateTime;
+			dt = current_delta;
+			m_LastUpdateTime = current_time;
+		}
+		else
+		{
+			dt = dt_target;
+			m_LastUpdateTime += dt_target;
 		}
 
-		m_LastUpdateTime = std::chrono::steady_clock::now();
+		if (current_delta - dt_target > 3ms)
+			LI_WARN("Tick thread not at 60hz. {}ms slow", li::duration::cast<li::duration::ms>(current_delta - dt_target).count());
+
 		SDL_Event event;
 		while (m_EventQueue->try_dequeue(event))
 		{
 			OnEvent(&event);
 		}
 		
-		Update(dt);
+		Update(li::duration::cast<li::duration::us>(dt));
 	}
 
 	Shutdown();
@@ -114,7 +120,7 @@ void Game::Init()
 #endif
 }
 
-void Game::Update(float dt)
+void Game::Update(li::duration::us dt)
 {
 	PlayerSystem::Update(m_Registry, dt);
 	PhysicsSystem::Step(m_Registry, dt);

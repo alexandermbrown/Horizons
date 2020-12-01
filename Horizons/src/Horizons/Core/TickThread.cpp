@@ -54,7 +54,7 @@ void TickThread::Finish(entt::registry& registry)
 	m_Started = false;
 }
 
-void TickThread::UpdateSync(entt::registry& registry, float dt)
+void TickThread::UpdateSync(entt::registry& registry, li::duration::us dt)
 {
 	SyncEventReceiveSystem::Update(registry, &m_SyncQueue);
 	SyncTransformReceiveSystem::Update(registry, &m_TransformQueue, dt);

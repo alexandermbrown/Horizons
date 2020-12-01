@@ -29,7 +29,7 @@ void CameraControllerSystem::Shutdown(entt::registry& registry)
 	delete camera.camera;
 }
 
-void CameraControllerSystem::Update(entt::registry& registry, float dt)
+void CameraControllerSystem::Update(entt::registry& registry, li::duration::us dt)
 {
 	cp::camera& camera = registry.ctx<cp::camera>();
 
@@ -50,8 +50,8 @@ void CameraControllerSystem::Update(entt::registry& registry, float dt)
 	if (!camera.finished_zoom)
 	{
 		float delta = camera.current_zoom - camera.target_zoom;
-		if (dt < 0.99f)
-			camera.current_zoom -= delta * dt * camera.zoom_speed;
+		if (dt < li::duration::ms(990))
+			camera.current_zoom -= delta * li::duration::fsec(dt).count() * camera.zoom_speed;
 		else
 			camera.current_zoom = camera.target_zoom;
 

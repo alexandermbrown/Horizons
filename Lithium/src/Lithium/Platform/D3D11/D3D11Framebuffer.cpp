@@ -16,9 +16,9 @@ namespace li
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
-		m_Texture = CreateRef<D3D11Texture2D>(width, height, nullptr,
+		m_Texture = CreateRef<D3D11Texture2D>(width, height, 4, nullptr,
 			WrapType::ClampToEdge, WrapType::ClampToEdge,
-			FilterType::Linear, FilterType::Nearest, 4, true);
+			FilterType::Linear, FilterType::Nearest, false, true);
 
 		CreateBuffers(width, height);
 	}

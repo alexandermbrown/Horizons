@@ -77,7 +77,7 @@ void EditorTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk
 	}
 }
 
-void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt)
+void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt)
 {
 	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
 	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
@@ -206,7 +206,7 @@ bool EditorTerrainStore::CreateEmptyTerrainFile(const std::string& path, glm::iv
 	return true;
 }
 
-void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, float dt, StoreChunk& chunk)
+void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt, StoreChunk& chunk)
 {
 	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
 	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
@@ -250,11 +250,11 @@ void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush
 			float new_value;
 			if (brush->Subtract != reverse)
 			{
-				new_value = std::max(prev_value - brush_power * brush->Strength * dt, 0.0f);
+				new_value = std::max(prev_value - brush_power * brush->Strength * li::duration::fsec(dt).count(), 0.0f);
 			}
 			else
 			{
-				new_value = std::min(prev_value + brush_power * brush->Strength * dt, 1.0f);
+				new_value = std::min(prev_value + brush_power * brush->Strength * li::duration::fsec(dt).count(), 1.0f);
 			}
 
 			if (new_value != prev_value)

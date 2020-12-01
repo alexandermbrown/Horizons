@@ -19,7 +19,7 @@ namespace li
 		}
 
 		const auto* image = font->image();
-		Ref<Texture2D> texture = Texture2D::Create(image->size(), image->data(), WrapType::ClampToEdge, WrapType::ClampToEdge, FilterType::Linear, FilterType::Linear);
+		Ref<Texture2D> texture = Texture2D::Create(image->size(), image->data(), 4, WrapType::ClampToEdge, WrapType::ClampToEdge, FilterType::Linear, FilterType::Linear);
 
 		const auto* ttf = font->ttf();
 		return CreateRef<Font>(font->name()->str(), props, std::move(textureOffsets), texture, (const char*)ttf->data(), (uint32_t)ttf->size());

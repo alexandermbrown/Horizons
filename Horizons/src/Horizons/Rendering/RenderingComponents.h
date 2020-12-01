@@ -40,7 +40,7 @@ namespace cp
 	struct flicker
 	{
 		float magnitude = 0.1f;
-		li::Timer<float> timer;
+		li::Timer timer;
 		float current;
 		float target;
 	};

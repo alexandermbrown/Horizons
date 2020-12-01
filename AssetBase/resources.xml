@@ -1,12 +1,12 @@
 <resources>
 
 	<shaders>
-    
+
 		<shader name="shader_instance">
 			<glsl>./res/shaders/Instanced.glsl</glsl>
 			<hlsl>./res/shaders/Instanced.hlsl</hlsl>
 		</shader>
-    
+
 		<shader name="shader_label">
 			<glsl>./res/shaders/Label.glsl</glsl>
 			<hlsl>./res/shaders/Label.hlsl</hlsl>
@@ -16,7 +16,7 @@
 			<glsl>./res/shaders/Line.glsl</glsl>
 			<hlsl>./res/shaders/Line.hlsl</hlsl>
 		</shader>
-    
+
 		<shader name="shader_debug_physics">
 			<glsl>./res/shaders/DebugPhysics.glsl</glsl>
 			<hlsl>./res/shaders/DebugPhysics.hlsl</hlsl>
@@ -26,7 +26,7 @@
 			<glsl>./res/shaders/Terrain.glsl</glsl>
 			<hlsl>./res/shaders/Terrain.hlsl</hlsl>
 		</shader>
-    
+
 	</shaders>
 
 	<textures>

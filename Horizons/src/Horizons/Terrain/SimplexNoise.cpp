@@ -78,7 +78,7 @@ li::Ref<li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int 
 		}
 	}
 
-	li::Ref<li::Texture2D> texture = li::Texture2D::Create(width, height, data, li::WrapType::Repeat, li::WrapType::Repeat, li::FilterType::Linear, li::FilterType::Nearest, 1);
+	li::Ref<li::Texture2D> texture = li::Texture2D::Create(width, height, 1, data, li::WrapType::Repeat, li::WrapType::Repeat, li::FilterType::Linear, li::FilterType::Nearest);
 	delete[] data;
 	return texture;
 }

@@ -5,7 +5,7 @@
 #include "Lithium/Renderer/Shader.h"
 #include "Lithium/Renderer/TextureAtlas.h"
 #include "Lithium/Renderer/Font.h"
-#include "Lithium/Audio/Audio.h"
+#include "Lithium/Audio/AudioBuffer.h"
 
 #include <unordered_map>
 
@@ -62,7 +62,7 @@ namespace li
 		}
 
 		template<>
-		static Ref<Audio> Get<Audio>(const std::string& name)
+		static Ref<AudioBuffer> Get<AudioBuffer>(const std::string& name)
 		{
 			LI_CORE_ASSERT(s_Data->Audio.find(name) != s_Data->Audio.end(), "Audio not found.");
 			return s_Data->Audio.at(name);
@@ -91,7 +91,7 @@ namespace li
 			std::unordered_map<std::string, Ref<Shader>> Shaders;
 			std::unordered_map<std::string, Ref<TextureAtlas>> TextureAtlases;
 			std::unordered_map<std::string, Ref<Font>> Fonts;
-			std::unordered_map<std::string, Ref<Audio>> Audio;
+			std::unordered_map<std::string, Ref<AudioBuffer>> Audio;
 
 			StaggeredLoadData LoadData;
 		};

@@ -5,10 +5,6 @@
 #include "Horizons/Core/AppState.h"
 
 MainMenuScene::MainMenuScene()
-	: m_MainMenuLayer()
-#ifndef LI_DIST
-	, m_Diagnostics()
-#endif
 {
 }
 
@@ -36,7 +32,7 @@ void MainMenuScene::TransitionOut()
 {
 }
 
-void MainMenuScene::OnUpdate(float dt)
+void MainMenuScene::OnUpdate(li::duration::us dt)
 {
 	li::Scene* scene = m_MainMenuLayer.GetTransitionScene();
 	if (scene)

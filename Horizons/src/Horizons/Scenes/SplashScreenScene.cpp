@@ -45,7 +45,7 @@ void SplashScreenScene::TransitionOut()
 	window->SetIcon("data/images/icon.png");
 }
 
-void SplashScreenScene::OnUpdate(float dt)
+void SplashScreenScene::OnUpdate(li::duration::us dt)
 {
 	li::Application::Get()->GetWindow()->GetContext()->Clear();
 

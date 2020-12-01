@@ -14,7 +14,7 @@ public:
 	virtual void TransitionIn() override;
 	virtual void TransitionOut() override;
 
-	virtual void OnUpdate(float dt) override;
+	virtual void OnUpdate(li::duration::us dt) override;
 
 	virtual bool Finished() override { return m_MainMenuLayer.IsFinished(); }
 

@@ -14,7 +14,7 @@ public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 
-	virtual void OnUpdate(float dt) override;
+	virtual void OnUpdate(li::duration::us dt) override;
 	virtual void OnEvent(SDL_Event* event) override;
 #ifndef LI_DIST
 	virtual void OnImGuiRender() override;
@@ -29,5 +29,5 @@ private:
 
 	bool m_Finished = false;
 	bool m_StartedTransition = false;
-	li::Timer<float> m_TransitionTimer;
+	li::Timer m_TransitionTimer;
 };

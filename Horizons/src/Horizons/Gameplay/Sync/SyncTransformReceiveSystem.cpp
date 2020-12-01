@@ -4,8 +4,6 @@
 #include "Horizons/Gameplay/Components.h"
 #include "Horizons/Gameplay/Sync/Sync.h"
 
-#include "Lithium.h"
-
 void AddSyncTransform(entt::registry& registry, entt::entity entity)
 {
 	cp::sync_transform& sync_transform = registry.get<cp::sync_transform>(entity);
@@ -22,7 +20,7 @@ void SyncTransformReceiveSystem::Init(entt::registry& registry)
 	registry.on_construct<cp::sync_transform>().connect<&AddSyncTransform>();
 }
 
-void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQueue* queue, float dt)
+void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQueue* queue, li::duration::us dt)
 {
 	// Possible Improvement: Include a timestamp in the queue to better synchronize.
 
@@ -42,16 +40,17 @@ void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQ
 		}
 	}
 
-	registry.view<cp::sync_transform, cp::transform>().each([dt](cp::sync_transform& sync, cp::transform& transform)
+	float dt_float = li::duration::fsec(dt).count();
+	registry.view<cp::sync_transform, cp::transform>().each([dt_float](cp::sync_transform& sync, cp::transform& transform)
 	{
 		if (sync.velocity.x || sync.velocity.y || sync.velocity.z || sync.angular_velocity != glm::identity<glm::quat>())
 		{
-			transform.position.x += sync.velocity.x * dt;
-			transform.position.y += sync.velocity.y * dt;
-			transform.position.z += sync.velocity.z * dt;
+			transform.position.x += sync.velocity.x * dt_float;
+			transform.position.y += sync.velocity.y * dt_float;
+			transform.position.z += sync.velocity.z * dt_float;
 			transform.rotation;
 			
-			glm::quat rotation = glm::mix(glm::identity<glm::quat>(), sync.angular_velocity, dt);
+			glm::quat rotation = glm::mix(glm::identity<glm::quat>(), sync.angular_velocity, dt_float);
 			transform.rotation = rotation * transform.rotation;
 
 			transform.old = true;

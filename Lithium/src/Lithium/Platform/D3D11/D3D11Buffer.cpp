@@ -65,13 +65,13 @@ namespace li
 	{
 		LI_CORE_ASSERT(size <= m_Size, "Buffer overflow.");
 
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+		D3D11_MAPPED_SUBRESOURCE resource;
+		ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
 		// Disable GPU access to the vertex buffer data.
-		D3D11Call( m_ContextHandle->Map(m_Buffer, 0, discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &mappedResource) );
+		D3D11Call( m_ContextHandle->Map(m_Buffer, 0, discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &resource) );
 		// Set the vertex data.
-		memcpy((float*)mappedResource.pData + offset, data, (rsize_t)size);
+		memcpy((float*)resource.pData + offset, data, (size_t)size);
 		// Reenable GPU access to the data.
 		m_ContextHandle->Unmap(m_Buffer, 0);
 	}

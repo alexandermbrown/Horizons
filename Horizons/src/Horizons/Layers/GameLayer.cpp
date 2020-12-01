@@ -24,7 +24,7 @@ GameLayer::GameLayer()
 	m_TerrainRenderer.LoadTerrain("data/worlds/test.terrain", { 0, 0 });
 
 	m_AudioSource = li::CreateRef<li::AudioSource>();
-	m_AudioSource->SetAudio(li::ResourceManager::Get<li::Audio>("audio_wind"));
+	m_AudioSource->SetAudio(li::ResourceManager::Get<li::AudioBuffer>("audio_wind"));
 	m_AudioSource->Play();
 }
 
@@ -45,7 +45,7 @@ void GameLayer::OnDetach()
 	
 }
 
-void GameLayer::OnUpdate(float dt)
+void GameLayer::OnUpdate(li::duration::us dt)
 {
 	m_TickThread.UpdateSync(m_Registry, dt);
 

@@ -23,7 +23,7 @@ namespace li
 		ALCall( alDeleteSources(1, &m_SourceID) );
 	}
 
-	void AudioSource::SetAudio(const Ref<Audio>& audio)
+	void AudioSource::SetAudio(const Ref<AudioBuffer>& audio)
 	{
 		ALCall( alSourcei(m_SourceID, AL_BUFFER, audio->GetBufferID()) );
 	}
@@ -38,5 +38,3 @@ namespace li
 		ALCall( alSourceStop(m_SourceID) );
 	}
 }
-
-

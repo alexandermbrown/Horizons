@@ -4,7 +4,7 @@
 #include "RenderingComponents.h"
 #include <random>
 
-void FlickerSystem::Update(entt::registry& registry, float dt)
+void FlickerSystem::Update(entt::registry& registry, li::duration::us dt)
 {
 	auto& rand = registry.ctx<std::mt19937>();
 

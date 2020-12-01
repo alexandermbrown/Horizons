@@ -45,7 +45,7 @@ namespace li
 		else
 		{
 			LI_ERROR("alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
-			return glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+			return { 0.0f, 0.0f, 1.0f, 1.0f };
 		}
 	}
 }

@@ -36,4 +36,20 @@ namespace li
 			return D3D11_TEXTURE_ADDRESS_CLAMP;
 		}
 	}
+	DXGI_FORMAT ConvertD3D11::TextureFormat(int num_channels)
+	{
+		switch (num_channels)
+		{
+		case 1:
+			return DXGI_FORMAT_R8_UNORM;
+		case 2:
+			return DXGI_FORMAT_R8G8_UNORM;
+		case 4:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+			break;
+		default:
+			LI_CORE_ERROR("{} channels not supported!", num_channels);
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
 }

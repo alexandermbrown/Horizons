@@ -38,7 +38,7 @@ namespace li
 		for (const Assets::Texture2D* texture : *asset_bundle->textures())
 		{
 			const auto* data = texture->data();
-			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(),
+			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
 				(WrapType)texture->wrap_s(), (WrapType)texture->wrap_t(), (FilterType)texture->min_filter(), (FilterType)texture->mag_filter());
 		}
 
@@ -63,7 +63,7 @@ namespace li
 		for (const Assets::Audio* audio : *asset_bundle->audio())
 		{
 			const auto* data = audio->data();
-			s_Data->Audio[audio->name()->str()] = CreateRef<Audio>(data->data(), (uint32_t)data->size());
+			s_Data->Audio[audio->name()->str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
 		}
 
 		for (const Assets::Locale* locale : *asset_bundle->locales())
@@ -114,7 +114,7 @@ namespace li
 		{
 			const Assets::Texture2D* texture = *s_Data->LoadData.TextureIt;
 			const auto* data = texture->data();
-			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(),
+			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
 				(WrapType)texture->wrap_s(), (WrapType)texture->wrap_t(), (FilterType)texture->min_filter(), (FilterType)texture->mag_filter());
 
 			s_Data->LoadData.TextureIt++;
@@ -147,7 +147,7 @@ namespace li
 		{
 			const Assets::Audio* audio = *s_Data->LoadData.AudioIt;
 			const auto* data = audio->data();
-			s_Data->Audio[audio->name()->str()] = CreateRef<Audio>(data->data(), (uint32_t)data->size());
+			s_Data->Audio[audio->name()->str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
 
 			s_Data->LoadData.AudioIt++;
 		}

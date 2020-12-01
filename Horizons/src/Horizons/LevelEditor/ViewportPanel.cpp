@@ -31,7 +31,7 @@ ViewportPanel::~ViewportPanel()
 	}
 }
 
-void ViewportPanel::OnUpdate(float dt)
+void ViewportPanel::OnUpdate(li::duration::us dt)
 {
 	EditorCameraSystem::Update(m_Registry, dt);
 

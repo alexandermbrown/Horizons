@@ -211,7 +211,8 @@ void UIPrototypes::UILoadElement(entt::registry& registry, entt::entity parent, 
 		auto& flicker_table = flicker_optional.value();
 		sol::optional<float> magnitude = flicker_table["magnitude"];
 		sol::optional<float> delay = flicker_table["delay"];
-		registry.emplace<cp::flicker>(entity, magnitude.value_or(0.1f), li::Timer<float>(delay.value_or(0.1f), false, true));
+		registry.emplace<cp::flicker>(entity, magnitude.value_or(0.1f),
+			li::Timer(li::duration::cast<li::duration::us>(li::duration::fsec(delay.value_or(0.1f))), false, true));
 		registry.emplace_or_replace<cp::color>(entity, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 

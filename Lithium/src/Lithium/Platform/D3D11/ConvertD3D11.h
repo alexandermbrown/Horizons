@@ -5,10 +5,10 @@
 
 namespace li
 {
-	class ConvertD3D11
+	namespace ConvertD3D11
 	{
-	public:
-		static D3D11_USAGE BufferUsage(BufferUsage usage);
-		static D3D11_TEXTURE_ADDRESS_MODE WrapType(WrapType type);
+		D3D11_USAGE BufferUsage(li::BufferUsage usage);
+		D3D11_TEXTURE_ADDRESS_MODE WrapType(li::WrapType type);
+		DXGI_FORMAT TextureFormat(int num_channels);
 	};
 }

@@ -32,7 +32,7 @@ void GameScene::TransitionOut()
 #endif
 }
 
-void GameScene::OnUpdate(float dt)
+void GameScene::OnUpdate(li::duration::us dt)
 {
 	if (m_GameLayer.ReturnToMainMenu())
 	{

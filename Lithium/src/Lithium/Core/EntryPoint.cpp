@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv)
 {
-	li::Log::Init();
+	li::Log::InitLog();
 
 	li::Application* app = li::CreateApplication();
 

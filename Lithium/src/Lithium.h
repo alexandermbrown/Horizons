@@ -22,7 +22,7 @@
 #include "Lithium/Renderer/RendererAPI.h"
 
 #include "Lithium/Audio/AudioManager.h"
-#include "Lithium/Audio/Audio.h"
+#include "Lithium/Audio/AudioBuffer.h"
 #include "Lithium/Audio/AudioSource.h"
 
 #include "Lithium/Resources/ResourceManager.h"
@@ -30,5 +30,7 @@
 #include "Lithium/Localization/Localization.h"
 
 #include "Lithium/UI/UI.h"
+#include "Lithium/VideoPlayer/AVPlayer.h"
 
+#include "Lithium/Utility/Time.h"
 #include "Lithium/Utility/Timer.h"

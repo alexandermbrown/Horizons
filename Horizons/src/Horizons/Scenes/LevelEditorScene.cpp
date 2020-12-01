@@ -28,7 +28,7 @@ void LevelEditorScene::TransitionOut()
 	
 }
 
-void LevelEditorScene::OnUpdate(float dt)
+void LevelEditorScene::OnUpdate(li::duration::us dt)
 {
 	if (m_LevelEditorLayer.ReturnToMainMenu())
 	{

@@ -9,24 +9,24 @@ namespace li
 	class D3D11Texture2D : public Texture2D
 	{
 	public:
-		D3D11Texture2D(int width, int height, void* data,
-			WrapType wrapS, WrapType wrapT,
-			FilterType minFilter, FilterType magFilter, int channels = 4, bool renderTarget = false);
-		D3D11Texture2D(const std::string& path,
-			WrapType wrapS, WrapType wrapT,
-			FilterType minFilter, FilterType magFilter);
-		D3D11Texture2D(size_t imageSize, const uint8_t* rawData,
-			WrapType wrapS = WrapType::ClampToEdge, WrapType wrapT = WrapType::ClampToEdge,
-			FilterType minFilter = FilterType::Linear, FilterType magFilter = FilterType::Linear);
+		D3D11Texture2D(int width, int height, int channels, void* data, WrapType wrap_s, WrapType wrap_t,
+			FilterType min_filter, FilterType magFilter, bool dynamic, bool render_target);
+
+		D3D11Texture2D(const std::string& path, int desired_channels, WrapType wrap_s, WrapType wrap_t,
+			FilterType min_filter, FilterType mag_filter);
+
+		D3D11Texture2D(size_t image_size, const uint8_t* rawData, int desired_channels, WrapType wrap_s, WrapType wrap_t,
+			FilterType min_filter, FilterType mag_filter);
 
 		virtual ~D3D11Texture2D();
 
 		virtual int GetWidth() const override { return m_Width; }
 		virtual int GetHeight() const override { return m_Height; }
 
-		virtual void Resize(int width, int height) override;
-		virtual void AttachToFramebuffer() const override {};
 		virtual void Bind(uint32_t slot = 0) const override;
+		virtual void Resize(int width, int height) override;
+		virtual void SetData(const void* data, int width, int height, bool discard) override;
+		virtual void AttachToFramebuffer() const override {};
 		virtual void* GetInternalTexture() const override { return static_cast<void*>(m_ResourceView); }
 		ID3D11Texture2D* GetTexture() { return m_Texture; }
 
@@ -35,8 +35,10 @@ namespace li
 
 		int m_Width;
 		int m_Height;
+		int m_Channels;
 
-		bool m_IsRenderTarget;
+		bool m_Dynamic;
+		bool m_RenderTarget;
 
 		ID3D11SamplerState* m_SamplerState;
 		ID3D11Texture2D* m_Texture;

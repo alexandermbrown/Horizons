@@ -1,3 +1,9 @@
+premake.override(premake.tools.msc, "getLibraryExtensions", function(oldfn)
+    local extensions = oldfn()
+    extensions["a"] = true
+    return extensions
+  end)
+
 workspace "Horizons"
     architecture "x86_64"
     startproject "Horizons"
@@ -30,6 +36,7 @@ IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
 IncludeDir["layout"] = "Lithium/vendor/layout/include"
 IncludeDir["harfbuzz"] = "Lithium/vendor/harfbuzz/src"
 IncludeDir["utfcpp"] = "Lithium/vendor/utfcpp/include"
+IncludeDir["libav"] = "Lithium/vendor/libav/include"
 
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
@@ -104,7 +111,8 @@ project "Lithium"
         "%{IncludeDir.flatbuffers}",
         "%{IncludeDir.lab_serial}",
         "%{IncludeDir.harfbuzz}",
-        "%{IncludeDir.utfcpp}"
+        "%{IncludeDir.utfcpp}",
+        "%{IncludeDir.libav}"
     }
 
     links {
@@ -113,14 +121,25 @@ project "Lithium"
         "libvorbis",
         "openal-soft",
         "SDL2",
-        "harfbuzz"
+        "harfbuzz",
+
+        "avcodec",
+        "avdevice",
+        "avformat",
+        "avutil",
+        "libcharset",
+        "libiconv",
+        "opus",
+        "swresample",
+        "swscale"
     }
 
     filter "system:windows"
         systemversion "latest"
 
         libdirs {
-            "Lithium/vendor/SDL2/lib/x64"
+            "Lithium/vendor/SDL2/lib/x64",
+            ("Lithium/vendor/libav/build/" .. outputdir)
         }
 
         defines {
@@ -130,7 +149,14 @@ project "Lithium"
         links {
             "d3d11.lib",
             "dxgi.lib",
-            "d3dcompiler.lib"
+            "d3dcompiler.lib",
+            -- For ffmpeg:
+            "Ws2_32.lib",
+            "Strmiids.lib",
+            "Secur32.lib",
+            "mfplat.lib",
+            "mfuuid.lib",
+            "bcrypt.lib"
         }
 
     filter "configurations:Debug"
@@ -140,12 +166,24 @@ project "Lithium"
         links "imgui"
         includedirs { "%{IncludeDir.imgui}" }
 
+        links {
+            "lzmad",
+            "vpxmdd",
+            "zlibd"
+        }
+
     filter "configurations:Release"
         defines "LI_RELEASE"
         runtime "Release"
         optimize "on"
         links "imgui"
         includedirs { "%{IncludeDir.imgui}" }
+
+        links {
+            "lzma",
+            "vpxmd",
+            "zlib"
+        }
     
     filter "configurations:Dist"
         defines "LI_DIST"

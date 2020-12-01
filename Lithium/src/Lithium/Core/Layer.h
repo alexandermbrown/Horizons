@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Lithium/Core/Core.h"
+#include "Lithium/Utility/Time.h"
 #include "SDL.h"
 
 namespace li
@@ -13,7 +14,7 @@ namespace li
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(float dt) {}
+		virtual void OnUpdate(duration::us dt) {}
 		virtual void OnEvent(SDL_Event* event) {}
 #ifndef LI_DIST
 		virtual void OnImGuiRender() {}

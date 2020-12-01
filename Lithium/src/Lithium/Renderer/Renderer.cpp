@@ -76,7 +76,7 @@ namespace li
 
 		// SETUP WHITE TEXTURE
 		uint32_t data = 0xffffffff;
-		Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1, &data);
+		Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1, 4, &data);
 
 		// SETUP SCENE FLAT COLOR TEXTURE ALTAS
 		Ref<TextureAtlas> flatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {

@@ -56,6 +56,7 @@ namespace li
 #ifndef LI_DIST
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 #endif
+		AudioManager::Init(nullptr);
 	}
 
 	Application::~Application()
@@ -91,7 +92,7 @@ namespace li
 			//////////////////////////
 
 			std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
-			std::chrono::duration<float> dt = currentTime - m_LastUpdateTime;
+			duration::us dt = duration::cast<duration::us>(currentTime - m_LastUpdateTime);
 			m_LastUpdateTime = currentTime;
 
 
@@ -101,7 +102,7 @@ namespace li
 
 			if (m_CurrentScene)
 			{
-				m_CurrentScene->OnUpdate(dt.count());
+				m_CurrentScene->OnUpdate(dt);
 
 				if (m_NextScene && m_CurrentScene->Finished())
 				{
@@ -131,7 +132,7 @@ namespace li
 					reachedFocused = true;
 				}
 
-				layer->OnUpdate(dt.count());
+				layer->OnUpdate(dt);
 
 				if (m_LayersDirty)
 					break;
@@ -253,7 +254,7 @@ namespace li
 			{
 				int w, h;
 				SDL_GetWindowSize(m_Window->GetWindow(), &w, &h);
-				LI_CORE_TRACE("Resizing renderer: {0}, {1}", w, h);
+				LI_CORE_INFO("Resizing renderer ({0}, {1})", w, h);
 
 				m_Window->OnWindowResize(w, h);
 				m_Window->GetContext()->ResizeView(w, h);

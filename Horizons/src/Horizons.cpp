@@ -25,7 +25,6 @@ Horizons::Horizons()
 #endif
 	li::Localization::Init();
 	li::Renderer::Init();
-	li::AudioManager::Init();
 	li::UI::Init();
 
 	LoadConfig();

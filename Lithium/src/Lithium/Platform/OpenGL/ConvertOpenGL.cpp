@@ -77,6 +77,37 @@ namespace li
 		}
 	}
 
+	GLint ConvertOpenGL::TextureInternalFormat(int channels)
+	{
+		switch (channels)
+		{
+		case 1:
+			return GL_R8;
+		case 2:
+			return GL_RG8;
+		case 3:
+			return GL_RGB8;
+		case 4:
+			return GL_RGBA8;
+		}
+	}
+
+	GLenum ConvertOpenGL::TextureDataFormat(int channels)
+	{
+		switch (channels)
+		{
+		case 1:
+			return GL_RED;
+			break;
+		case 2:
+			return GL_RG;
+		case 3:
+			return GL_RGB;
+		case 4:
+			return GL_RGBA;
+		}
+	}
+
 	//uint32_t ConvertOpenGL::FramebufferTarget(li::FramebufferTarget target)
 	//{
 	//	switch (target)

@@ -14,7 +14,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 HUDLayer::HUDLayer()
-	: Layer("HUD"), m_Registry(), m_FadeInTimer(0.25f, true), m_FadeIn(true)
+	: Layer("HUD"), m_Registry(), m_FadeInTimer(li::duration::ms(250), true), m_FadeIn(true)
 {
 	UILayoutSystem::Init(m_Registry);
 
@@ -40,7 +40,7 @@ void HUDLayer::OnDetach()
 
 }
 
-void HUDLayer::OnUpdate(float dt)
+void HUDLayer::OnUpdate(li::duration::us dt)
 {
 	UILayoutSystem::Update(m_Registry);
 	UITransformSortSystem::SortTransforms(m_Registry);

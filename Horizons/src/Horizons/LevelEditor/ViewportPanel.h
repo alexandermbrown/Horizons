@@ -16,7 +16,7 @@ public:
 	~ViewportPanel();
 
 	inline void ShowPanel() { m_WindowOpen = true; }
-	void OnUpdate(float dt);
+	void OnUpdate(li::duration::us dt);
 	void RenderPanel();
 	void OnEvent(SDL_Event* event);
 

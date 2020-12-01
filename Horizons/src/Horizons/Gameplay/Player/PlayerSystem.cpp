@@ -56,7 +56,7 @@ void PlayerSystem::Init(entt::registry& registry, SyncEventQueue* queue)
 	physBody.body->CreateFixture(&fixtureDef);
 }
 
-void PlayerSystem::Update(entt::registry& registry, float dt)
+void PlayerSystem::Update(entt::registry& registry, li::duration::us dt)
 {
 	auto view = registry.view<cp::player, cp::physics_body>();
 	cp::player& player = view.get<cp::player>(view.front());
