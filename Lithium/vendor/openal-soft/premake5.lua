@@ -1,5 +1,3 @@
-
-
 project "openal-soft"
     kind "StaticLib"
     language "C++"
