@@ -58,7 +58,7 @@
 namespace moodycamel {
 
 template<typename T, size_t MAX_BLOCK_SIZE = 512>
-class ReaderWriterQueue
+class AE_ALIGN(MOODYCAMEL_CACHE_LINE_SIZE) ReaderWriterQueue
 {
 	// Design: Based on a queue-of-queues. The low-level queues are just
 	// circular buffers with front and tail indices indicating where the
@@ -727,10 +727,10 @@ private:
 	}
 
 private:
-	weak_atomic<Block*> frontBlock;		// (Atomic) Elements are enqueued to this block
+	weak_atomic<Block*> frontBlock;		// (Atomic) Elements are dequeued from this block
 	
 	char cachelineFiller[MOODYCAMEL_CACHE_LINE_SIZE - sizeof(weak_atomic<Block*>)];
-	weak_atomic<Block*> tailBlock;		// (Atomic) Elements are dequeued from this block
+	weak_atomic<Block*> tailBlock;		// (Atomic) Elements are enqueued to this block
 
 	size_t largestBlockSize;
 
@@ -788,6 +788,19 @@ public:
 		return false;
 	}
 
+#if MOODYCAMEL_HAS_EMPLACE
+	// Like try_enqueue() but with emplace semantics (i.e. construct-in-place).
+	template<typename... Args>
+	AE_FORCEINLINE bool try_emplace(Args&&... args) AE_NO_TSAN
+	{
+		if (inner.try_emplace(std::forward<Args>(args)...)) {
+			sema->signal();
+			return true;
+		}
+		return false;
+	}
+#endif
+
 
 	// Enqueues a copy of element on the queue.
 	// Allocates an additional block of memory if needed.
@@ -812,6 +825,19 @@ public:
 		}
 		return false;
 	}
+
+#if MOODYCAMEL_HAS_EMPLACE
+	// Like enqueue() but with emplace semantics (i.e. construct-in-place).
+	template<typename... Args>
+	AE_FORCEINLINE bool emplace(Args&&... args) AE_NO_TSAN
+	{
+		if (inner.emplace(std::forward<Args>(args)...)) {
+			sema->signal();
+			return true;
+		}
+		return false;
+	}
+#endif
 
 
 	// Attempts to dequeue an element; if the queue is empty,
