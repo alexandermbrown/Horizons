@@ -248,8 +248,8 @@ project "Horizons"
 
         libdirs { 
             "Horizons/vendor/steam/lib/win64",
-            "Horizons/vendor/lua/src/build/win64"
-         }
+            "Horizons/vendor/lua/lib/win64"
+        }
         links { "steam_api64" }
         
     filter "configurations:Debug"
