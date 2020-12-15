@@ -3,9 +3,12 @@ pushd %~dp0\..\AssetBase
 call ..\build\Release-windows-x86_64\AssetBase\AssetBase.exe
 setlocal
 :PROMPT
-SET /P DOCOPY="Write lab files to Horizons/data/ ? (Y/[N]) "
-IF /I "%DOCOPY%" NEQ "Y" GOTO END
+SET /P DOCOPY="Write asset files to Horizons/data/ ? (y/N) "
+IF /I "%DOCOPY%" == "y" GOTO COPY
+IF /I "%DOCOPY%" == "Y" GOTO COPY
+GOTO END
 
+:COPY
 copy .\output\*.* ..\Horizons\data\
 PAUSE
 
