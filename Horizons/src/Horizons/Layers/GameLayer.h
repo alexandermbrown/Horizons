@@ -16,25 +16,20 @@
 #include "readerwriterqueue/readerwriterqueue.h"
 #include "entt/entt.hpp"
 
-class GameLayer : public li::Layer
+class GameLayer : public Li::Layer
 {
 public:
 	GameLayer();
 	virtual ~GameLayer();
 
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-
-	virtual void OnUpdate(li::duration::us dt) override;
+	virtual void OnUpdate(Li::Duration::us dt) override;
 	virtual void OnEvent(SDL_Event* event) override;
 #ifndef LI_DIST
 	virtual void OnImGuiRender() override;
 #endif
 
-	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
-
 private:
-	li::Ref<li::AudioSource> m_AudioSource;
+	Li::Ref<Li::AudioSource> m_AudioSource;
 
 	entt::registry m_Registry;
 
@@ -46,6 +41,4 @@ private:
 
 	DefaultTerrainStore m_TerrainStore;
 	TerrainRenderer m_TerrainRenderer;
-
-	bool m_ReturnToMainMenu;
 };

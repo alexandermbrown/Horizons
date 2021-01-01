@@ -29,7 +29,6 @@
 
 #include "Lithium/Localization/Localization.h"
 
-#include "Lithium/UI/UI.h"
 #include "Lithium/VideoPlayer/AVPlayer.h"
 
 #include "Lithium/Utility/Time.h"

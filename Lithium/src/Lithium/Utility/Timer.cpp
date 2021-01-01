@@ -1,9 +1,9 @@
 #include "lipch.h"
 #include "Timer.h"
 
-namespace li
+namespace Li
 {
-	Timer::Timer(duration::us delay, bool completionValue, bool repeat) :
+	Timer::Timer(Duration::us delay, bool completionValue, bool repeat) :
 		m_Delay(delay),
 		m_CompletionValue(completionValue),
 		m_Repeat(repeat),
@@ -13,7 +13,7 @@ namespace li
 	{
 	}
 
-	bool Timer::Update(duration::us dt)
+	bool Timer::Update(Duration::us dt)
 	{
 		if (m_Completed)
 			return m_CompletionValue;
@@ -24,7 +24,7 @@ namespace li
 			if (!m_Repeat)
 				m_Completed = true;
 			else {
-				m_Elapsed = duration::us(0);
+				m_Elapsed = Duration::us(0);
 				m_RepeatCount++;
 			}
 			return true;

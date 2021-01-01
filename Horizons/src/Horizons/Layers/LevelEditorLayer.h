@@ -12,20 +12,15 @@
 
 #include <filesystem>
 
-class LevelEditorLayer : public li::Layer
+class LevelEditorLayer : public Li::Layer
 {
 public:
 	LevelEditorLayer();
 	virtual ~LevelEditorLayer();
 
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-
-	virtual void OnUpdate(li::duration::us dt) override;
+	virtual void OnUpdate(Li::Duration::us dt) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
-
-	inline bool ReturnToMainMenu() const { return m_ReturnToMainMenu; }
 
 private:
 	void FileNew();
@@ -35,8 +30,7 @@ private:
 	void FileSaveAs();
 
 	void UnsavedChangesDialog(int* button_id);
-
-	bool m_ReturnToMainMenu;
+	
 	bool m_DockspaceOpen;
 	bool m_TitleHasAsterisk;
 

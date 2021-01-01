@@ -6,7 +6,7 @@
 
 #include "OpenGLCore.h"
 
-namespace li
+namespace Li
 {
 	OpenGLRenderbuffer::OpenGLRenderbuffer(uint32_t width, uint32_t height)
 	{

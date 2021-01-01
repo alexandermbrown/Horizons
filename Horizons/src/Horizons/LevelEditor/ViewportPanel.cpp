@@ -1,4 +1,5 @@
 #include "pch.h"
+#ifndef LI_DIST
 #include "ViewportPanel.h"
 
 #include "EditorComponents.h"
@@ -14,7 +15,7 @@ ViewportPanel::ViewportPanel(EditorSettings* settings)
 	: m_Settings(settings), m_WindowOpen(true), m_ViewportSize(512, 256), m_TerrainOpen(false),
 		m_TerrainRenderer(&m_TerrainStore, 7)
 {
-	m_ViewportFB = li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
+	m_ViewportFB = Li::Framebuffer::Create(m_ViewportSize.x, m_ViewportSize.y);
 	m_ViewportFB->SetClearColor({ 0.25f, 0.25f, 0.25f, 1.0f });
 
 	EditorCameraSystem::Init(m_Registry);
@@ -31,7 +32,7 @@ ViewportPanel::~ViewportPanel()
 	}
 }
 
-void ViewportPanel::OnUpdate(li::duration::us dt)
+void ViewportPanel::OnUpdate(Li::Duration::us dt)
 {
 	EditorCameraSystem::Update(m_Registry, dt);
 
@@ -68,7 +69,7 @@ void ViewportPanel::OnUpdate(li::duration::us dt)
 		m_ViewportFB->Bind();
 		m_ViewportFB->Clear();
 
-		li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
+		Li::Renderer::BeginScene(m_Registry.ctx<cp::camera>().camera);
 		m_TerrainRenderer.SubmitQuad();
 
 		switch (m_Settings->Display.VertexDisplayMode)
@@ -87,7 +88,7 @@ void ViewportPanel::OnUpdate(li::duration::us dt)
 
 		BrushSystem::SubmitBrush(m_Registry, m_MousePos, m_ViewportFB->GetSize());
 
-		li::Renderer::EndScene();
+		Li::Renderer::EndScene();
 	}
 }
 
@@ -110,7 +111,7 @@ void ViewportPanel::RenderPanel()
 			m_ViewportSize = { viewport_size.x, viewport_size.y };
 			
 			// Account for OpenGL's flipped framebuffer texture.
-			if (li::Application::Get()->GetAPI() == li::RendererAPI::OpenGL)
+			if (Li::Application::Get().GetAPI() == Li::RendererAPI::OpenGL)
 				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewport_size, { 0, 1 }, { 1, 0 });
 			else
 				ImGui::Image(m_ViewportFB->GetTexture()->GetInternalTexture(), viewport_size, { 0, 0 }, { 1, 1 });
@@ -169,3 +170,4 @@ void ViewportPanel::CloseTerrain()
 	m_TerrainStore.UnloadTerrain();
 	m_TerrainOpen = false;
 }
+#endif

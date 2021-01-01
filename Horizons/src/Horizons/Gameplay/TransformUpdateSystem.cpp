@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "TransformUpdateSystem.h"
 
+#include "TransformComponent.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 void TransformUpdateSystem::Update(entt::registry& registry)

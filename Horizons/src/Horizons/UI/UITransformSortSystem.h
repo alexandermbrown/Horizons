@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Lithium.h"
 #include "entt/entt.hpp"
 
-namespace UITransformSortSystem
+namespace Systems::UISortTransforms
 {
-	void SortTransforms(entt::registry& registry);
+	void OnUpdate(entt::registry& registry, Li::Duration::us dt);
 }

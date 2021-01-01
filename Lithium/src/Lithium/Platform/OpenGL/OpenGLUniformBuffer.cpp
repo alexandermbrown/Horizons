@@ -5,7 +5,7 @@
 
 #include "glad/glad.h"
 
-namespace li
+namespace Li
 {
 	OpenGLUniformBuffer::OpenGLUniformBuffer(const std::string& name, uint32_t bindingSlot, const UniformBufferLayout& layout)
 		: m_Name(name), m_Slot(bindingSlot), m_Elements()

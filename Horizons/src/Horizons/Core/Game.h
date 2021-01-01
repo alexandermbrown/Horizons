@@ -32,10 +32,9 @@ public:
 	ConfigStore& GetConfig() { return m_ConfigStore; }
 
 private:
-
 	void Init();
-	void Update(li::duration::us dt);
-	void Shutdown();
+	void Update(Li::Duration::us dt);
+	void Deinit();
 
 	bool m_Running;
 	std::atomic<bool>* m_AppRun;

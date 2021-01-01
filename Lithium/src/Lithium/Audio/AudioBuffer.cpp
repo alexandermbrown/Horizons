@@ -11,7 +11,7 @@
 
 #define LI_AUDIO_BUFFER_SIZE 8192
 
-namespace li
+namespace Li
 {
 	static ALenum GetALFormat(int channels, int bytes_per_sample);
 	static void ReadPcmData(std::vector<char>& pcm_data, OggVorbis_File& file);
@@ -56,7 +56,7 @@ namespace li
 		ReadPcmData(pcm_data, file);
 
 		vorbis_info* info = ov_info(&file, -1);
-		Ref<AudioBuffer> buffer = CreateRef<AudioBuffer>();
+		Ref<AudioBuffer> buffer = MakeRef<AudioBuffer>();
 		buffer->SetData(pcm_data.data(), (uint32_t)pcm_data.size(), info->channels, 2, info->rate);
 
 		ov_clear(&file);
@@ -91,7 +91,7 @@ namespace li
 		ReadPcmData(pcm_data, file);
 
 		vorbis_info* info = ov_info(&file, -1);
-		Ref<AudioBuffer> buffer = CreateRef<AudioBuffer>();
+		Ref<AudioBuffer> buffer = MakeRef<AudioBuffer>();
 		buffer->SetData(pcm_data.data(), (uint32_t)pcm_data.size(), info->channels, 2, info->rate);
 
 		ov_clear(&file);

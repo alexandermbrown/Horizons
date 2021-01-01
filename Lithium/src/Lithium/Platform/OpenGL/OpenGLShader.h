@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 
-namespace li 
+namespace Li 
 {
 	class OpenGLShader : public Shader
 	{

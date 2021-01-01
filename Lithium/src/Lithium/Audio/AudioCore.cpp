@@ -5,7 +5,7 @@
 #include "AL/al.h"
 
 #ifdef LI_ENABLE_ASSERTS
-namespace li
+namespace Li
 {
 	void ALClearError()
 	{

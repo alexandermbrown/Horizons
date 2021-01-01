@@ -3,7 +3,7 @@
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace li
+namespace Li
 {
 	Ref<spdlog::logger> s_CoreLogger;
 	Ref<spdlog::logger> s_ClientLogger;

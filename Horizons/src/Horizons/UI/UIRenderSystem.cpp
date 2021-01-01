@@ -5,8 +5,18 @@
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "UIComponents.h"
 
-void UIRenderSystem::Render(entt::registry& registry)
+void RenderQuads(entt::registry& registry);
+void RenderLabels(entt::registry& registry);
+
+void Systems::UIRender::OnRender(entt::registry& registry)
 {
+	RenderQuads(registry);
+	RenderLabels(registry);
+}
+
+void RenderQuads(entt::registry& registry)
+{
+	Li::Renderer::BeginUI();
 	auto ui_transform_view = registry.view<cp::ui_transform>(entt::exclude<cp::label>);
 	for (entt::entity entity : ui_transform_view)
 	{
@@ -17,32 +27,33 @@ void UIRenderSystem::Render(entt::registry& registry)
 
 		if (has_color && has_texture)
 		{
-			li::Renderer::UISubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color, 
+			Li::Renderer::UISubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color,
 				transform.transform, registry.has<cp::ui_texture_crop>(entity));
 		}
 		else if (has_texture)
 		{
-			li::Renderer::UISubmitTextured(registry.get<cp::texture>(entity).alias,
+			Li::Renderer::UISubmitTextured(registry.get<cp::texture>(entity).alias,
 				transform.transform, registry.has<cp::ui_texture_crop>(entity));
 		}
 		else if (has_color)
 		{
-			li::Renderer::UISubmitColored(registry.get<cp::color>(entity).color, transform.transform);
+			Li::Renderer::UISubmitColored(registry.get<cp::color>(entity).color, transform.transform);
 		}
 	}
+	Li::Renderer::EndUI();
 }
 
-void UIRenderSystem::RenderLabels(entt::registry& registry)
+void RenderLabels(entt::registry& registry)
 {
 	registry.view<cp::ui_transform, cp::label>().each([&registry](entt::entity entity, auto& transform, auto& label)
 	{
 		if (registry.has<cp::color>(entity))
 		{
-			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, registry.get<cp::color>(entity).color);
+			Li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, registry.get<cp::color>(entity).color);
 		}
 		else
 		{
-			li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, { 1.0f, 1.0f, 1.0f, 1.0f });
+			Li::Renderer::UISubmitLabel(registry.get<cp::label>(entity).label_ref, transform.transform, { 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 	});
 }

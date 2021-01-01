@@ -1,6 +1,6 @@
 #pragma once
 
-namespace li
+namespace Li
 {
 	enum class RendererAPI
 	{

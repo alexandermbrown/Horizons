@@ -4,7 +4,7 @@
 #include "Lithium/Core/Application.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace li 
+namespace Li 
 {
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
 		: m_ViewMatrix(1.0f)
@@ -14,7 +14,7 @@ namespace li
 
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 		case RendererAPI::OpenGL:
 			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 100.0f);

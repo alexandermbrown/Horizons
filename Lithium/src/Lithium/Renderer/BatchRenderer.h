@@ -9,7 +9,7 @@
 
 #include "glm/glm.hpp"
 
-namespace li
+namespace Li
 {
 	class BatchRenderer
 	{

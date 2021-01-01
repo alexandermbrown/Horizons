@@ -3,9 +3,9 @@
 
 #include <glad/glad.h>
 
-namespace li
+namespace Li
 {
-	uint32_t ConvertOpenGL::BufferUsage(li::BufferUsage usage)
+	uint32_t ConvertOpenGL::BufferUsage(Li::BufferUsage usage)
 	{
 		switch (usage)
 		{
@@ -19,7 +19,7 @@ namespace li
 		}
 	}
 
-	uint32_t ConvertOpenGL::DrawMode(li::DrawMode mode)
+	uint32_t ConvertOpenGL::DrawMode(Li::DrawMode mode)
 	{
 		switch (mode)
 		{
@@ -39,7 +39,7 @@ namespace li
 		}
 	}
 
-	uint32_t ConvertOpenGL::WrapType(li::WrapType type)
+	uint32_t ConvertOpenGL::WrapType(Li::WrapType type)
 	{
 		switch (type)
 		{
@@ -57,7 +57,7 @@ namespace li
 		}
 	}
 
-	uint32_t ConvertOpenGL::FilterType(li::FilterType type)
+	uint32_t ConvertOpenGL::FilterType(Li::FilterType type)
 	{
 		switch (type)
 		{
@@ -89,6 +89,8 @@ namespace li
 			return GL_RGB8;
 		case 4:
 			return GL_RGBA8;
+		default:
+			return 0;
 		}
 	}
 
@@ -105,10 +107,12 @@ namespace li
 			return GL_RGB;
 		case 4:
 			return GL_RGBA;
+		default:
+			return 0;
 		}
 	}
 
-	//uint32_t ConvertOpenGL::FramebufferTarget(li::FramebufferTarget target)
+	//uint32_t ConvertOpenGL::FramebufferTarget(Li::FramebufferTarget target)
 	//{
 	//	switch (target)
 	//	{
@@ -124,7 +128,7 @@ namespace li
 	//	}
 	//}
 
-	//uint32_t ConvertOpenGL::FramebufferAttachment(li::FramebufferAttachment attachment)
+	//uint32_t ConvertOpenGL::FramebufferAttachment(Li::FramebufferAttachment attachment)
 	//{
 	//	switch (attachment)
 	//	{
@@ -156,7 +160,7 @@ namespace li
 	//	}
 	//}
 
-	//uint32_t ConvertOpenGL::ImageFormat(li::ImageFormat format)
+	//uint32_t ConvertOpenGL::ImageFormat(Li::ImageFormat format)
 	//{
 	//	switch (format)
 	//	{

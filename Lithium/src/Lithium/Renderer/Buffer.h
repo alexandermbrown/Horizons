@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace li 
+namespace Li 
 {
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{

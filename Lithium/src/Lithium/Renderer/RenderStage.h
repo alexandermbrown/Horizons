@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "OrthographicCamera.h"
 
-namespace li
+namespace Li
 {
 	class RenderStage
 	{

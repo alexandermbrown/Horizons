@@ -3,7 +3,7 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/RendererEnums.h"
 
-namespace li
+namespace Li
 {
 	class OpenGLRenderbuffer
 	{

@@ -6,7 +6,7 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-namespace li
+namespace Li
 {
 	AVReader::AVReader(const std::string& path)
 		: m_FormatCtx(nullptr), m_Packet(nullptr), m_VideoPackets(32, 128), m_AudioPackets(64, 256), m_Finished(false), m_Running(false)

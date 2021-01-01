@@ -11,7 +11,7 @@ extern "C"
 #include "libswresample/swresample.h"
 }
 
-namespace li
+namespace Li
 {
 	static float RationalToFloat(const AVRational& time_base);
 	
@@ -30,7 +30,7 @@ namespace li
 		LI_CORE_ASSERT(!m_Open, "Player already open.");
 
 		try {
-			m_Reader = CreateScope<AVReader>(path);
+			m_Reader = MakeUnique<AVReader>(path);
 		}
 		catch (...)
 		{
@@ -58,7 +58,7 @@ namespace li
 		LI_CORE_INFO("Opened {}: width={} height={}", path, m_Video.Width, m_Video.Height);
 		m_Open = true;
 		m_Playing = true;
-		m_Elapsed = duration::us(0);
+		m_Elapsed = Duration::us(0);
 
 		return true;
 	}
@@ -204,17 +204,17 @@ namespace li
 		FreeInternal();
 	}
 
-	bool AVPlayer::UpdateFrame(duration::us dt)
+	bool AVPlayer::UpdateFrame(Duration::us dt)
 	{
 		if (!m_Playing)
 			return false;
 
 		// Play video when audio queue is ready.
-		if (dt < li::duration::ms(200) && !m_Audio.HasAudio || (m_Audio.HasAudio && m_Audio.Started))
+		if (dt < Li::Duration::ms(200) && !m_Audio.HasAudio || (m_Audio.HasAudio && m_Audio.Started))
 			m_Elapsed += dt;
 
 		// VIDEO //
-		if (m_Elapsed > li::duration::fsec(m_Video.NextPTS * m_Video.TimeBase))
+		if (m_Elapsed > Li::Duration::fsec(m_Video.NextPTS * m_Video.TimeBase))
 		{
 			m_Video.Texture->SetData(m_Video.PixelBuffer, m_Video.Width, m_Video.Height, true);
 
@@ -357,7 +357,7 @@ namespace li
 
 		// Skip audio frames if behind.
 		int64_t pts = GetPTS(m_Frame->pts, m_Frame->pkt_dts);
-		if (m_Elapsed > li::duration::fsec(pts * m_Video.TimeBase + m_Frame->nb_samples / (float)m_Audio.Frequency))
+		if (m_Elapsed > Li::Duration::fsec(pts * m_Video.TimeBase + m_Frame->nb_samples / (float)m_Audio.Frequency))
 		{
 			m_Audio.DiscardCount++;
 			return true;
@@ -402,7 +402,7 @@ namespace li
 			}
 
 			if (m_Audio.Queue == nullptr)
-				m_Audio.Queue = CreateScope<AudioQueue>(m_Audio.OutBytesPerSample, m_Audio.Channels, m_Audio.Frequency, out_num_samples, m_Audio.Frequency);
+				m_Audio.Queue = MakeUnique<AudioQueue>(m_Audio.OutBytesPerSample, m_Audio.Channels, m_Audio.Frequency, out_num_samples, m_Audio.Frequency);
 
 			if (m_Audio.Started)
 			{
@@ -419,7 +419,7 @@ namespace li
 			if (m_Audio.Queue == nullptr)
 			{
 				LI_CORE_WARN("Non-resampled audio is not tested.");
-				m_Audio.Queue = CreateScope<AudioQueue>(m_Audio.OutBytesPerSample, m_Audio.Channels, m_Audio.Frequency, m_Frame->nb_samples, m_Audio.Frequency);
+				m_Audio.Queue = MakeUnique<AudioQueue>(m_Audio.OutBytesPerSample, m_Audio.Channels, m_Audio.Frequency, m_Frame->nb_samples, m_Audio.Frequency);
 			}
 
 			if (m_Audio.Started)

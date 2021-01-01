@@ -7,7 +7,7 @@ class NoiseStore
 {
 public:
 	static void Shutdown();
-	static li::Ref<li::Texture2D> GetSimplex(int width, int height, int cell_size, int octaves, float persistence, float aspect_ratio);
+	static Li::Ref<Li::Texture2D> GetSimplex(int width, int height, int cell_size, int octaves, float persistence, float aspect_ratio);
 
 private:
 
@@ -20,7 +20,7 @@ private:
 		float Persistence;
 		float AspectRatio;
 
-		li::Ref<li::Texture2D> Texture;
+		Li::Ref<Li::Texture2D> Texture;
 	};
 	
 	struct NoiseData
@@ -28,5 +28,5 @@ private:
 		std::vector<SimplexEntry> SimplexEntries;
 	};
 
-	static li::Scope<NoiseData> s_Data;
+	static Li::Unique<NoiseData> s_Data;
 };

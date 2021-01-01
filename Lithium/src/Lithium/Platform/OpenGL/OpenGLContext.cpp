@@ -7,7 +7,7 @@
 #include "SDL.h"
 #include "glad/glad.h"
 
-namespace li
+namespace Li
 {
 	void OpenGLMessageCallback(
 		unsigned source,

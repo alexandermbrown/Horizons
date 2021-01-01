@@ -35,7 +35,7 @@ void TickThread::Begin(entt::registry& registry)
 		threadData.EventQueue = &m_EventQueue;
 		threadData.SyncQueue = &m_SyncQueue;
 		threadData.TransformQueue = &m_TransformQueue;
-		threadData.Config = li::Application::Get<Horizons>()->GetConfig();
+		threadData.Config = Li::Application::Get<Horizons>().GetConfig();
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 		m_TickThread = std::thread(TickThread::ThreadEntryPointDebugDraw, threadData, &m_DebugDrawQueue);
@@ -54,7 +54,7 @@ void TickThread::Finish(entt::registry& registry)
 	m_Started = false;
 }
 
-void TickThread::UpdateSync(entt::registry& registry, li::duration::us dt)
+void TickThread::UpdateSync(entt::registry& registry, Li::Duration::us dt)
 {
 	SyncEventReceiveSystem::Update(registry, &m_SyncQueue);
 	SyncTransformReceiveSystem::Update(registry, &m_TransformQueue, dt);

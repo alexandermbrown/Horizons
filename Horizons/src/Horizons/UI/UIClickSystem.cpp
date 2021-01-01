@@ -7,7 +7,23 @@
 #include "Lithium.h"
 #include <limits>
 
-bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int button)
+bool OnMouseDown(entt::registry& registry, int x, int y, int button);
+bool OnMouseUp(entt::registry& registry, int x, int y, int button);
+
+void Systems::UIClick::OnEvent(entt::registry& registry, SDL_Event* event)
+{
+	switch (event->type)
+	{
+	case SDL_MOUSEBUTTONDOWN:
+		OnMouseDown(registry, event->button.x, event->button.y, event->button.button);
+		break;
+	case SDL_MOUSEBUTTONUP:
+		OnMouseUp(registry, event->button.x, event->button.y, event->button.button);
+		break;
+	}
+}
+
+bool OnMouseDown(entt::registry& registry, int x, int y, int button)
 {
 	auto view = registry.view<cp::ui_transform>();
 
@@ -73,7 +89,7 @@ bool UIClickSystem::OnMouseDown(entt::registry& registry, int x, int y, int butt
 	return mouseDownHandled;
 }
 
-bool UIClickSystem::OnMouseUp(entt::registry& registry, int x, int y, int button)
+bool OnMouseUp(entt::registry& registry, int x, int y, int button)
 {
 	auto view = registry.view<cp::ui_transform>();
 

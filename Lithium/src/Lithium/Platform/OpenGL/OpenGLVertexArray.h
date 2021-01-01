@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace li 
+namespace Li 
 {
 	class OpenGLVertexArray : public VertexArray
 	{

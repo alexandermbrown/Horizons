@@ -19,7 +19,6 @@ typedef enum
 class ConfigVar
 {
 public:
-
 	ConfigVar(const std::string& name, uint32_t flags, bool save);
 
 	ConfigVar(const std::string& name, bool value, uint32_t flags, bool save);
@@ -99,7 +98,6 @@ public:
 	};
 
 private:
-
 	union
 	{
 		bool m_BoolValue;

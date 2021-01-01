@@ -7,7 +7,7 @@
 	x;\
 	LI_CORE_ASSERT(ALCheckError(#x, __FILE__, __LINE__), "OpenAL error!") }
 
-namespace li
+namespace Li
 {
 	void ALClearError();
 	bool ALCheckError(const char* function, const char* file, int line);

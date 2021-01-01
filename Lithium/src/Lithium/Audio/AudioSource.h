@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 #include "AudioBuffer.h"
 
-namespace li
+namespace Li
 {
 	class AudioSource
 	{

@@ -30,7 +30,7 @@ void ChunkBorderSystem::SubmitBorders(entt::registry& registry, glm::vec2 camera
 			color = { 0.1f, 0.4f, 1.0f, 0.7f };
 		else
 			color = { 0.1f, 1.0f, 0.1f, 0.5f };
-		li::Renderer::SubmitLine(color, { x, bottom_left.y, 0.0f }, { x, top_right.y, 0.0f });
+		Li::Renderer::SubmitLine(color, { x, bottom_left.y, 0.0f }, { x, top_right.y, 0.0f });
 	}
 
 	for (float y = lines_bottom_left.y * 16.0f; y <= top_right.y; y += TerrainRenderer::MetersPerChunk)
@@ -41,7 +41,7 @@ void ChunkBorderSystem::SubmitBorders(entt::registry& registry, glm::vec2 camera
 			color = { 0.1f, 0.4f, 1.0f, 0.7f };
 		else
 			color = { 0.1f, 1.0f, 0.1f, 0.5f };
-		li::Renderer::SubmitLine(color, { bottom_left.x, y, 0.0f }, { top_right.x, y, 0.0f });
+		Li::Renderer::SubmitLine(color, { bottom_left.x, y, 0.0f }, { top_right.x, y, 0.0f });
 	}
 }
 

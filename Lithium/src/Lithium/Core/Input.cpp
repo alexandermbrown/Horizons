@@ -1,10 +1,10 @@
 #include "lipch.h"
 #include "Input.h"
 
-namespace li
+namespace Li
 {
 	Input::Input()
-		: m_KeyStates(), m_Mouse({ 0, 0, 0 }), m_Enabled(true)
+		: m_Enabled(true), m_MouseX(0), m_MouseY(0), m_MouseButtonStates(0), m_KeyStates()
 	{
 	}
 
@@ -23,18 +23,36 @@ namespace li
 		// Mouse button events.
 		else if (event->type == SDL_MOUSEBUTTONDOWN)
 		{
-			m_Mouse.ButtonStates |= SDL_BUTTON(event->button.button);
+			m_MouseButtonStates |= SDL_BUTTON(event->button.button);
 		}
 		else if (event->type == SDL_MOUSEBUTTONUP)
 		{
-			m_Mouse.ButtonStates &= ~SDL_BUTTON(event->button.button);
+			m_MouseButtonStates &= ~SDL_BUTTON(event->button.button);
 		}
 
 		// Mouse motion event.
 		else if (event->type == SDL_MOUSEMOTION)
 		{
-			m_Mouse.X = event->motion.x;
-			m_Mouse.X = event->motion.y;
+			m_MouseX = event->motion.x;
+			m_MouseX = event->motion.y;
 		}
+	}
+
+	bool Input::IsKeyPressed(int scancode) const
+	{
+		LI_CORE_ASSERT(scancode >= 0 && scancode < ScancodeCount, "Invalid scancode.");
+		if (m_Enabled)
+			return m_KeyStates[scancode];
+		else
+			return false;
+	}
+
+	bool Input::IsMouseButtonPressed(int sdl_button) const
+	{
+		LI_CORE_ASSERT(sdl_button >= 0 && sdl_button < 8, "Invalid mouse button.");
+		if (m_Enabled)
+			return m_MouseButtonStates & SDL_BUTTON(sdl_button);
+		else
+			return false;
 	}
 }

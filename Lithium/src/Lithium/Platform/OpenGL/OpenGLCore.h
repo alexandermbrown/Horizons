@@ -7,7 +7,7 @@
 	x;\
 	LI_CORE_ASSERT(GLCheckError(#x, __FILE__, __LINE__), "OpenGL error - see log for details")
 
-namespace li
+namespace Li
 {
 	void GLClearError();
 	bool GLCheckError(const char* function, const char* file, int line);

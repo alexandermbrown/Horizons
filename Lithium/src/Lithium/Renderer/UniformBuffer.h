@@ -8,7 +8,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace li
+namespace Li
 {
 	struct UniformBufferElement
 	{

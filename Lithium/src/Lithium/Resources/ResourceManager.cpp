@@ -7,9 +7,9 @@
 
 #include <fstream>
 
-namespace li
+namespace Li
 {
-	Scope<ResourceManager::ResourceData> ResourceManager::s_Data = CreateScope<ResourceData>();
+	Unique<ResourceManager::ResourceData> ResourceManager::s_Data = MakeUnique<ResourceData>();
 
 	void ResourceManager::Load(const std::string& labFilePath)
 	{
@@ -52,12 +52,12 @@ namespace li
 
 		for (const Assets::TextureAtlas* atlas : *asset_bundle->atlases())
 		{
-			s_Data->TextureAtlases[atlas->name()->c_str()] = TextureAtlasLoader::Load(atlas);
+			s_Data->TextureAtlases[atlas->name()->c_str()] = Loaders::LoadTextureAtlas(atlas);
 		}
 
 		for (const Assets::Font* font : *asset_bundle->fonts())
 		{
-			s_Data->Fonts[font->name()->str()] = FontLoader::Load(font);
+			s_Data->Fonts[font->name()->str()] = Loaders::LoadFont(font);
 		}
 
 		for (const Assets::Audio* audio : *asset_bundle->audio())
@@ -68,7 +68,7 @@ namespace li
 
 		for (const Assets::Locale* locale : *asset_bundle->locales())
 		{
-			Localization::AddLocale(LocaleLoader::Load(locale));
+			Localization::AddLocale(Loaders::LoadLocale(locale));
 		}
 
 		delete[] buffer;
@@ -132,14 +132,14 @@ namespace li
 		else if (s_Data->LoadData.TextureAtlasIt != s_Data->LoadData.Bundle->atlases()->end())
 		{
 			const Assets::TextureAtlas* atlas = *s_Data->LoadData.TextureAtlasIt;
-			s_Data->TextureAtlases[atlas->name()->c_str()] = TextureAtlasLoader::Load(atlas);
+			s_Data->TextureAtlases[atlas->name()->c_str()] = Loaders::LoadTextureAtlas(atlas);
 
 			s_Data->LoadData.TextureAtlasIt++;
 		}
 		else if (s_Data->LoadData.FontIt != s_Data->LoadData.Bundle->fonts()->end())
 		{
 			const Assets::Font* font = *s_Data->LoadData.FontIt;
-			s_Data->Fonts[font->name()->str()] = FontLoader::Load(font);
+			s_Data->Fonts[font->name()->str()] = Loaders::LoadFont(font);
 
 			s_Data->LoadData.FontIt++;
 		}
@@ -154,7 +154,7 @@ namespace li
 		else if (s_Data->LoadData.LocaleIt != s_Data->LoadData.Bundle->locales()->end())
 		{
 			const Assets::Locale* locale = *s_Data->LoadData.LocaleIt;
-			Localization::AddLocale(LocaleLoader::Load(locale));
+			Localization::AddLocale(Loaders::LoadLocale(locale));
 
 			s_Data->LoadData.LocaleIt++;
 		}
@@ -171,6 +171,11 @@ namespace li
 
 	void ResourceManager::Shutdown()
 	{
+		if (s_Data->LoadData.Buffer)
+		{
+			LI_CORE_WARN("Load data buffer not freed.");
+			delete[] s_Data->LoadData.Buffer;
+		}
 		s_Data.reset();
 	}
 

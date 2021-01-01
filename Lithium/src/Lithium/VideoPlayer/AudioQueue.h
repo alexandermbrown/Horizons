@@ -3,7 +3,7 @@
 #include "Lithium/Audio/AudioBuffer.h"
 #include <stdint.h>
 
-namespace li
+namespace Li
 {
 	/**
 	 * Audio queue, used for streaming audio.
@@ -36,7 +36,7 @@ namespace li
 		int m_BufferSize;
 		int m_Frequency;
 		
-		std::vector<Scope<AudioBuffer>> m_Buffers;
+		std::vector<Unique<AudioBuffer>> m_Buffers;
 		uint32_t m_SourceID;
 
 		int m_NumPartial;

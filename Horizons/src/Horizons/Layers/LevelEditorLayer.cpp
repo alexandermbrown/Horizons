@@ -1,6 +1,7 @@
 #include "pch.h"
 #ifndef LI_DIST
 #include "LevelEditorLayer.h"
+#include "Horizons/Scripting/ScriptScene.h"
 
 #include "imgui.h"
 #include "nfd.h"
@@ -11,7 +12,7 @@
 #endif
 
 LevelEditorLayer::LevelEditorLayer()
-	: m_ReturnToMainMenu(false), m_DockspaceOpen(true), m_TitleHasAsterisk(false), m_Viewport(&m_Settings), m_TerrainEditingPanel(&m_Settings)
+	: Layer("LevelEditor"), m_DockspaceOpen(true), m_TitleHasAsterisk(false), m_Viewport(&m_Settings), m_TerrainEditingPanel(&m_Settings)
 {
 	m_Settings.Brush.Enabled = true;
 	m_Settings.Brush.Subtract = false;
@@ -21,38 +22,31 @@ LevelEditorLayer::LevelEditorLayer()
 	m_Settings.Display.ShowChunkBorders = true;
 	m_Settings.Display.VertexDisplayMode = VertexDisplayMode::ShowInBrush;
 	m_Settings.Layer = 0;
+
+	SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), "Horizons Level Editor");
 }
 
 LevelEditorLayer::~LevelEditorLayer()
 {
+	SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), "Horizons");
 }
 
-void LevelEditorLayer::OnAttach()
-{
-	SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons Level Editor");
-}
-
-void LevelEditorLayer::OnDetach()
-{
-	SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons");
-}
-
-void LevelEditorLayer::OnUpdate(li::duration::us dt)
+void LevelEditorLayer::OnUpdate(Li::Duration::us dt)
 {
 	m_Viewport.OnUpdate(dt);
 	if (!m_TitleHasAsterisk && m_Viewport.IsTerrainModified())
 	{
-		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + "* - Horizons Level Editor").c_str());
+		SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), (m_TerrainPath.filename().string() + "* - Horizons Level Editor").c_str());
 		m_TitleHasAsterisk = true;
 	}
 	else if (m_TitleHasAsterisk && !m_Viewport.IsTerrainModified())
 	{
-		SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
+		SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
 		m_TitleHasAsterisk = false;
 	}
 
-	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
-	li::Application::Get()->GetWindow()->GetContext()->Clear();
+	Li::Application::Get().GetWindow().GetContext()->BindDefaultRenderTarget();
+	Li::Application::Get().GetWindow().GetContext()->Clear();
 }
 
 void LevelEditorLayer::OnImGuiRender()
@@ -98,13 +92,13 @@ void LevelEditorLayer::OnImGuiRender()
 					if (button_id == 0)
 					{
 						FileSave();
-						m_ReturnToMainMenu = true;
+						Li::Application::Get().Transition(Li::MakeUnique<ScriptScene>("MainMenuScene"), true);
 					}
 					// If cancel is clicked.
 					else if (button_id == 1)
-						m_ReturnToMainMenu = true;
+						Li::Application::Get().Transition(Li::MakeUnique<ScriptScene>("MainMenuScene"), true);
 				}
-				else m_ReturnToMainMenu = true;
+				else Li::Application::Get().Transition(Li::MakeUnique<ScriptScene>("MainMenuScene"), true);
 			}
 			if (ImGui::MenuItem("Exit", "Alt+F4"))
 			{
@@ -116,13 +110,13 @@ void LevelEditorLayer::OnImGuiRender()
 					if (button_id == 0)
 					{
 						FileSave();
-						li::Application::Get()->Exit();
+						Li::Application::Get().Exit();
 					}
 					// If cancel is clicked.
 					else if (button_id == 1)
-						li::Application::Get()->Exit();
+						Li::Application::Get().Exit();
 				}
-				else li::Application::Get()->Exit();
+				else Li::Application::Get().Exit();
 			}
 
 			ImGui::EndMenu();
@@ -188,12 +182,12 @@ void LevelEditorLayer::OnImGuiRender()
 		if (m_Viewport.FileNew(path, m_NewTerrainModal.GetWorldSize()))
 		{
 			m_TerrainPath = path;
-			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
+			SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
 		}
 		else
 		{
-			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), "Horizons Level Editor");
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open new terrain file.", li::Application::Get()->GetWindow()->GetWindow());
+			SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), "Horizons Level Editor");
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open new terrain file.", Li::Application::Get().GetWindow().GetWindow());
 		}
 	}
 }
@@ -204,7 +198,7 @@ void LevelEditorLayer::OnEvent(SDL_Event* event)
 
 	if (event->type == SDL_KEYDOWN)
 	{
-		auto& input = li::Application::Get()->GetInput();
+		auto& input = Li::Application::Get().GetInput();
 		if (input.IsKeyPressed(SDL_SCANCODE_LCTRL))
 		{
 			switch (event->key.keysym.scancode)
@@ -231,7 +225,7 @@ void LevelEditorLayer::OnEvent(SDL_Event* event)
 		UnsavedChangesDialog(&button_id);
 		// If open is cancelled.
 		if (button_id < 0 || button_id >= 2)
-			li::Application::Get()->EventHandled();
+			Li::Application::Get().EventHandled();
 		// If save is clicked.
 		if (button_id == 0)
 			FileSave();
@@ -286,12 +280,12 @@ void LevelEditorLayer::FileOpenDialog()
 		if (m_Viewport.FileOpen(path))
 		{
 			m_TerrainPath = path;
-			SDL_SetWindowTitle(li::Application::Get()->GetWindow()->GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
+			SDL_SetWindowTitle(Li::Application::Get().GetWindow().GetWindow(), (m_TerrainPath.filename().string() + " - Horizons Level Editor").c_str());
 			m_TitleHasAsterisk = false;
 		}
 		else
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open terrain file.", li::Application::Get()->GetWindow()->GetWindow());
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Horizons Level Editor", "Failed to open terrain file.", Li::Application::Get().GetWindow().GetWindow());
 		}
 	}
 	else if (result == NFD_ERROR)
@@ -318,7 +312,7 @@ void LevelEditorLayer::UnsavedChangesDialog(int* button_id)
 	std::string message = m_TerrainPath.filename().string() + " has unsaved changes. What would you like to do?";
 	const SDL_MessageBoxData msg_box_data = {
 		SDL_MESSAGEBOX_INFORMATION | SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,
-		li::Application::Get()->GetWindow()->GetWindow(),
+		Li::Application::Get().GetWindow().GetWindow(),
 		"Unsaved Changes",
 		message.c_str(),
 		SDL_arraysize(m_OverwriteButtons),

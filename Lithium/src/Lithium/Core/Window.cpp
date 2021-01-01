@@ -9,19 +9,19 @@
 #include "Lithium/Platform/D3D11/D3D11Window.h"
 #endif
 
-namespace li 
+namespace Li 
 {
-	Window* Window::Create(const WindowProps& props)
+	Li::Unique<Window> Window::Create(const WindowProps& props)
 	{
 		switch (props.API)
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
-			return new OpenGLWindow(props);
+			return Li::MakeUnique<OpenGLWindow>(props);
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:
-			return new D3D11Window(props);
+			return Li::MakeUnique<D3D11Window>(props);
 #endif
 		default:
 			LI_CORE_ERROR("Unknown graphics API");
@@ -29,4 +29,3 @@ namespace li
 		}
 	}
 }
-

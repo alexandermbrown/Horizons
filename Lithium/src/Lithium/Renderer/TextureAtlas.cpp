@@ -3,7 +3,7 @@
 
 #include "Lithium/Resources/ResourceManager.h"
 
-namespace li
+namespace Li
 {
 	TextureAtlas::TextureAtlas(const std::string& textureAlias, const std::initializer_list<std::pair<const std::string, glm::vec4>>& entries)
 		: m_TextureAlias(textureAlias), m_Entries(entries), m_Texture(nullptr) 
@@ -39,13 +39,11 @@ namespace li
 	{
 		auto iter = m_Entries.find(texture_alias);
 		if (iter != m_Entries.end())
-		{
 			return iter->second;
-		}
-		else
-		{
-			LI_ERROR("alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
-			return { 0.0f, 0.0f, 1.0f, 1.0f };
-		}
+
+		LI_ERROR(false, "Alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
+		// Ensure we don't return a dangling pointer.
+		static const glm::vec4 default_bounds = { 0.0f, 0.0f, 1.0f, 1.0f };
+		return default_bounds;
 	}
 }

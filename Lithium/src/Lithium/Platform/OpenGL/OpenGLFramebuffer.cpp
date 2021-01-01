@@ -6,7 +6,7 @@
 
 #include "OpenGLCore.h"
 
-namespace li
+namespace Li
 {
 	OpenGLFramebuffer::OpenGLFramebuffer(int width, int height)
 		: m_Width(width), m_Height(height)
@@ -18,7 +18,7 @@ namespace li
 			WrapType::ClampToEdge, WrapType::ClampToEdge, FilterType::Linear, FilterType::Nearest);
 		m_Texture->AttachToFramebuffer();
 
-		m_Renderbuffer = CreateScope<OpenGLRenderbuffer>(width, height);
+		m_Renderbuffer = MakeUnique<OpenGLRenderbuffer>(width, height);
 		m_Renderbuffer->AttachToFramebuffer();
 
 		LI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer not complete!");

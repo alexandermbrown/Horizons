@@ -3,7 +3,7 @@
 
 #include "UIComponents.h"
 
-void UITransformSortSystem::SortTransforms(entt::registry& registry)
+void Systems::UISortTransforms::OnUpdate(entt::registry& registry, Li::Duration::us dt)
 {
 	registry.sort<cp::ui_transform>([](const cp::ui_transform& lhs, const cp::ui_transform& rhs)
 	{

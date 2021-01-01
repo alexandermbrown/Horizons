@@ -35,7 +35,7 @@ void TerrainVerticeSystem::SubmitVerticesShow(entt::registry& registry, glm::ive
 						chunk_pos.x * TerrainRenderer::MetersPerChunk + x * distance_x,
 						chunk_pos.y * TerrainRenderer::MetersPerChunk + y * distance_y,
 						0.0f });
-					li::Renderer::SubmitColored({ 1.0f, 0.1f, 0.1f, 1.0f }, transform * scale * rotation);
+					Li::Renderer::SubmitColored({ 1.0f, 0.1f, 0.1f, 1.0f }, transform * scale * rotation);
 				}
 			}
 		}
@@ -86,7 +86,7 @@ void TerrainVerticeSystem::SubmitVerticesShowInBrush(entt::registry& registry, g
 						float alpha = 1.0f - std::clamp((distance - brush.brush->InnerRadius) / (brush.brush->OuterRadius - brush.brush->InnerRadius), 0.0f, 1.0f);
 
 						glm::mat4 transform = glm::translate(glm::mat4(1.0f), { vert, 0.0f });
-						li::Renderer::SubmitColored({ 1.0f, 0.1f, 0.1f, alpha }, transform * scale * rotation);
+						Li::Renderer::SubmitColored({ 1.0f, 0.1f, 0.1f, alpha }, transform * scale * rotation);
 					}
 				}
 			}

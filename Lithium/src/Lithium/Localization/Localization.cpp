@@ -1,15 +1,15 @@
 #include "lipch.h"
 #include "Localization.h"
 
-namespace li
+namespace Li
 {
-	Scope<Localization::LocalizationData> Localization::s_Data;
+	Unique<Localization::LocalizationData> Localization::s_Data;
 
 	Locale::Locale(const std::string& code) : m_Code(code), m_Strings() {}
 
 	void Localization::Init()
 	{
-		s_Data = CreateScope<Localization::LocalizationData>();
+		s_Data = MakeUnique<Localization::LocalizationData>();
 		s_Data->m_Locales = std::vector<Ref<Locale>>();
 	}
 

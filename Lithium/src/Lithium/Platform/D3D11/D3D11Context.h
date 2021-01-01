@@ -7,7 +7,7 @@
 
 #include "glm/glm.hpp"
 
-namespace li
+namespace Li
 {
 	class D3D11Context : public GraphicsContext
 	{

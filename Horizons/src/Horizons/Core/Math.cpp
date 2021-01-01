@@ -11,7 +11,7 @@ bool Math::TransformContainsPoint(const glm::mat4& transform, int x, int y)
 	float bottom = transform[3][1];
 	float top = bottom + transform[1][1];
 
-	y = li::Application::Get()->GetWindow()->GetHeight() - y;
+	y = Li::Application::Get().GetWindow().GetHeight() - y;
 	return x >= left && x <= right && y >= bottom && y <= top;
 }
 

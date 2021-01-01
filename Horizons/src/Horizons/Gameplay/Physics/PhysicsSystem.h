@@ -6,7 +6,6 @@
 namespace PhysicsSystem
 {
 	void Init(entt::registry& registry);
-	void Shutdown(entt::registry& registry);
 
-	void Step(entt::registry& registry, li::duration::us dt);
+	void Step(entt::registry& registry, Li::Duration::us dt);
 };

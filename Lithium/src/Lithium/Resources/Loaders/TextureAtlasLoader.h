@@ -5,11 +5,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
 
-namespace li
+namespace Li::Loaders
 {
-	class TextureAtlasLoader
-	{
-	public:
-		static Ref<TextureAtlas> Load(const Assets::TextureAtlas* atlas);
-	};
+	Ref<Li::TextureAtlas> LoadTextureAtlas(const Assets::TextureAtlas* atlas);
 }

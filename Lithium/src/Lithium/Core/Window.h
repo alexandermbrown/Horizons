@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 
-namespace li
+namespace Li
 {
 	struct WindowProps
 	{
@@ -29,14 +29,13 @@ namespace li
 	class Window
 	{
 	public:
-
 		virtual ~Window() = default;
 
 		virtual void SwapBuffers() = 0;
 
 		virtual int GetWidth() const = 0;
 		virtual int GetHeight() const = 0;
-		virtual GraphicsContext* GetContext() const = 0;
+		virtual GraphicsContext* GetContext() = 0;
 		virtual SDL_Window* GetWindow() const = 0;
 		virtual uint32_t GetWindowID() const = 0;
 
@@ -54,10 +53,10 @@ namespace li
 		virtual void SetSize(int width, int height) = 0;
 		virtual void SetPosition(int x, int y) = 0;
 
-		virtual void SetIcon(const std::string& path) = 0;
+		virtual void SetIcon(const char* path) = 0;
 
 		virtual void OnWindowResize(int width, int height) = 0;
 
-		static Window* Create(const WindowProps& props);
+		static Li::Unique<Window> Create(const WindowProps& props);
 	};
 }

@@ -12,13 +12,13 @@
 
 #include <algorithm>
 
-namespace li
+namespace Li
 {
 #ifdef LI_DEBUG
 	D3D11Shader::D3D11Shader(const std::string& name, const std::filesystem::path& filepath)
 		: m_Name(name)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -64,7 +64,7 @@ namespace li
 		m_VSBufferData = new uint8_t[vs_size];
 		memcpy(m_VSBufferData, vs_bytecode, vs_size);
 
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 

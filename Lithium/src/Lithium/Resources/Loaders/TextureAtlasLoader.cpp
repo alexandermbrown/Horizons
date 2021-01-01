@@ -1,9 +1,9 @@
 #include "lipch.h"
 #include "TextureAtlasLoader.h"
 
-namespace li
+namespace Li
 {
-	Ref<TextureAtlas> TextureAtlasLoader::Load(const Assets::TextureAtlas* atlas)
+	Ref<TextureAtlas> Loaders::LoadTextureAtlas(const Assets::TextureAtlas* atlas)
 	{
 		std::unordered_map<std::string, glm::vec4> entries;
 		for (const Assets::AtlasEntry* entry : *atlas->entries())
@@ -12,6 +12,6 @@ namespace li
 			entries[entry->alias()->str()] = { bounds->x(), bounds->y(), bounds->z(), bounds->w() };
 		}
 
-		return CreateRef<TextureAtlas>(atlas->texture()->str(), std::move(entries));
+		return MakeRef<TextureAtlas>(atlas->texture()->str(), std::move(entries));
 	}
 }

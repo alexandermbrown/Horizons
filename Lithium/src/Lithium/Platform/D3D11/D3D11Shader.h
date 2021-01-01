@@ -6,7 +6,7 @@
 #include <d3d11.h>
 #include <filesystem>
 
-namespace li
+namespace Li
 {
 	class D3D11Shader : public Shader
 	{

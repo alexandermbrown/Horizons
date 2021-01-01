@@ -9,19 +9,11 @@
 using namespace std::chrono_literals;
 
 DiagnosticsLayer::DiagnosticsLayer()
-	: m_Timer(100ms, false, true), m_CurrentDelta(0), m_AverageTotal(0), m_Min(0), m_Max(0)
+	: Layer("DiagnosticsLayer"), m_Timer(100ms, false, true), m_CurrentDelta(0), m_AverageTotal(0), m_Min(0), m_Max(0)
 {
 }
 
-void DiagnosticsLayer::OnAttach()
-{
-}
-
-void DiagnosticsLayer::OnDetach()
-{
-}
-
-void DiagnosticsLayer::OnUpdate(li::duration::us dt)
+void DiagnosticsLayer::OnUpdate(Li::Duration::us dt)
 {
 	m_CurrentDelta = dt;
 
@@ -36,16 +28,16 @@ void DiagnosticsLayer::OnUpdate(li::duration::us dt)
 
 	if (m_Timer.Update(dt))
 	{
-		m_Average = li::duration::fsec(m_AverageTotal).count() / (float)m_AverageCount;
-		m_AverageTotal = li::duration::us(0);
+		m_Average = Li::Duration::fsec(m_AverageTotal).count() / (float)m_AverageCount;
+		m_AverageTotal = Li::Duration::us(0);
 		m_AverageCount = 0ULL;
 
-		m_DisplayMin = li::duration::fsec(m_Min).count();
-		m_DisplayMax = li::duration::fsec(m_Max).count();
+		m_DisplayMin = Li::Duration::fsec(m_Min).count();
+		m_DisplayMax = Li::Duration::fsec(m_Max).count();
 
 		m_Averages[m_EntryIndex] = m_Average;
-		m_Maximums[m_EntryIndex] = li::duration::fsec(m_Max).count();
-		m_Minimums[m_EntryIndex] = li::duration::fsec(m_Min).count();
+		m_Maximums[m_EntryIndex] = Li::Duration::fsec(m_Max).count();
+		m_Minimums[m_EntryIndex] = Li::Duration::fsec(m_Min).count();
 
 		m_EntryIndex = (m_EntryIndex + 1) % DiagnosticsMaxEntries;
 
@@ -137,7 +129,7 @@ void DiagnosticsLayer::OnImGuiRender()
 	{
 		ImGui::Begin("Config Variables", &m_CVarsOpen);
 
-		ConfigStore& config = li::Application::Get<Horizons>()->GetConfig();
+		ConfigStore& config = Li::Application::Get<Horizons>().GetConfig();
 
 		ImGui::BeginChild("cvar_list");
 		for (auto& [name, var] : config)
@@ -162,13 +154,13 @@ void DiagnosticsLayer::OnEvent(SDL_Event* event)
 		{
 			m_PerformanceOpen = !m_PerformanceOpen;
 
-			li::Application::Get()->EventHandled();
+			Li::Application::Get().EventHandled();
 		}
 		else if (event->key.keysym.scancode == SDL_SCANCODE_F4)
 		{
 			m_CVarsOpen = !m_CVarsOpen;
 
-			li::Application::Get()->EventHandled();
+			Li::Application::Get().EventHandled();
 		}
 	}
 }

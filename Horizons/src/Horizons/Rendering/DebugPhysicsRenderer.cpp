@@ -26,16 +26,16 @@ void DebugPhysicsRenderer::SubmitLines(DebugDrawCommandQueue* queue)
 		{
 		case DebugDrawType::Point:
 			// Draw a '+' with two lines to represent the point.
-			li::Renderer::SubmitLine(command.Color,
+			Li::Renderer::SubmitLine(command.Color,
 				{ command.Point1.x - 0.01, command.Point1.y, ZPos },
 				{ command.Point1.x + 0.01, command.Point1.y, ZPos });
 
-			li::Renderer::SubmitLine(command.Color,
+			Li::Renderer::SubmitLine(command.Color,
 				{ command.Point1.x, command.Point1.y - 0.01, ZPos },
 				{ command.Point1.x, command.Point1.y + 0.01, ZPos });
 			break;
 		case DebugDrawType::Line:
-			li::Renderer::SubmitLine(command.Color,
+			Li::Renderer::SubmitLine(command.Color,
 				{ command.Point1, ZPos },
 				{ command.Point2, ZPos });
 			break;
@@ -51,14 +51,14 @@ void DebugPhysicsRenderer::SubmitLines(DebugDrawCommandQueue* queue)
 				else
 					point2 = { command.Vertices[i + 1], ZPos };
 
-				li::Renderer::SubmitLine(command.Color, { command.Vertices[i], ZPos }, point2);
+				Li::Renderer::SubmitLine(command.Color, { command.Vertices[i], ZPos }, point2);
 			}
 			delete[] command.Vertices;
 			break;
 		}
 		case DebugDrawType::Circle:
 		{
-			li::Renderer::SubmitCircle(command.Color, { command.Point1, ZPos }, command.Radius);
+			Li::Renderer::SubmitCircle(command.Color, { command.Point1, ZPos }, command.Radius);
 			break;
 		}
 		}

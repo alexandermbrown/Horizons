@@ -2,37 +2,24 @@
 #ifndef LI_DIST
 #include "LevelEditorScene.h"
 
-#include "MainMenuScene.h"
-
 LevelEditorScene::LevelEditorScene()
 {
 }
 
 LevelEditorScene::~LevelEditorScene()
 {
-	li::Application* app = li::Application::Get();
-	app->PopLayer(&m_LevelEditorLayer);
+	Li::Application::Get().PopLayer("LevelEditor");
 }
 
-void LevelEditorScene::TransitionIn()
+void LevelEditorScene::OnShow()
 {
-	li::Application* app = li::Application::Get();
-	app->PushLayer(&m_LevelEditorLayer);
-#ifndef LI_DIST
-	app->GetImGuiRenderer()->SetBlockEvents(false);
-#endif
+	Li::Application& app = Li::Application::Get();
+	app.PushLayer(Li::MakeUnique<LevelEditorLayer>());
+	app.GetImGuiRenderer()->SetBlockEvents(false);
 }
 
-void LevelEditorScene::TransitionOut()
+void LevelEditorScene::OnTransition()
 {
-	
 }
 
-void LevelEditorScene::OnUpdate(li::duration::us dt)
-{
-	if (m_LevelEditorLayer.ReturnToMainMenu())
-	{
-		li::Application::Get()->Transition(new MainMenuScene());
-	}
-}
 #endif // !LI_DIST

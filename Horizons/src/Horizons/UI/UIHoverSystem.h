@@ -1,9 +1,9 @@
 #pragma once
 
 #include "entt/entt.hpp"
-#include "glm/glm.hpp"
+#include "SDL.h"
 
-namespace UIHoverSystem
+namespace Systems::UIHover
 {
-	void OnMouseMove(entt::registry& registry, int x, int y);
+	void OnEvent(entt::registry& registry, SDL_Event* event);
 }

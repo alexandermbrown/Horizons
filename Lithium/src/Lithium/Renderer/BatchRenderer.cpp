@@ -6,7 +6,7 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-namespace li
+namespace Li
 {
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer)
 		: m_QuadOrigin(quadOrigin), m_InstanceCount(0),
@@ -159,8 +159,8 @@ namespace li
 			m_ViewProjUB->Bind();
 			m_TransformUB->Bind();
 			m_InstanceVA->Bind();
-			Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
-			Application::Get()->GetWindow()->GetContext()->DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);
+			Application::Get().GetWindow().GetContext()->SetDrawMode(Li::DrawMode::Triangles);
+			Application::Get().GetWindow().GetContext()->DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);
 			m_InstanceVA->Unbind();
 		}
 		m_InstanceCount = 0;

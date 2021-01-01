@@ -2,7 +2,7 @@
 
 #include "Lithium/Core/Core.h"
 
-namespace li
+namespace Li
 {
 	namespace AudioManager
 	{

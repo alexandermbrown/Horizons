@@ -3,9 +3,10 @@
 #include "Lithium/Core/Core.h"
 #include "Layer.h"
 
-#include <vector>
+#include <list>
+#include <string_view>
 
-namespace li
+namespace Li
 {
 	class LayerStack
 	{
@@ -13,25 +14,29 @@ namespace li
 		LayerStack();
 		~LayerStack();
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
-		void PopLayer(Layer* layer);
-		void PopOverlay(Layer* overlay);
+		void PushLayer(Unique<Layer> layer);
+		void PushOverlay(Unique<Layer> overlay);
+		void PopLayer(const std::string_view& layer_name);
+		void PopOverlay(const std::string_view& overlay_name);
+
+		Layer* GetLayer(const std::string_view& name);
 
 		void Clear();
 
-		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
-		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
-		std::vector<Layer*>::reverse_iterator rbegin() { return m_Layers.rbegin(); }
-		std::vector<Layer*>::reverse_iterator rend() { return m_Layers.rend(); }
+		using LayerList = std::list<Unique<Layer>>;
 
-		std::vector<Layer*>::const_iterator begin() const { return m_Layers.begin(); }
-		std::vector<Layer*>::const_iterator end()	const { return m_Layers.end(); }
-		std::vector<Layer*>::const_reverse_iterator rbegin() const { return m_Layers.rbegin(); }
-		std::vector<Layer*>::const_reverse_iterator rend() const { return m_Layers.rend(); }
+		LayerList::iterator begin() { return m_Layers.begin(); }
+		LayerList::iterator end() { return m_Layers.end(); }
+		LayerList::reverse_iterator rbegin() { return m_Layers.rbegin(); }
+		LayerList::reverse_iterator rend() { return m_Layers.rend(); }
+
+		LayerList::const_iterator begin() const { return m_Layers.begin(); }
+		LayerList::const_iterator end()	const { return m_Layers.end(); }
+		LayerList::const_reverse_iterator rbegin() const { return m_Layers.rbegin(); }
+		LayerList::const_reverse_iterator rend() const { return m_Layers.rend(); }
+
 	private:
-		std::vector<Layer*> m_Layers;
-		unsigned int m_LayerInsertIndex;
+		LayerList m_Layers;
+		LayerList::iterator m_BottomOverlay;
 	};
 }
-

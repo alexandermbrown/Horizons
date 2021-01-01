@@ -4,7 +4,7 @@
 #define AL_LIBTYPE_STATIC
 #include "AL/alc.h"
 
-namespace li
+namespace Li
 {
 	struct AudioData
 	{
@@ -14,7 +14,7 @@ namespace li
 		ALCcontext* Context;
 	};
 
-	Scope<AudioData> s_Data = nullptr;
+	Unique<AudioData> s_Data = nullptr;
 
 	bool AudioManager::Init(const char* device_name)
 	{
@@ -40,7 +40,7 @@ namespace li
 			return false;
 		}
 
-		s_Data = CreateScope<AudioData>(device, context);
+		s_Data = MakeUnique<AudioData>(device, context);
 		return true;
 	}
 

@@ -6,7 +6,7 @@
 #define AL_LIBTYPE_STATIC
 #include "AL/al.h"
 
-namespace li
+namespace Li
 {
 	AudioSource::AudioSource(float gain, float pitch, glm::vec3 position, glm::vec3 velocity, bool looping)
 	{

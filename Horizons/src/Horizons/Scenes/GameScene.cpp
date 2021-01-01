@@ -4,38 +4,20 @@
 #include "Horizons.h"
 #include "Horizons/Core/AppState.h"
 
-#include "MainMenuScene.h"
+#include "Horizons/Layers/GameLayer.h"
 
-GameScene::GameScene()
+void GameScene::OnShow()
 {
-}
-
-void GameScene::TransitionIn()
-{
-	Horizons* app = li::Application::Get<Horizons>();
-	app->GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::InGame);
-	app->PushLayer(&m_GameLayer);
-	app->PushLayer(&m_HUDLayer);
+	Horizons& app = Li::Application::Get<Horizons>();
+	app.GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::InGame);
+	app.PushLayer(Li::MakeUnique<GameLayer>());
 #ifndef LI_DIST
-	app->PushOverlay(&m_Diagnostics);
-	app->GetImGuiRenderer()->SetBlockEvents(true);
+	app.GetImGuiRenderer()->SetBlockEvents(true);
 #endif
 }
 
-void GameScene::TransitionOut()
+void GameScene::OnTransition()
 {
-	Horizons* app = li::Application::Get<Horizons>();
-	app->PopLayer(&m_GameLayer);
-	app->PopLayer(&m_HUDLayer);
-#ifndef LI_DIST
-	app->PopOverlay(&m_Diagnostics);
-#endif
-}
-
-void GameScene::OnUpdate(li::duration::us dt)
-{
-	if (m_GameLayer.ReturnToMainMenu())
-	{
-		li::Application::Get()->Transition(new MainMenuScene());
-	}
+	Horizons& app = Li::Application::Get<Horizons>();
+	app.PopLayer("GameLayer");
 }

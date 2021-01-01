@@ -1,10 +1,10 @@
 #include "lipch.h"
 #include "Layer.h"
 
-namespace li
+namespace Li
 {
 	Layer::Layer(const std::string& name)
-		: m_DebugName(name)
+		: m_Name(name)
 	{
 	}
 }

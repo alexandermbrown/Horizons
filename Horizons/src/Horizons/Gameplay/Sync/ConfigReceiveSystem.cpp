@@ -36,7 +36,7 @@ bool ConfigReceiveSystem::OnEvent(SDL_Event* event)
 			break;
 
 		default:
-			LI_CORE_ERROR("Unknown CVAR type!");
+			LI_ERROR("Unknown CVAR type!");
 			break;
 		}
 

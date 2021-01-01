@@ -6,7 +6,7 @@
 #include "ConvertOpenGL.h"
 #include "OpenGLCore.h"
 
-namespace li
+namespace Li
 {
 	OpenGLTexture2D::OpenGLTexture2D(int width, int height, int channels, void* data,
 		WrapType wrapS, WrapType wrapT, FilterType minFilter, FilterType magFilter)

@@ -4,7 +4,7 @@
 
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
-namespace li
+namespace Li
 {
 	class D3D11ImGuiRenderer : public ImGuiRenderer
 	{

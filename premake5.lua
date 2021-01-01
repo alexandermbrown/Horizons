@@ -1,9 +1,3 @@
-premake.override(premake.tools.msc, "getLibraryExtensions", function(oldfn)
-    local extensions = oldfn()
-    extensions["a"] = true
-    return extensions
-  end)
-
 workspace "Horizons"
     architecture "x86_64"
     startproject "Horizons"
@@ -33,7 +27,6 @@ IncludeDir["libogg"] = "Lithium/vendor/libogg/include"
 IncludeDir["libvorbis"] = "Lithium/vendor/libvorbis/include"
 IncludeDir["simpleini"] = "Lithium/vendor/simpleini/include"
 IncludeDir["readerwriterqueue"] = "Lithium/vendor/readerwriterqueue/include"
-IncludeDir["layout"] = "Lithium/vendor/layout/include"
 IncludeDir["harfbuzz"] = "Lithium/vendor/harfbuzz/src"
 IncludeDir["utfcpp"] = "Lithium/vendor/utfcpp/include"
 IncludeDir["libav"] = "Lithium/vendor/libav/include"
@@ -53,7 +46,9 @@ IncludeDir["libb64"] = "ServerManager/vendor/libb64/include"
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
 IncludeDir["steam"] = "Horizons/vendor/steam/include"
+IncludeDir["layout"] = "Horizons/vendor/layout/include"
 IncludeDir["lua"] = "Horizons/vendor/lua/include"
+IncludeDir["sol"] = "Horizons/vendor/sol"
 IncludeDir["nativefiledialog"] = "Horizons/vendor/nativefiledialog/src/include"
 
 group "vendor"
@@ -107,7 +102,6 @@ project "Lithium"
         "%{IncludeDir.libogg}",
         "%{IncludeDir.libvorbis}",
         "%{IncludeDir.readerwriterqueue}",
-        "%{IncludeDir.layout}",
         "%{IncludeDir.flatbuffers}",
         "%{IncludeDir.lab_serial}",
         "%{IncludeDir.harfbuzz}",
@@ -227,6 +221,7 @@ project "Horizons"
         "%{IncludeDir.lab_serial}",
         "%{IncludeDir.harfbuzz}",
         "%{IncludeDir.lua}",
+        "%{IncludeDir.sol}",
         "%{IncludeDir.nativefiledialog}"
     }
 
@@ -262,13 +257,19 @@ project "Horizons"
         includedirs { "%{IncludeDir.imgui}" }
 
     filter "configurations:Release"
-        defines "LI_RELEASE"
+        defines {
+            "LI_RELEASE",
+            "HZ_RELEASE"
+        }
         runtime "Release"
         optimize "on"
         includedirs { "%{IncludeDir.imgui}" }
 
     filter "configurations:Dist"
-        defines "LI_DIST"
+        defines {
+            "LI_DIST",
+            "HZ_DIST"
+        }
         runtime "Release"
         optimize "on"
 

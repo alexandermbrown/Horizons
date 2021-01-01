@@ -18,7 +18,7 @@ public:
 
 	virtual glm::ivec2 GetWorldSize() const override { return { m_WorldWidth, m_WorldHeight }; }
 
-	void ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt);
+	void ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, Li::Duration::us dt);
 	void Save();
 	bool SaveAs(const std::string& path);
 
@@ -37,7 +37,7 @@ private:
 	};
 
 	void LoadChunkFromDisk(glm::ivec2 coord, StoreChunk* destination);
-	void ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt, StoreChunk& chunk);
+	void ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, Li::Duration::us dt, StoreChunk& chunk);
 	void OverwriteWorld();
 
 	// Assumes we are already in the correct file position.

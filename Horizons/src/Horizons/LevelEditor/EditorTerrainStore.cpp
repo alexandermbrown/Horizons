@@ -77,7 +77,7 @@ void EditorTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk
 	}
 }
 
-void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt)
+void EditorTerrainStore::ApplyBrush(BrushSettings* brush, glm::vec2 brush_pos, int layer, Li::Duration::us dt)
 {
 	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
 	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
@@ -206,12 +206,12 @@ bool EditorTerrainStore::CreateEmptyTerrainFile(const std::string& path, glm::iv
 	return true;
 }
 
-void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, li::duration::us dt, StoreChunk& chunk)
+void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush_pos, int layer, Li::Duration::us dt, StoreChunk& chunk)
 {
 	const float world_width = (float)m_WorldWidth * TerrainRenderer::MetersPerChunk;
 	const float world_height = (float)m_WorldHeight * TerrainRenderer::MetersPerChunk;
 
-	bool reverse = li::Application::Get()->GetInput().IsKeyPressed(SDL_SCANCODE_LSHIFT);
+	bool reverse = Li::Application::Get().GetInput().IsKeyPressed(SDL_SCANCODE_LSHIFT);
 
 	for (int y = 0; y <= ChunkHeight; y++)
 	{
@@ -250,11 +250,11 @@ void EditorTerrainStore::ApplyBrushToChunk(BrushSettings* brush, glm::vec2 brush
 			float new_value;
 			if (brush->Subtract != reverse)
 			{
-				new_value = std::max(prev_value - brush_power * brush->Strength * li::duration::fsec(dt).count(), 0.0f);
+				new_value = std::max(prev_value - brush_power * brush->Strength * Li::Duration::fsec(dt).count(), 0.0f);
 			}
 			else
 			{
-				new_value = std::min(prev_value + brush_power * brush->Strength * li::duration::fsec(dt).count(), 1.0f);
+				new_value = std::min(prev_value + brush_power * brush->Strength * Li::Duration::fsec(dt).count(), 1.0f);
 			}
 
 			if (new_value != prev_value)

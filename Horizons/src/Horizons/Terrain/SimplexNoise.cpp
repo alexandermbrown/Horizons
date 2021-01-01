@@ -9,7 +9,7 @@
 // https://ronvalstar.nl/creating-tileable-noise-maps
 
 // permutations: arranged array of all numbers from 0-255 inclusive.
-static const int perm[] = { 151,160,137,91,90,15,
+constexpr int perm[] = { 151,160,137,91,90,15,
 	131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
 	190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
 	88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
@@ -39,7 +39,7 @@ static const int perm[] = { 151,160,137,91,90,15,
 };
 
 // 4D gradients.
-static const glm::vec4 grad4[] = {
+constexpr glm::vec4 grad4[] = {
 	{0,1,1,1}, {0,1,1,-1},{0,1,-1,1},{0,1,-1,-1},
 	{0,-1,1,1},{0,-1,1,-1},{0,-1,-1,1},{0,-1,-1,-1},
 	{1,0,1,1},{1,0,1,-1},{1,0,-1,1},{1,0,-1,-1},
@@ -53,7 +53,7 @@ static const glm::vec4 grad4[] = {
 static const float F4 = (std::sqrt(5.0f) - 1.0f) / 4.0f;
 static const float G4 = (5.0f - std::sqrt(5.0f)) / 20.0f;
 
-li::Ref<li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int height, int cell_size, int octaves, float persistence, float aspect_ratio)
+Li::Ref<Li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int height, int cell_size, int octaves, float persistence, float aspect_ratio)
 {
 	uint8_t* data = new uint8_t[(size_t)width * (size_t)height];
 
@@ -78,7 +78,7 @@ li::Ref<li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int 
 		}
 	}
 
-	li::Ref<li::Texture2D> texture = li::Texture2D::Create(width, height, 1, data, li::WrapType::Repeat, li::WrapType::Repeat, li::FilterType::Linear, li::FilterType::Nearest);
+	Li::Ref<Li::Texture2D> texture = Li::Texture2D::Create(width, height, 1, data, Li::WrapType::Repeat, Li::WrapType::Repeat, Li::FilterType::Linear, Li::FilterType::Nearest);
 	delete[] data;
 	return texture;
 }

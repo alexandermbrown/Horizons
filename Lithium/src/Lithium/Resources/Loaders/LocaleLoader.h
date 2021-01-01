@@ -6,11 +6,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
 
-namespace li
+namespace Li::Loaders
 {
-	class LocaleLoader
-	{
-	public:
-		static Ref<Locale> Load(const Assets::Locale* locale);
-	};
+	Ref<Locale> LoadLocale(const Assets::Locale* locale);
 }

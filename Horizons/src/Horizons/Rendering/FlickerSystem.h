@@ -3,7 +3,7 @@
 #include "Lithium.h"
 #include "entt/entt.hpp"
 
-namespace FlickerSystem
+namespace Systems::Flicker
 {
-	void Update(entt::registry& registry, li::duration::us dt);
+	void OnUpdate(entt::registry& registry, Li::Duration::us dt);
 }

@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #ifdef LI_ENABLE_ASSERTS
-namespace li
+namespace Li
 {
 	const char* GLErrorToString(GLenum error)
 	{

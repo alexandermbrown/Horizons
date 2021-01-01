@@ -20,8 +20,8 @@ struct RenderChunk
 
 	glm::mat4 Transform;
 
-	li::Ref<li::VertexBuffer> AlphaVB;
-	li::Ref<li::VertexArray> VertexArray;
+	Li::Ref<Li::VertexBuffer> AlphaVB;
+	Li::Ref<Li::VertexArray> VertexArray;
 };
 
 class TerrainStore

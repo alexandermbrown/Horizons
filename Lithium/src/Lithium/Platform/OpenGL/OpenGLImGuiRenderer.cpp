@@ -9,13 +9,13 @@
 #include "examples/imgui_impl_sdl.h"
 #include "examples/imgui_impl_opengl3.h"
 
-namespace li
+namespace Li
 {
 	OpenGLImGuiRenderer::OpenGLImGuiRenderer()
 	{
-		Application* app = Application::Get();
+		Application& app = Application::Get();
 
-		ImGui_ImplSDL2_InitForOpenGL(app->GetWindow()->GetWindow(), ((OpenGLContext*)app->GetWindow()->GetContext())->GetGLContext());
+		ImGui_ImplSDL2_InitForOpenGL(app.GetWindow().GetWindow(), static_cast<OpenGLContext*>(app.GetWindow().GetContext())->GetGLContext());
 
 		// TODO: set version dynamically for maximum compatibility.
 		ImGui_ImplOpenGL3_Init("#version 410");
@@ -31,7 +31,7 @@ namespace li
 	void OpenGLImGuiRenderer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame(Application::Get()->GetWindow()->GetWindow());
+		ImGui_ImplSDL2_NewFrame(Application::Get().GetWindow().GetWindow());
 		ImGui::NewFrame();
 	}
 

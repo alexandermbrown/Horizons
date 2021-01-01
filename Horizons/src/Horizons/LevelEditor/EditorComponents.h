@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "EditorSettings.h"
 
 namespace cp
@@ -17,3 +17,4 @@ namespace cp
 		glm::vec2 world_pos;
 	};
 }
+#endif

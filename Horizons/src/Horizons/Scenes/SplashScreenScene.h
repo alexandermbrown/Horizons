@@ -1,25 +1,12 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
-#include "Horizons/Layers/SplashScreenLayer.h"
-#include "Horizons/Layers/ConfigUpdateLayer.h"
-
-class SplashScreenScene : public li::Scene
+class SplashScreenScene : public Li::Scene
 {
 public:
-	SplashScreenScene();
 	virtual ~SplashScreenScene() = default;
 
-	virtual void TransitionIn() override;
-	virtual void TransitionOut() override;
-
-	virtual void OnUpdate(li::duration::us dt) override;
-
-	virtual bool Finished() override { return true; }
-
-private:
-	SplashScreenLayer m_SplashScreenLayer;
-	ConfigUpdateLayer m_ConfigCleanLayer;
+	virtual void OnShow() override;
+	virtual void OnTransition() override;
 };

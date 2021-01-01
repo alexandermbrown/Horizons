@@ -9,19 +9,19 @@
 #include "Lithium/Platform/D3D11/D3D11Shader.h"
 #endif
 
-namespace li
+namespace Li
 {
 	Ref<Shader> Shader::Create(const std::string& name, const std::string& glsl, const void* vs_bytecode, uint32_t vs_size, const void* ps_bytecode, uint32_t ps_size)
 	{
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
-			return CreateRef<OpenGLShader>(name, glsl);
+			return MakeRef<OpenGLShader>(name, glsl);
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:
-			return CreateRef<D3D11Shader>(name, vs_bytecode, vs_size, ps_bytecode, ps_size);
+			return MakeRef<D3D11Shader>(name, vs_bytecode, vs_size, ps_bytecode, ps_size);
 #endif
 		}
 

@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace li 
+namespace Li 
 {
 	class VertexArray
 	{

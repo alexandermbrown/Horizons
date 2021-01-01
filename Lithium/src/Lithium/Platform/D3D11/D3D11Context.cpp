@@ -7,7 +7,7 @@
 #include <d3d11_2.h>
 #include <VersionHelpers.h>
 
-namespace li
+namespace Li
 {
 	D3D11Context::D3D11Context(HWND hwnd, int width, int height)
 	{

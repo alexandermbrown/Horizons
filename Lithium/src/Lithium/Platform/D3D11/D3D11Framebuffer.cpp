@@ -7,16 +7,16 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-namespace li
+namespace Li
 {
 	D3D11Framebuffer::D3D11Framebuffer(int width, int height)
 		: m_Size(width, height)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
-		m_Texture = CreateRef<D3D11Texture2D>(width, height, 4, nullptr,
+		m_Texture = MakeRef<D3D11Texture2D>(width, height, 4, nullptr,
 			WrapType::ClampToEdge, WrapType::ClampToEdge,
 			FilterType::Linear, FilterType::Nearest, false, true);
 

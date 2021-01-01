@@ -9,15 +9,15 @@
 #include "examples/imgui_impl_sdl.h"
 #include "examples/imgui_impl_dx11.h"
 
-namespace li
+namespace Li
 {
 	D3D11ImGuiRenderer::D3D11ImGuiRenderer()
 	{
-		Application* app = Application::Get();
+		Application& app = Application::Get();
 
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 
-		ImGui_ImplSDL2_InitForD3D(app->GetWindow()->GetWindow());
+		ImGui_ImplSDL2_InitForD3D(app.GetWindow().GetWindow());
 		ImGui_ImplDX11_Init(context->GetDevice(), context->GetDeviceContext());
 	}
 
@@ -31,7 +31,7 @@ namespace li
 	void D3D11ImGuiRenderer::Begin()
 	{
 		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplSDL2_NewFrame(Application::Get()->GetWindow()->GetWindow());
+		ImGui_ImplSDL2_NewFrame(Application::Get().GetWindow().GetWindow());
 		ImGui::NewFrame();
 	}
 

@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "SyncEventReceiveSystem.h"
 
-#include "Horizons/Gameplay/Components.h"
+#include "Horizons/Gameplay/TransformComponent.h"
 #include "Horizons/Gameplay/Player/PlayerComponents.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/Sync/SyncTransform.h"
 
 #include "Lithium.h"
 
-template<typename component_t>
+template<typename Component>
 void AddComponent(entt::registry& registry, SyncEvent& event)
 {
 	cp::sync_tracker& tracker = registry.ctx<cp::sync_tracker>();
@@ -17,24 +17,24 @@ void AddComponent(entt::registry& registry, SyncEvent& event)
 
 	if (event.data)
 	{
-		component_t* recieved_cp = (component_t*)event.data;
-		registry.emplace<component_t>(entity, *recieved_cp);
+		Component* recieved_cp = static_cast<Component*>(event.data);
+		registry.emplace<Component>(entity, *recieved_cp);
 		delete recieved_cp;
 	}
 	else
 	{
-		registry.emplace<component_t>(entity);
+		registry.emplace<Component>(entity);
 	}
 }
 
-template<typename component_t>
+template<typename Component>
 void RemoveComponent(entt::registry& registry, SyncEvent& event)
 {
 	cp::sync_tracker& tracker = registry.ctx<cp::sync_tracker>();
 	entt::entity entity = tracker.map[event.sync_id];
 	LI_ASSERT(registry.get<cp::sync>(entity).sync_id == event.sync_id, "Sync IDs do not match!");
 
-	registry.remove<component_t>(entity);
+	registry.remove<Component>(entity);
 }
 
 void SyncEventReceiveSystem::Init(entt::registry& registry)

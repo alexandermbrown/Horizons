@@ -5,14 +5,14 @@
 
 #include <glad/glad.h>
 
-namespace li
+namespace Li
 {
 	namespace ConvertOpenGL
 	{
-		uint32_t BufferUsage(li::BufferUsage usage);
-		uint32_t DrawMode(li::DrawMode mode);
-		uint32_t WrapType(li::WrapType type);
-		uint32_t FilterType(li::FilterType type);
+		uint32_t BufferUsage(Li::BufferUsage usage);
+		uint32_t DrawMode(Li::DrawMode mode);
+		uint32_t WrapType(Li::WrapType type);
+		uint32_t FilterType(Li::FilterType type);
 		GLint TextureInternalFormat(int channels);
 		GLenum TextureDataFormat(int channels);
 	};

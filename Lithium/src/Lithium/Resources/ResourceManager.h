@@ -12,7 +12,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
 
-namespace li
+namespace Li
 {
 	class ResourceManager
 	{
@@ -96,6 +96,6 @@ namespace li
 			StaggeredLoadData LoadData;
 		};
 		
-		static Scope<ResourceData> s_Data;
+		static Unique<ResourceData> s_Data;
 	};
 }

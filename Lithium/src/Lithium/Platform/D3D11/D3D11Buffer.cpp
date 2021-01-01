@@ -7,12 +7,12 @@
 
 #include "Lithium/Core/Application.h"
 
-namespace li
+namespace Li
 {
 	D3D11VertexBuffer::D3D11VertexBuffer(uint32_t size, BufferUsage usage)
 		: m_Size(size)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = static_cast<D3D11Context*>(Application::Get().GetWindow().GetContext());
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -35,7 +35,7 @@ namespace li
 	D3D11VertexBuffer::D3D11VertexBuffer(float* vertices, uint32_t size, BufferUsage usage)
 		: m_Size(size)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -80,7 +80,7 @@ namespace li
 	D3D11IndexBuffer::D3D11IndexBuffer(uint32_t size, BufferUsage usage)
 		: m_Size(size), m_Count()
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -102,7 +102,7 @@ namespace li
 	D3D11IndexBuffer::D3D11IndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage)
 		: m_Size(count * sizeof(uint32_t)), m_Count(count)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 

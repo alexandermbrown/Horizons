@@ -4,19 +4,12 @@
 #include "Horizons.h"
 
 ConfigUpdateLayer::ConfigUpdateLayer()
-{
-}
-
-void ConfigUpdateLayer::OnAttach()
+	: Layer("ConfigUpdate")
 {
 	Clean();
 }
 
-void ConfigUpdateLayer::OnDetach()
-{
-}
-
-void ConfigUpdateLayer::OnUpdate(li::duration::us dt)
+void ConfigUpdateLayer::OnUpdate(Li::Duration::us dt)
 {
 	Clean();
 }
@@ -31,7 +24,7 @@ void ConfigUpdateLayer::OnEvent(SDL_Event* event)
 	{
 		if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 		{
-			ConfigStore& config = li::Application::Get<Horizons>()->GetConfig();
+			ConfigStore& config = Li::Application::Get<Horizons>().GetConfig();
 
 			int width = config.Get("window_width").GetInt();
 			int height = config.Get("window_height").GetInt();
@@ -47,13 +40,13 @@ void ConfigUpdateLayer::OnEvent(SDL_Event* event)
 
 void ConfigUpdateLayer::Clean()
 {
-	ConfigStore& config = li::Application::Get<Horizons>()->GetConfig();
+	ConfigStore& config = Li::Application::Get<Horizons>().GetConfig();
 
 	ConfigVar& vsync = config.Get("use_vsync");
 	if (vsync.IsDirty())
 	{
 		LI_TRACE("Changed vsync!");
-		li::Application::Get()->GetWindow()->SetVSync(vsync.GetBool());
+		Li::Application::Get().GetWindow().SetVSync(vsync.GetBool());
 		vsync.Clean();
 	}
 }

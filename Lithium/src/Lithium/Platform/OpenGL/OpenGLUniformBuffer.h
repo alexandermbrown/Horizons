@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace li
+namespace Li
 {
 	class OpenGLUniformBuffer : public UniformBuffer
 	{

@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-namespace li
+namespace Li
 {
-	D3D11_USAGE ConvertD3D11::BufferUsage(li::BufferUsage usage)
+	D3D11_USAGE ConvertD3D11::BufferUsage(Li::BufferUsage usage)
 	{
 		switch (usage)
 		{
@@ -19,7 +19,7 @@ namespace li
 		}
 	}
 
-	D3D11_TEXTURE_ADDRESS_MODE ConvertD3D11::WrapType(li::WrapType type)
+	D3D11_TEXTURE_ADDRESS_MODE ConvertD3D11::WrapType(Li::WrapType type)
 	{
 		switch (type)
 		{

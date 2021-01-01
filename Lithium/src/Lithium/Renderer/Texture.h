@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace li 
+namespace Li 
 {
 	class Texture
 	{

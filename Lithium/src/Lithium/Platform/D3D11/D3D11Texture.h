@@ -4,7 +4,7 @@
 
 #include <d3d11.h>
 
-namespace li
+namespace Li
 {
 	class D3D11Texture2D : public Texture2D
 	{

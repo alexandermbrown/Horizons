@@ -25,8 +25,8 @@ void BrushSystem::SubmitBrush(entt::registry& registry, glm::ivec2 mouse_pos, gl
 			focus_point.y - (float)pixel_distance.y * camera.current_zoom / (float)view_size.y * 2.0f
 		};
 
-		li::Renderer::SubmitCircle({ 1.000f, 0.391f, 0.000f, 1.000f }, { brush.world_pos, 0.0f }, brush.brush->InnerRadius);
-		li::Renderer::SubmitCircle({ 1.000f, 0.391f, 0.000f, 1.000f }, { brush.world_pos, 0.0f }, brush.brush->OuterRadius);
+		Li::Renderer::SubmitCircle({ 1.000f, 0.391f, 0.000f, 1.000f }, { brush.world_pos, 0.0f }, brush.brush->InnerRadius);
+		Li::Renderer::SubmitCircle({ 1.000f, 0.391f, 0.000f, 1.000f }, { brush.world_pos, 0.0f }, brush.brush->OuterRadius);
 	}
 }
 #endif

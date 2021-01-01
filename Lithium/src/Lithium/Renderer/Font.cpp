@@ -6,7 +6,7 @@
 
 #include "hb-ot.h"
 
-namespace li
+namespace Li
 {
 	Font::Font(const std::string& name, const FontProperties& props, std::unordered_map<uint32_t, glm::vec2>&& textureOffsets, Ref<Texture2D> texture, const char* ttfData, uint32_t ttfSize)
 		: m_Name(name), m_Properties(props), m_TextureOffsets(textureOffsets), m_Texture(texture)

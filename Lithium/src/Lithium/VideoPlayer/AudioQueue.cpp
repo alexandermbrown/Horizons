@@ -8,7 +8,7 @@
 
 #include <fstream>
 
-namespace li
+namespace Li
 {
 	AudioQueue::AudioQueue(int bytes_per_sample, int channels, int sample_rate, int frame_sample_count, int frequency)
 		: m_BytesPerSample(bytes_per_sample), m_Channels(channels), m_NumPartial(0), m_CurrentBuffer(0),
@@ -60,7 +60,7 @@ namespace li
 				if (num_processed == 0)
 				{
 					// insert new OpenAL buffer into vector.
-					m_Buffers.insert(m_Buffers.begin() + m_CurrentBuffer, CreateScope<AudioBuffer>());
+					m_Buffers.insert(m_Buffers.begin() + m_CurrentBuffer, MakeUnique<AudioBuffer>());
 					buffer_id = m_Buffers[m_CurrentBuffer]->GetBufferID();
 
 					if (m_Buffers.size() > NumBuffersTarget)

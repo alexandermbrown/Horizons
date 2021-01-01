@@ -4,7 +4,7 @@
 #include "PlayerComponents.h"
 #include "Horizons/Gameplay/Physics/PhysicsComponents.h"
 #include "Horizons/Rendering/RenderingComponents.h"
-#include "Horizons/Gameplay/Components.h"
+#include "Horizons/Gameplay/TransformComponent.h"
 
 #include "Horizons/Core/Game.h"
 
@@ -56,7 +56,7 @@ void PlayerSystem::Init(entt::registry& registry, SyncEventQueue* queue)
 	physBody.body->CreateFixture(&fixtureDef);
 }
 
-void PlayerSystem::Update(entt::registry& registry, li::duration::us dt)
+void PlayerSystem::Update(entt::registry& registry, Li::Duration::us dt)
 {
 	auto view = registry.view<cp::player, cp::physics_body>();
 	cp::player& player = view.get<cp::player>(view.front());

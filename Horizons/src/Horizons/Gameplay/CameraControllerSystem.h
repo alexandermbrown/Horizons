@@ -8,6 +8,6 @@ namespace CameraControllerSystem
 {
 	void Init(entt::registry& registry);
 	void Shutdown(entt::registry& registry);
-	void Update(entt::registry& registry, li::duration::us dt);
+	void Update(entt::registry& registry, Li::Duration::us dt);
 	void OnEvent(entt::registry& registry, SDL_Event* event);
 };

@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef LI_DIST
 #include "Lithium.h"
 #include "SDL.h"
 #include "glm/glm.hpp"
@@ -16,7 +16,7 @@ public:
 	~ViewportPanel();
 
 	inline void ShowPanel() { m_WindowOpen = true; }
-	void OnUpdate(li::duration::us dt);
+	void OnUpdate(Li::Duration::us dt);
 	void RenderPanel();
 	void OnEvent(SDL_Event* event);
 
@@ -40,7 +40,7 @@ private:
 	bool m_ViewportHovered;
 	glm::ivec2 m_MousePos;
 	glm::ivec2 m_ViewportSize;
-	li::Ref<li::Framebuffer> m_ViewportFB;
+	Li::Ref<Li::Framebuffer> m_ViewportFB;
 
 	bool m_TerrainOpen;
 
@@ -50,3 +50,4 @@ private:
 	glm::ivec2 m_ChunkCenter;
 	glm::vec2 m_CameraFocus;
 };
+#endif

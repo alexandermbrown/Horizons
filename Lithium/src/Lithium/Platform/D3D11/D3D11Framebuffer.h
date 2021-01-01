@@ -5,7 +5,7 @@
 
 #include <d3d11.h>
 
-namespace li
+namespace Li
 {
 	class D3D11Framebuffer : public Framebuffer
 	{

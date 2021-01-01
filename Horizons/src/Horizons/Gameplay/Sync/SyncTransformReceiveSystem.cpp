@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SyncTransformReceiveSystem.h"
 
-#include "Horizons/Gameplay/Components.h"
+#include "Horizons/Gameplay/TransformComponent.h"
 #include "Horizons/Gameplay/Sync/Sync.h"
 
 void AddSyncTransform(entt::registry& registry, entt::entity entity)
@@ -20,7 +20,7 @@ void SyncTransformReceiveSystem::Init(entt::registry& registry)
 	registry.on_construct<cp::sync_transform>().connect<&AddSyncTransform>();
 }
 
-void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQueue* queue, li::duration::us dt)
+void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQueue* queue, Li::Duration::us dt)
 {
 	// Possible Improvement: Include a timestamp in the queue to better synchronize.
 
@@ -40,7 +40,7 @@ void SyncTransformReceiveSystem::Update(entt::registry& registry, SyncTransformQ
 		}
 	}
 
-	float dt_float = li::duration::fsec(dt).count();
+	float dt_float = Li::Duration::fsec(dt).count();
 	registry.view<cp::sync_transform, cp::transform>().each([dt_float](cp::sync_transform& sync, cp::transform& transform)
 	{
 		if (sync.velocity.x || sync.velocity.y || sync.velocity.z || sync.angular_velocity != glm::identity<glm::quat>())

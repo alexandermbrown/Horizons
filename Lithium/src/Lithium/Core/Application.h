@@ -13,69 +13,82 @@
 
 #include <functional>
 #include <chrono>
+#include <string>
 
-namespace li
+namespace Li
 {
 	class Application
 	{
 	public:
+		using EventCallbackFn = std::function<void(SDL_Event* event)>;
+
+		inline static Application& Get() { return *s_Instance; }
+
 		template<typename T>
-		inline static T* Get() { return static_cast<T*>(s_Instance); }
-		inline static Application* Get() { return s_Instance; } 
+		inline static T& Get()
+		{
+			static_assert(std::is_base_of<Application, T>::value, "T is not a subclass of Application!");
+			return *static_cast<T*>(s_Instance);
+		}
 
 		Application(const WindowProps& props);
 		virtual ~Application();
 		void Run();
+		inline void Exit() { m_Running = false; }
 
 		void OnEvent(SDL_Event* event);
 		inline void EventHandled() { m_EventHandled = true; }
-		inline void TakeFocus(Layer* layer) { m_FocusedLayer = layer; }
+		inline void TakeFocus(const std::string& layer) { m_FocusedLayer = layer; }
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* layer);
-		void PopLayer(Layer* layer);
-		void PopOverlay(Layer* overlay);
+		inline void PushLayer(Unique<Layer> layer) { m_LayerStack.PushLayer(std::move(layer)); }
+		inline void PushOverlay(Unique<Layer> layer) { m_LayerStack.PushOverlay(std::move(layer)); }
+		inline void PopLayer(const std::string_view& name) { m_LayerStack.PopLayer(name); }
+		inline void PopOverlay(const std::string_view& name) { m_LayerStack.PopOverlay(name); }
 
-		inline Window* GetWindow() { return m_Window;  }
-		inline const std::function<void(SDL_Event* event)>& GetEventCallbackFn() { return m_EventCallbackFn; }
+		void Transition(Unique<Scene> next_scene, bool instant);
+		inline void FinishTransition() { m_TransitionFinished = true; }
+
+		inline Window& GetWindow() { return *m_Window; }
+		inline const EventCallbackFn& GetEventCallbackFn() { return m_EventCallbackFn; }
 		inline const Input& GetInput() { return m_Input; }
 		inline RendererAPI GetAPI() const { return m_RendererAPI; }
-
-		void Transition(Scene* scene);
-		void Exit();
-
 #ifndef LI_DIST
-		const Ref<ImGuiRenderer>& GetImGuiRenderer() { return m_ImGuiRenderer; }
+		inline const Unique<ImGuiRenderer>& GetImGuiRenderer() { return m_ImGuiRenderer; }
 #endif
+
+	protected:
+		inline void ClearScene() {
+			m_CurrentScene.reset();
+			m_NextScene.reset();
+		}
+		inline void ClearLayers() { m_LayerStack.Clear(); }
 
 	private:
 		void OnWindowEvent(SDL_Event* event);
 
-		RendererAPI m_RendererAPI;
-
 		bool m_Running;
 		std::chrono::time_point<std::chrono::steady_clock> m_LastUpdateTime;
 
-		Window* m_Window;
-		LayerStack m_LayerStack;
+		RendererAPI m_RendererAPI;
+		Unique<Window> m_Window;
 		Input m_Input;
 #ifndef LI_DIST
-		Ref<ImGuiRenderer> m_ImGuiRenderer;
+		Unique<ImGuiRenderer> m_ImGuiRenderer;
 #endif
-
-		std::function<void(SDL_Event* event)> m_EventCallbackFn;
-
+		EventCallbackFn m_EventCallbackFn;
 		bool m_EventHandled;
-		bool m_LayersDirty;
 
-		Layer* m_FocusedLayer;
+		LayerStack m_LayerStack;
+		std::string m_FocusedLayer;
 		
-		Scene* m_CurrentScene;
-		Scene* m_NextScene;
+		Unique<Scene> m_CurrentScene;
+		Unique<Scene> m_NextScene;
+		bool m_CallOnTransition;
+		bool m_TransitionFinished;
 
 		static Application* s_Instance;
 	};
 
 	// To be defined in CLIENT
-	Application* CreateApplication();
+	Unique<Application> CreateApplication();
 }

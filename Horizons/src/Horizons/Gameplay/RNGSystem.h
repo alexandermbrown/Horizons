@@ -2,7 +2,7 @@
 
 #include "entt/entt.hpp"
 
-namespace RNGSystem
+namespace Systems::RNG
 {
-	void Init(entt::registry& registry);
+	void OnInit(entt::registry& registry);
 }

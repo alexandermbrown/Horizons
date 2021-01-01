@@ -46,12 +46,12 @@ private:
 	bool m_ReloadRenderChunks;
 	bool m_RenderCenterChanged;
 
-	li::Ref<li::Shader> m_TerrainShader;
-	li::Ref<li::UniformBuffer> m_AtlasBoundsUB;
-	li::Ref<li::Framebuffer> m_Framebuffer;
+	Li::Ref<Li::Shader> m_TerrainShader;
+	Li::Ref<Li::UniformBuffer> m_AtlasBoundsUB;
+	Li::Ref<Li::Framebuffer> m_Framebuffer;
 
 	glm::mat4 m_QuadTransform;
-	li::Scope<li::OrthographicCamera> m_TerrainCamera;
+	Li::Unique<Li::OrthographicCamera> m_TerrainCamera;
 
 	TerrainStore* m_Store;
 };

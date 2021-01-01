@@ -13,7 +13,7 @@
 #include "Lithium/Platform/D3D11/D3D11ImGuiRenderer.h"
 #endif
 
-namespace li 
+namespace Li 
 {
 	ImGuiRenderer::ImGuiRenderer()
 		: m_BlockEvents(true)
@@ -41,7 +41,7 @@ namespace li
 					event->type == SDL_TEXTEDITING ||
 					event->type == SDL_TEXTINPUT)
 				{
-					Application::Get()->EventHandled();
+					Application::Get().EventHandled();
 				}
 			}
 
@@ -51,11 +51,10 @@ namespace li
 					event->type == SDL_MOUSEMOTION ||
 					event->type == SDL_MOUSEWHEEL)
 				{
-					Application::Get()->EventHandled();
+					Application::Get().EventHandled();
 				}
 			}
 		}
-		
 	}
 
 	void ImGuiRenderer::Resize(int width, int height)
@@ -64,15 +63,15 @@ namespace li
 		io.DisplaySize = ImVec2((float)width, (float)height);
 	}
 
-	Ref<ImGuiRenderer> ImGuiRenderer::Create()
+	Unique<ImGuiRenderer> ImGuiRenderer::Create()
 	{
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
-		case RendererAPI::OpenGL:  return CreateRef<OpenGLImGuiRenderer>();
+		case RendererAPI::OpenGL:  return MakeUnique<OpenGLImGuiRenderer>();
 #endif
 #ifdef LI_INCLUDE_D3D11
-		case RendererAPI::D3D11:  return CreateRef<D3D11ImGuiRenderer>();
+		case RendererAPI::D3D11:  return MakeUnique<D3D11ImGuiRenderer>();
 #endif
 		}
 

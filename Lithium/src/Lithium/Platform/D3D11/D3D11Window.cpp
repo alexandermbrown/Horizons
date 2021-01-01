@@ -5,7 +5,7 @@
 
 #include "SDL_syswm.h"
 
-namespace li
+namespace Li
 {
 	D3D11Window::D3D11Window(const WindowProps& props)
 		: m_Title(props.Title), m_Width(props.Width), m_Height(props.Height), m_Fullscreen(FullscreenType::Windowed), m_Icon(nullptr), m_IconData(nullptr)
@@ -28,12 +28,12 @@ namespace li
 		SDL_SysWMinfo wmInfo;
 		SDL_VERSION(&wmInfo.version);
 		SDL_GetWindowWMInfo(m_Window, &wmInfo);
-		m_Context = new D3D11Context(wmInfo.info.win.window, m_Width, m_Height);
+		m_Context = MakeUnique<D3D11Context>(wmInfo.info.win.window, m_Width, m_Height);
 	}
 
 	D3D11Window::~D3D11Window()
 	{
-		delete m_Context;
+		m_Context.reset();
 
 		if (m_Icon)
 			SDL_FreeSurface(m_Icon);
@@ -42,6 +42,7 @@ namespace li
 			stbi_image_free(m_IconData);
 
 		SDL_DestroyWindow(m_Window);
+		m_Window = nullptr;
 	}
 
 	void D3D11Window::SwapBuffers()
@@ -59,17 +60,17 @@ namespace li
 		m_Fullscreen = type;
 		switch (m_Fullscreen)
 		{
-		case li::FullscreenType::Windowed:
+		case Li::FullscreenType::Windowed:
 		{
 			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, 0), "Failed to turn to windowed.");
 			break;
 		}
-		case li::FullscreenType::Fullscreen:
+		case Li::FullscreenType::Fullscreen:
 		{
 			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN), "Failed to turn to fullscreen.");
 			break;
 		}
-		case li::FullscreenType::FullscreenWindowed:
+		case Li::FullscreenType::FullscreenWindowed:
 		{
 			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP), "Failed to turn to fullscreen windowed.");
 			break;
@@ -112,12 +113,12 @@ namespace li
 		SDL_SetWindowPosition(m_Window, x, y);
 	}
 
-	void D3D11Window::SetIcon(const std::string& path)
+	void D3D11Window::SetIcon(const char* path)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(0);
 
-		m_IconData = stbi_load(path.c_str(), &width, &height, &channels, 0);
+		m_IconData = stbi_load(path, &width, &height, &channels, 0);
 
 		LI_CORE_ASSERT(m_IconData, "Failed to load image!");
 

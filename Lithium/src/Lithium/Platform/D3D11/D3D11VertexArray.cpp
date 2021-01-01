@@ -6,7 +6,7 @@
 #include "D3D11Context.h"
 #include "D3D11Shader.h"
 
-namespace li
+namespace Li
 {
 	static DXGI_FORMAT ShaderDataTypeToD3D11(ShaderDataType type)
 	{
@@ -30,7 +30,7 @@ namespace li
 
 	D3D11VertexArray::D3D11VertexArray()
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 	}

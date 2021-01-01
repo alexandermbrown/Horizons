@@ -12,7 +12,7 @@
 #include "Lithium/Platform/D3D11/D3D11UniformBuffer.h"
 #endif
 
-namespace li
+namespace Li
 {
 	// Returns alignment as multiple of 4 bytes.
 	static uint32_t GetOpenGLAlignment(ShaderDataType type)
@@ -31,7 +31,7 @@ namespace li
 		}
 
 		LI_CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
+		return 1;
 	}
 
 	// Returns base alignment as multiple of 4 bytes.
@@ -51,7 +51,7 @@ namespace li
 		}
 
 		LI_CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
+		return 1;
 	}
 
 	UniformBufferLayout::UniformBufferLayout(const std::initializer_list<UniformBufferElement>& elements)
@@ -60,7 +60,7 @@ namespace li
 		// Current offset in multiples of 4 bytes.
 		uint32_t componentOffset = 0;
 
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 		case RendererAPI::OpenGL:
 			// Conform to OpenGL's std140 layout.
@@ -115,17 +115,17 @@ namespace li
 		
 	}
 
-	Ref<UniformBuffer> li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)
+	Ref<UniformBuffer> Li::UniformBuffer::Create(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)
 	{
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
-			return CreateRef<OpenGLUniformBuffer>(name, bindingSlot, layout);
+			return MakeRef<OpenGLUniformBuffer>(name, bindingSlot, layout);
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:
-			return CreateRef<D3D11UniformBuffer>(name, bindingSlot, shaderType, layout);
+			return MakeRef<D3D11UniformBuffer>(name, bindingSlot, shaderType, layout);
 #endif
 		}
 

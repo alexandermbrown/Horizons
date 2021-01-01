@@ -9,13 +9,13 @@
 
 #include "stb_image.h"
 
-namespace li
+namespace Li
 {
 	D3D11Texture2D::D3D11Texture2D(int width, int height, int channels, void* data,
 		WrapType wrap_s, WrapType wrap_t, FilterType min_filter, FilterType mag_filter, bool dynamic, bool render_target)
 		: m_Width(width), m_Height(height), m_Channels(channels), m_Dynamic(dynamic), m_RenderTarget(render_target)
 	{
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -82,7 +82,7 @@ namespace li
 
 		LI_CORE_ASSERT(data, "Failed to load image!");
 
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 
@@ -140,7 +140,7 @@ namespace li
 
 		LI_CORE_ASSERT(data, "Failed to load image!");
 
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_DeviceHandle = context->GetDevice();
 		m_ContextHandle = context->GetDeviceContext();
 

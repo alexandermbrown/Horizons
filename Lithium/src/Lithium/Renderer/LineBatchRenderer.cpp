@@ -4,7 +4,7 @@
 #include "Lithium/Core/Application.h"
 #include "Lithium/Resources/ResourceManager.h"
 
-namespace li
+namespace Li
 {
 	LineBatchRenderer::LineBatchRenderer(const Ref<UniformBuffer>& viewProjBuffer)
 		: m_VertexCount(0), m_ViewProjUB(viewProjBuffer), m_VertexArray(VertexArray::Create())
@@ -53,8 +53,8 @@ namespace li
 			m_ViewProjUB->Bind();
 
 			m_VertexArray->Bind();
-			Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Lines);
-			Application::Get()->GetWindow()->GetContext()->DrawArrays(m_VertexCount);
+			Application::Get().GetWindow().GetContext()->SetDrawMode(Li::DrawMode::Lines);
+			Application::Get().GetWindow().GetContext()->DrawArrays(m_VertexCount);
 			m_VertexArray->Unbind();
 
 			m_VertexCount = 0;

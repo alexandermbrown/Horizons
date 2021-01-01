@@ -13,7 +13,7 @@
 
 #include <glm/glm.hpp>
 
-namespace li
+namespace Li
 {
 	class Renderer
 	{
@@ -67,9 +67,9 @@ namespace li
 
 		struct RendererData
 		{
-			Scope<BatchRenderer> SceneRenderer = nullptr;
-			Scope<BatchRenderer> UIRenderer = nullptr;
-			Scope<LineBatchRenderer> SceneLineRenderer = nullptr;
+			Unique<BatchRenderer> SceneRenderer = nullptr;
+			Unique<BatchRenderer> UIRenderer = nullptr;
+			Unique<LineBatchRenderer> SceneLineRenderer = nullptr;
 
 			Ref<Shader> FontShader;
 
@@ -81,11 +81,11 @@ namespace li
 			Ref<UniformBuffer> FontUB;
 
 			OrthographicCamera* Camera;
-			Scope<OrthographicCamera> UICamera;
+			Unique<OrthographicCamera> UICamera;
 
 			bool ResourcesLoaded = false;
 		};
 
-		static Scope<RendererData> s_Data;
+		static Unique<RendererData> s_Data;
 	};
 }

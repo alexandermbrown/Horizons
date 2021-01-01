@@ -3,16 +3,13 @@
 #include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
-class DiagnosticsLayer : public li::Layer
+class DiagnosticsLayer : public Li::Layer
 {
 public:
 	DiagnosticsLayer();
 	virtual ~DiagnosticsLayer() = default;
 
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-
-	virtual void OnUpdate(li::duration::us dt) override;
+	virtual void OnUpdate(Li::Duration::us dt) override;
 	virtual void OnImGuiRender() override;
 	virtual void OnEvent(SDL_Event* event) override;
 
@@ -22,16 +19,16 @@ private:
 	bool m_PerformanceOpen = false;
 	bool m_CVarsOpen = false;
 
-	li::duration::us m_CurrentDelta;
+	Li::Duration::us m_CurrentDelta;
 
-	li::Timer m_Timer;
+	Li::Timer m_Timer;
 
 	float m_Average = 0.0f;
-	li::duration::us m_AverageTotal;
+	Li::Duration::us m_AverageTotal;
 	size_t m_AverageCount = 0ULL;
 
-	li::duration::us m_Min;
-	li::duration::us m_Max;
+	Li::Duration::us m_Min;
+	Li::Duration::us m_Max;
 
 	float m_DisplayMin = 0.0f;
 	float m_DisplayMax = 0.0f;

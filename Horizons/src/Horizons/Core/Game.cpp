@@ -2,6 +2,7 @@
 #include "Game.h"
 
 #include "Horizons/Core/Core.h"
+#include "Horizons/Core/Constants.h"
 #include "Horizons/Gameplay/Physics/PhysicsSystem.h"
 #include "Horizons/Gameplay/Player/PlayerSystem.h"
 #include "Horizons/Gameplay/Sync/SyncInitSystem.h"
@@ -46,27 +47,29 @@ void Game::Run()
 	Init();
 
 	using namespace std::chrono_literals;
-	constexpr li::duration::ns dt_target(16666666ns);
-	constexpr li::duration::ns sleep_margin(5ms);
+	constexpr Li::Duration::ns dt_target(16666666ns);
+	constexpr Li::Duration::ns sleep_margin(5ms);
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
 	while (m_Running && m_AppRun->load())
 	{
 		std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
-		li::duration::ns current_delta = current_time - m_LastUpdateTime;
+		Li::Duration::ns current_delta = current_time - m_LastUpdateTime;
 
-#ifdef HZ_SLEEP_BETWEEN_TICKS
-		li::duration::ns waitNano = dt_target - current_delta - sleep_margin;
-		if (waitNano > li::duration::ns::zero())
-			std::this_thread::sleep_for(waitNano);
-#endif
+		if constexpr (Constants::SleepBetweenTicks)
+		{
+			Li::Duration::ns waitNano = dt_target - current_delta - sleep_margin;
+			if (waitNano > Li::Duration::ns::zero())
+				std::this_thread::sleep_for(waitNano);
+		}
+
 		do {
 			current_time = std::chrono::steady_clock::now();
 			current_delta = current_time - m_LastUpdateTime;
 		} while (current_delta < dt_target);
 
-		li::duration::ns dt;
+		Li::Duration::ns dt;
 		if (current_delta - dt_target > 16ms)
 		{
 			dt = current_delta;
@@ -79,18 +82,16 @@ void Game::Run()
 		}
 
 		if (current_delta - dt_target > 3ms)
-			LI_WARN("Tick thread not at 60hz. {}ms slow", li::duration::cast<li::duration::ms>(current_delta - dt_target).count());
+			LI_WARN("Tick thread not at 60hz. {}ms slow", Li::Duration::Cast<Li::Duration::ms>(current_delta - dt_target).count());
 
 		SDL_Event event;
 		while (m_EventQueue->try_dequeue(event))
-		{
 			OnEvent(&event);
-		}
 		
-		Update(li::duration::cast<li::duration::us>(dt));
+		Update(Li::Duration::Cast<Li::Duration::us>(dt));
 	}
 
-	Shutdown();
+	Deinit();
 }
 
 void Game::OnEvent(SDL_Event* event)
@@ -120,7 +121,7 @@ void Game::Init()
 #endif
 }
 
-void Game::Update(li::duration::us dt)
+void Game::Update(Li::Duration::us dt)
 {
 	PlayerSystem::Update(m_Registry, dt);
 	PhysicsSystem::Step(m_Registry, dt);
@@ -130,12 +131,9 @@ void Game::Update(li::duration::us dt)
 #endif
 }
 
-void Game::Shutdown()
+void Game::Deinit()
 {
-	PhysicsSystem::Shutdown(m_Registry);
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	DebugDrawSystem::Shutdown(m_Registry);
 #endif
 }
-
-

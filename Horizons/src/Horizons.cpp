@@ -3,40 +3,38 @@
 
 #include "Horizons/Terrain/NoiseStore.h"
 #include "Horizons/Scenes/SplashScreenScene.h"
-#include "Horizons/Scripting/Prototypes.h"
+#include "Horizons/ECS/RegisterSystems.h"
 
-#ifdef HZ_CONSOLE_ENABLED
-#include "Horizons/Commands/CVarCommands.h"
+#ifndef LI_DIST
+#include "Horizons/Console/CVarCommands.h"
+#include "Horizons/Layers/ConsoleLayer.h"
 #endif
-
-#include "Lithium/Core/EntryPoint.h"
 
 #ifdef HZ_PLATFORM_WINDOWS
 #include <shlobj.h>
 #endif
 
-Horizons::Horizons()
-	: li::Application({ li::RendererAPI::D3D11, "Horizons", 768, 384, false, true, true })
+Horizons::Horizons(Li::RendererAPI renderer_api)
+	: Li::Application({ renderer_api, "Horizons", 768, 384, false, true, true})
 {
-#ifdef LI_DEBUG
-	li::ResourceManager::Load("data/preload.lab-debug");
+#ifdef HZ_DEBUG
+	Li::ResourceManager::Load("data/preload.lab-debug");
 #else
-	li::ResourceManager::Load("data/preload.lab");
+	Li::ResourceManager::Load("data/preload.lab");
 #endif
-	li::Localization::Init();
-	li::Renderer::Init();
-	li::UI::Init();
+	Li::Localization::Init();
+	Li::Renderer::Init();
 
+	RegisterSystems(m_SystemRegistry);
 	LoadConfig();
 
-	Prototypes::Init("data/scripts/prototypes.lua");
+	m_ScriptContext.InitApp("data/scripts/Init.lua");
 
 #ifdef HZ_CONSOLE_ENABLED
-	m_Console = new ConsoleLayer();
-	PushOverlay(m_Console);
+	PushOverlay(Li::MakeUnique<ConsoleLayer>());
 
-	m_Console->AddCommand(CreateCVarSetCommand());
-	m_Console->AddCommand(CreateCVarGetCommand());
+	m_Console.AddCommand(CreateCVarSetCommand());
+	m_Console.AddCommand(CreateCVarGetCommand());
 #endif
 
 	uint32_t game_to_app = SDL_RegisterEvents(1);
@@ -50,15 +48,17 @@ Horizons::Horizons()
 
 	m_ConfigStore.Add(ConfigVar{ "app_state", 0, HZ_CVAR_UNSIGNED,  false });
 
-	Transition(new SplashScreenScene());
+	Transition(Li::MakeUnique<SplashScreenScene>(), true);
 }
 
 Horizons::~Horizons()
 {
+	ClearScene();
+	ClearLayers();
 	NoiseStore::Shutdown();
-	Prototypes::Shutdown();
 	SaveConfig();
 }
+
 void Horizons::LoadConfig()
 {
 	m_ConfigStore.LoadTemplate("data/config/config_default.ini");
@@ -92,7 +92,12 @@ void Horizons::SaveConfig()
 #endif
 }
 
-li::Application* li::CreateApplication()
+Li::Unique<Li::Application> Li::CreateApplication()
 {
-	return new Horizons();
+	// TODO: Add fallback to OpenGL on Windows.
+#ifdef LI_PLATFORM_WINDOWS
+	return Li::MakeUnique<Horizons>(Li::RendererAPI::D3D11);
+#else
+	return Li::MakeUnique<Horizons>(Li::RendererAPI::OpenGL);
+#endif
 }

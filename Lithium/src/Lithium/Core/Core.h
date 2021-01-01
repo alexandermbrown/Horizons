@@ -7,11 +7,13 @@
 #endif
 
 #ifdef LI_ENABLE_ASSERTS
-#	define LI_RUN_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#	define LI_CORE_RUN_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#	define LI_DEBUG_BREAK() __debugbreak()
+#	define LI_RUN_ASSERT(x, ...) { if(!(x)) { LI_ERROR("Assertion Failed: {0}", __VA_ARGS__); LI_DEBUG_BREAK(); } }
+#	define LI_CORE_RUN_ASSERT(x, ...) { if(!(x)) { LI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); LI_DEBUG_BREAK(); } }
 #	define LI_ASSERT LI_RUN_ASSERT
 #	define LI_CORE_ASSERT LI_CORE_RUN_ASSERT
 #else
+#	define LI_DEBUG_BREAK()
 #	define LI_RUN_ASSERT(x, ...) x
 #	define LI_CORE_RUN_ASSERT(x, ...) x
 
@@ -29,12 +31,12 @@
 #	define LI_INCLUDE_OPENGL
 #endif
 
-namespace li 
+namespace Li 
 {
 	template<typename T>
-	using Scope = std::unique_ptr<T>;
+	using Unique = std::unique_ptr<T>;
 	template<typename T, typename ... Args>
-	constexpr Scope<T> CreateScope(Args&& ... args)
+	constexpr Unique<T> MakeUnique(Args&& ... args)
 	{
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
@@ -42,7 +44,7 @@ namespace li
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
 	template<typename T, typename ... Args>
-	constexpr Ref<T> CreateRef(Args&& ... args)
+	constexpr Ref<T> MakeRef(Args&& ... args)
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}

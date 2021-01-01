@@ -5,11 +5,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
 
-namespace li
+namespace Li::Loaders
 {
-	class FontLoader
-	{
-	public:
-		static Ref<Font> Load(const Assets::Font* font);
-	};
+	Ref<Font> LoadFont(const Assets::Font* font);
 }

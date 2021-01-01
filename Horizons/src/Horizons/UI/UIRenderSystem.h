@@ -2,8 +2,7 @@
 
 #include "entt/entt.hpp"
 
-namespace UIRenderSystem
+namespace Systems::UIRender
 {
-	void Render(entt::registry& registry);
-	void RenderLabels(entt::registry& registry);
+	void OnRender(entt::registry& registry);
 }

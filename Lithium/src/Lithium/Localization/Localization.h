@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace li
+namespace Li
 {
 	class Locale
 	{
@@ -72,6 +72,6 @@ namespace li
 			Ref<Locale> m_Selected;
 		};
 
-		static Scope<LocalizationData> s_Data;
+		static Unique<LocalizationData> s_Data;
 	};
 }

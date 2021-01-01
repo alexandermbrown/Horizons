@@ -3,7 +3,7 @@
 #include "Lithium/Core/Window.h"
 #include "Lithium/Platform/OpenGL/OpenGLContext.h"
 
-namespace li
+namespace Li
 {
 	class OpenGLWindow : public Window
 	{
@@ -12,16 +12,16 @@ namespace li
 		virtual ~OpenGLWindow();
 
 		virtual void SwapBuffers() override;
-		virtual inline int GetWidth() const override { return m_Width; }
-		virtual inline int GetHeight() const override { return m_Height; }
-		virtual inline GraphicsContext* GetContext() const override { return m_Context; }
-		virtual inline SDL_Window* GetWindow() const override { return m_Window; }
+		virtual int GetWidth() const override { return m_Width; }
+		virtual int GetHeight() const override { return m_Height; }
+		virtual GraphicsContext* GetContext() override { return m_Context.get(); }
+		virtual SDL_Window* GetWindow() const override { return m_Window; }
 		virtual uint32_t GetWindowID() const override { return m_ID; }
 
 		virtual void SetVSync(bool enabled) override;
-		virtual inline bool IsVSync() const override { return m_VSync; }
+		virtual bool IsVSync() const override { return m_VSync; }
 		virtual void SetFullscreen(FullscreenType type) override;
-		virtual inline FullscreenType GetFullscreen() const override { return m_Fullscreen; };
+		virtual FullscreenType GetFullscreen() const override { return m_Fullscreen; };
 		virtual void SetBordered(bool bordered) override;
 		virtual void SetResizable(bool resizable) override;
 		virtual void Show() override;
@@ -29,13 +29,13 @@ namespace li
 		virtual void SetSize(int width, int height) override;
 		virtual void SetPosition(int x, int y) override;
 
-		virtual void SetIcon(const std::string& path) override;
+		virtual void SetIcon(const char* path) override;
 
 		virtual void OnWindowResize(int width, int height) override;
 
 	private:
 		SDL_Window* m_Window;
-		OpenGLContext* m_Context;
+		Unique<OpenGLContext> m_Context;
 		uint32_t m_ID;
 
 		SDL_Surface* m_Icon;

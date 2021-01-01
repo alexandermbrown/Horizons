@@ -6,22 +6,28 @@
 #include "Horizons/Core/ConfigStore.h"
 #include "Horizons/Core/AppState.h"
 
-#ifdef HZ_CONSOLE_ENABLED
-#include "Horizons/Layers/ConsoleLayer.h"
+#include "Horizons/Scripting/ScriptContext.h"
+#include "Horizons/Scripting/TerrainData.h"
+
+#include "Horizons/ECS/SystemRegistry.h"
+
+#ifndef LI_DIST
+#include "Horizons/Console/Console.h"
 #endif
 
-#include "entt/entt.hpp"
-
-class Horizons : public li::Application
+class Horizons : public Li::Application
 {
 public:
-	Horizons();
+	Horizons(Li::RendererAPI renderer_api);
 	virtual ~Horizons();
 
 	inline ConfigStore& GetConfig() { return m_ConfigStore; }
+	inline ScriptContext& GetScriptContext() { return m_ScriptContext; }
+	inline TerrainData& GetTerrainData() { return m_TerrainData; }
+	inline const SystemRegistry& GetSystemRegistry() const { return m_SystemRegistry; }
 
-#ifdef HZ_CONSOLE_ENABLED
-	inline ConsoleLayer* GetConsole() { return m_Console; }
+#ifndef LI_DIST
+	inline Console& GetConsole() { return m_Console; }
 #endif
 
 private:
@@ -30,7 +36,11 @@ private:
 
 	ConfigStore m_ConfigStore;
 
-#ifdef HZ_CONSOLE_ENABLED
-	ConsoleLayer* m_Console;
+	ScriptContext m_ScriptContext;
+	TerrainData m_TerrainData;
+	SystemRegistry m_SystemRegistry;
+
+#ifndef LI_DIST
+	Console m_Console;
 #endif
 };

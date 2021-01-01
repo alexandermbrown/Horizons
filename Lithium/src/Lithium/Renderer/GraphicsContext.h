@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 #include "Lithium/Renderer/RendererEnums.h"
 
-namespace li
+namespace Li
 {
 	class GraphicsContext
 	{

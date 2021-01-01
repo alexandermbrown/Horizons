@@ -6,7 +6,7 @@
 #include "imgui.h"
 #include "SDL.h"
 
-namespace li 
+namespace Li 
 {
 	class ImGuiRenderer
 	{
@@ -20,7 +20,7 @@ namespace li
 		void Resize(int width, int height);
 		inline void SetBlockEvents(bool block) { m_BlockEvents = block; }
 
-		static Ref<ImGuiRenderer> Create();
+		static Unique<ImGuiRenderer> Create();
 
 		static void InitImGuiStyle();
 

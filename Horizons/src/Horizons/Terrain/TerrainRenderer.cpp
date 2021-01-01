@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "TerrainRenderer.h"
 
+#include "Horizons.h"
 #include "Horizons/Core/Math.h"
-#include "Horizons/Scripting/TerrainPrototypes.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
@@ -10,19 +10,19 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 {
 	m_RenderChunks = new RenderChunk[RenderWidth * RenderWidth];
 
-	m_Framebuffer = li::Framebuffer::Create(ChunkWidthInPixels * RenderWidth, ChunkHeightInPixels * RenderWidth);
+	m_Framebuffer = Li::Framebuffer::Create(ChunkWidthInPixels * RenderWidth, ChunkHeightInPixels * RenderWidth);
 	
-	m_AtlasBoundsUB = li::UniformBuffer::Create("Terrain", 3, li::ShaderType::Fragment, {
-		{ "u_AtlasBounds0", li::ShaderDataType::Float4 },
-		{ "u_AtlasBounds1", li::ShaderDataType::Float4 },
-		{ "u_AtlasBounds2", li::ShaderDataType::Float4 },
-		{ "u_AtlasBounds3", li::ShaderDataType::Float4 },
-		{ "u_NoiseWeights", li::ShaderDataType::Float3 },
-		{ "u_BlendWidths", li::ShaderDataType::Float3 }
+	m_AtlasBoundsUB = Li::UniformBuffer::Create("Terrain", 3, Li::ShaderType::Fragment, {
+		{ "u_AtlasBounds0", Li::ShaderDataType::Float4 },
+		{ "u_AtlasBounds1", Li::ShaderDataType::Float4 },
+		{ "u_AtlasBounds2", Li::ShaderDataType::Float4 },
+		{ "u_AtlasBounds3", Li::ShaderDataType::Float4 },
+		{ "u_NoiseWeights", Li::ShaderDataType::Float3 },
+		{ "u_BlendWidths", Li::ShaderDataType::Float3 }
 	});
 	m_AtlasBoundsUB->BindToSlot();
 
-	m_TerrainShader = li::ResourceManager::Get<li::Shader>("shader_terrain");
+	m_TerrainShader = Li::ResourceManager::Get<Li::Shader>("shader_terrain");
 
 	struct ChunkVertex
 	{
@@ -41,10 +41,10 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 		}
 	}
 
-	li::Ref<li::VertexBuffer> positionBuffer = li::VertexBuffer::Create((float*)vertices, sizeof(vertices), li::BufferUsage::StaticDraw);
+	Li::Ref<Li::VertexBuffer> positionBuffer = Li::VertexBuffer::Create((float*)vertices, sizeof(vertices), Li::BufferUsage::StaticDraw);
 	positionBuffer->SetLayout({
-		{ li::ShaderDataType::Float2, "POSITION", 0 },
-		{ li::ShaderDataType::Float2, "TEXCOORD", 1 }
+		{ Li::ShaderDataType::Float2, "POSITION", 0 },
+		{ Li::ShaderDataType::Float2, "TEXCOORD", 1 }
 	});
 
 	// Triangulate chunk.
@@ -63,16 +63,16 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 			indices[index + 5] = indices[index + 2];
 		}
 	}
-	li::Ref<li::IndexBuffer> indexBuffer = li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, li::BufferUsage::StaticDraw);
+	Li::Ref<Li::IndexBuffer> indexBuffer = Li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, Li::BufferUsage::StaticDraw);
 
 	for (int i = 0; i < RenderWidth * RenderWidth; i++)
 	{
 		auto& chunk = m_RenderChunks[i];
-		chunk.VertexArray = li::VertexArray::Create();
+		chunk.VertexArray = Li::VertexArray::Create();
 
-		chunk.AlphaVB = li::VertexBuffer::Create(sizeof(TerrainStore::AlphaValuesArray), li::BufferUsage::DynamicDraw);
+		chunk.AlphaVB = Li::VertexBuffer::Create(sizeof(TerrainStore::AlphaValuesArray), Li::BufferUsage::DynamicDraw);
 		chunk.AlphaVB->SetLayout({
-			{ li::ShaderDataType::Float3, "ALPHAVALUES", 2 }
+			{ Li::ShaderDataType::Float3, "ALPHAVALUES", 2 }
 		});
 
 		chunk.VertexArray->AddVertexBuffer(positionBuffer);
@@ -82,13 +82,13 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 	}
 
 	int HalfRenderWidth = RenderWidth / 2;
-	switch (li::Application::Get()->GetAPI())
+	switch (Li::Application::Get().GetAPI())
 	{
-	case li::RendererAPI::OpenGL:
-		m_TerrainCamera = li::CreateScope<li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f);
+	case Li::RendererAPI::OpenGL:
+		m_TerrainCamera = Li::MakeUnique<Li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f);
 		break;
-	case li::RendererAPI::D3D11:
-		m_TerrainCamera = li::CreateScope<li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth);
+	case Li::RendererAPI::D3D11:
+		m_TerrainCamera = Li::MakeUnique<Li::OrthographicCamera>((float)-HalfRenderWidth, (float)HalfRenderWidth + 1.0f, (float)HalfRenderWidth + 1.0f, (float)-HalfRenderWidth);
 		break;
 	}
 }
@@ -146,11 +146,11 @@ void TerrainRenderer::RenderFramebuffer()
 	for (int i = 0; i < RenderWidth * RenderWidth; i++)
 	{
 		auto& chunk = m_RenderChunks[i];
-		const TerrainPrototype& terrain0 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[0]);
-		const TerrainPrototype& terrain1 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[1]);
-		const TerrainPrototype& terrain2 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[2]);
-		const TerrainPrototype& terrain3 = TerrainPrototypes::GetTerrainPrototype(chunk.Tiles[3]);
-		li::Ref<li::TextureAtlas> atlas = li::ResourceManager::Get<li::TextureAtlas>(terrain0.Atlas);
+		const TerrainType& terrain0 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[0]);
+		const TerrainType& terrain1 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[1]);
+		const TerrainType& terrain2 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[2]);
+		const TerrainType& terrain3 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[3]);
+		Li::Ref<Li::TextureAtlas> atlas = Li::ResourceManager::Get<Li::TextureAtlas>(terrain0.Atlas);
 
 		m_AtlasBoundsUB->SetFloat4("u_AtlasBounds0", atlas->GetBounds(terrain0.Name));
 		m_AtlasBoundsUB->SetFloat4("u_AtlasBounds1", atlas->GetBounds(terrain1.Name));
@@ -162,11 +162,11 @@ void TerrainRenderer::RenderFramebuffer()
 
 		m_TerrainShader->Bind();
 
-		auto& transform_ub = li::Renderer::GetTransformUniformBuffer();
+		auto& transform_ub = Li::Renderer::GetTransformUniformBuffer();
 		transform_ub->SetMat4("u_Transform", chunk.Transform);
 		transform_ub->UploadData();
 
-		auto& viewproj_ub = li::Renderer::GetViewProjUniformBuffer();
+		auto& viewproj_ub = Li::Renderer::GetViewProjUniformBuffer();
 		viewproj_ub->SetMat4("u_ViewProj", m_TerrainCamera->GetViewProjectionMatrix());
 		viewproj_ub->UploadData();
 
@@ -181,19 +181,21 @@ void TerrainRenderer::RenderFramebuffer()
 		m_TerrainShader->SetTexture("u_Noise2", 2);
 		m_TerrainShader->SetTexture("u_Noise3", 3);
 
-		li::Renderer::GetViewProjUniformBuffer()->Bind();
-		li::Renderer::GetTransformUniformBuffer()->Bind();
+		Li::Renderer::GetViewProjUniformBuffer()->Bind();
+		Li::Renderer::GetTransformUniformBuffer()->Bind();
 		m_AtlasBoundsUB->Bind();
 		chunk.VertexArray->Bind();
-		li::Application::Get()->GetWindow()->GetContext()->SetDrawMode(li::DrawMode::Triangles);
-		li::Application::Get()->GetWindow()->GetContext()->DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());
+		Li::Application::Get().GetWindow().GetContext()->SetDrawMode(Li::DrawMode::Triangles);
+		Li::Application::Get().GetWindow().GetContext()->DrawIndexed(chunk.VertexArray->GetIndexBuffer()->GetCount());
 		chunk.VertexArray->Unbind();
 	}
+
+	Li::Application::Get().GetWindow().GetContext()->BindDefaultRenderTarget();
 }
 
 void TerrainRenderer::SubmitQuad()
 {
-	li::Renderer::Submit(m_Framebuffer->GetTexture(), m_QuadTransform);
+	Li::Renderer::Submit(m_Framebuffer->GetTexture(), m_QuadTransform);
 }
 
 void TerrainRenderer::PrepareRenderChunks()

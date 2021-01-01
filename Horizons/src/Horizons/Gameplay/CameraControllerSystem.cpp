@@ -3,7 +3,7 @@
 
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/Player/PlayerComponents.h"
-#include "Horizons/Gameplay/Components.h"
+#include "Horizons/Gameplay/TransformComponent.h"
 
 #include "Lithium.h"
 
@@ -13,11 +13,11 @@ void CameraControllerSystem::Init(entt::registry& registry)
 
 	camera.current_zoom = 10.0f;
 	camera.target_zoom = 10.0f;
-	camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-		/ (float)li::Application::Get()->GetWindow()->GetHeight();
+	camera.aspect_ratio = (float)Li::Application::Get().GetWindow().GetWidth()
+		/ (float)Li::Application::Get().GetWindow().GetHeight();
 
 	const float half_zoom = camera.current_zoom * 0.5f;
-	camera.camera = new li::OrthographicCamera(-camera.aspect_ratio * half_zoom,
+	camera.camera = new Li::OrthographicCamera(-camera.aspect_ratio * half_zoom,
 		camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);
 	camera.camera->SetLookAt({ 0.0f, -3.0f, std::sqrt(3.0f) }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 }
@@ -29,7 +29,7 @@ void CameraControllerSystem::Shutdown(entt::registry& registry)
 	delete camera.camera;
 }
 
-void CameraControllerSystem::Update(entt::registry& registry, li::duration::us dt)
+void CameraControllerSystem::Update(entt::registry& registry, Li::Duration::us dt)
 {
 	cp::camera& camera = registry.ctx<cp::camera>();
 
@@ -50,8 +50,8 @@ void CameraControllerSystem::Update(entt::registry& registry, li::duration::us d
 	if (!camera.finished_zoom)
 	{
 		float delta = camera.current_zoom - camera.target_zoom;
-		if (dt < li::duration::ms(990))
-			camera.current_zoom -= delta * li::duration::fsec(dt).count() * camera.zoom_speed;
+		if (dt < Li::Duration::ms(990))
+			camera.current_zoom -= delta * Li::Duration::fsec(dt).count() * camera.zoom_speed;
 		else
 			camera.current_zoom = camera.target_zoom;
 
@@ -86,8 +86,8 @@ void CameraControllerSystem::OnEvent(entt::registry& registry, SDL_Event* event)
 		{
 			cp::camera& camera = registry.ctx<cp::camera>();
 
-			camera.aspect_ratio = (float)li::Application::Get()->GetWindow()->GetWidth()
-				/ (float)li::Application::Get()->GetWindow()->GetHeight();
+			camera.aspect_ratio = (float)Li::Application::Get().GetWindow().GetWidth()
+				/ (float)Li::Application::Get().GetWindow().GetHeight();
 			const float half_zoom = camera.current_zoom * 0.5f;
 			camera.camera->SetProjection(-camera.aspect_ratio * half_zoom,
 				camera.aspect_ratio * half_zoom, -half_zoom, half_zoom);

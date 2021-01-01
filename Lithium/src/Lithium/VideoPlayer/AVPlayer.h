@@ -20,7 +20,7 @@ struct SwsContext;
 struct SwrContext;
 enum AVSampleFormat;
 
-namespace li
+namespace Li
 {
 	class AVPlayer
 	{
@@ -33,7 +33,7 @@ namespace li
 		void Close();
 
 		// Returns true while video is playing.
-		bool UpdateFrame(duration::us dt);
+		bool UpdateFrame(Duration::us dt);
 
 		inline const Ref<Texture2D>& GetTexture() const { return m_Video.Texture; }
 		inline int GetWidth() const { return m_Video.Width; }
@@ -52,11 +52,11 @@ namespace li
 
 		bool m_Open;
 		bool m_Playing;
-		duration::us m_Elapsed;
+		Duration::us m_Elapsed;
 
 		AVFrame* m_Frame;
 
-		Scope<AVReader> m_Reader;
+		Unique<AVReader> m_Reader;
 
 		struct VideoData
 		{
@@ -91,7 +91,7 @@ namespace li
 			int OutBytesPerSample;
 			AVSampleFormat OutFormat;
 
-			Scope<AudioQueue> Queue{ nullptr };
+			Unique<AudioQueue> Queue{ nullptr };
 
 			// Debug info
 			int DiscardCount{ 0 };

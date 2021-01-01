@@ -3,59 +3,44 @@
 #include "VideoPlayerScene.h"
 
 #include "Horizons.h"
-#include "MainMenuScene.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include <algorithm>
+#include "Horizons/Scripting/ScriptScene.h"
 
 //////////////////////
 // VideoPlayerLayer //
 //////////////////////
 
 VideoPlayerLayer::VideoPlayerLayer()
-	: Layer("VideoPlayerLayer"), m_Exit(false)
+	: Layer("VideoPlayer")
 {
-	LI_ASSERT(m_VideoPlayer.Open("data/videos/bowling.mkv"), "Failed to open video!");
+	LI_RUN_ASSERT(m_VideoPlayer.Open("data/videos/bowling.mkv"), "Failed to open video!");
 }
 
-VideoPlayerLayer::~VideoPlayerLayer()
+void VideoPlayerLayer::OnUpdate(Li::Duration::us dt)
 {
-}
-
-void VideoPlayerLayer::OnAttach()
-{
-}
-
-void VideoPlayerLayer::OnDetach()
-{
-}
-
-void VideoPlayerLayer::OnUpdate(li::duration::us dt)
-{
-	li::Window* window = li::Application::Get()->GetWindow();
-	window->GetContext()->BindDefaultRenderTarget();
-	window->GetContext()->Clear();
+	Li::Window& window = Li::Application::Get().GetWindow();
 	
-	li::Renderer::BeginUI();
+	Li::Renderer::BeginUI();
 	if (m_VideoPlayer.UpdateFrame(dt))
 	{
-		float window_width = static_cast<float>(window->GetWidth());
-		float window_height = static_cast<float>(window->GetHeight());
-		float scale = std::min(window->GetWidth() / (float)m_VideoPlayer.GetWidth(), window->GetHeight() / (float)m_VideoPlayer.GetHeight());
+		float window_width = static_cast<float>(window.GetWidth());
+		float window_height = static_cast<float>(window.GetHeight());
+		float scale = std::min(window_width / (float)m_VideoPlayer.GetWidth(), window_height / (float)m_VideoPlayer.GetHeight());
 		float scaled_width = scale * m_VideoPlayer.GetWidth();
 		float scaled_height = scale * m_VideoPlayer.GetHeight();
 
-		li::Renderer::UISubmit(m_VideoPlayer.GetTexture(), glm::translate(glm::mat4(1.0f), { (window_width - scaled_width) / 2, (window_height - scaled_height) / 2, 1.0f })
+		Li::Renderer::UISubmit(m_VideoPlayer.GetTexture(), glm::translate(glm::mat4(1.0f), { (window_width - scaled_width) / 2, (window_height - scaled_height) / 2, 1.0f })
 			* glm::scale(glm::mat4(1.0f), { scaled_width, scaled_height, 1.0f }));
 	}
-	li::Renderer::EndUI();
+	Li::Renderer::EndUI();
 }
 
 void VideoPlayerLayer::OnEvent(SDL_Event* event)
 {
 	if (event->type == SDL_KEYUP && event->key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-		m_Exit = true;
+		Li::Application::Get().Transition(Li::MakeUnique<ScriptScene>("MainMenuScene"), true);
 }
 
 void VideoPlayerLayer::OnImGuiRender()
@@ -72,32 +57,20 @@ VideoPlayerScene::VideoPlayerScene()
 
 VideoPlayerScene::~VideoPlayerScene()
 {
-	Horizons* app = li::Application::Get<Horizons>();
-	app->PopLayer(&m_VideoPlayerLayer);
+	Horizons& app = Li::Application::Get<Horizons>();
+	app.PopLayer("VideoPlayer");
+}
+
+void VideoPlayerScene::OnShow()
+{
+	Horizons& app = Li::Application::Get<Horizons>();
+	app.PushLayer(Li::MakeUnique<VideoPlayerLayer>());
 #ifndef LI_DIST
-	app->PopOverlay(&m_Diagnostics);
+	app.GetImGuiRenderer()->SetBlockEvents(true);
 #endif
 }
 
-void VideoPlayerScene::TransitionIn()
+void VideoPlayerScene::OnTransition()
 {
-	Horizons* app = li::Application::Get<Horizons>();
-	app->PushLayer(&m_VideoPlayerLayer);
-#ifndef LI_DIST
-	app->PushOverlay(&m_Diagnostics);
-	app->GetImGuiRenderer()->SetBlockEvents(true);
-#endif
-}
-
-void VideoPlayerScene::TransitionOut()
-{
-}
-
-void VideoPlayerScene::OnUpdate(li::duration::us dt)
-{
-	if (m_VideoPlayerLayer.ReturnToMainMenu())
-	{
-		li::Application::Get()->Transition(new MainMenuScene());
-	}
 }
 #endif

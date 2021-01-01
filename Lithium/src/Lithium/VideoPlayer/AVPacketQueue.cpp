@@ -6,7 +6,7 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-namespace li
+namespace Li
 {
 	AVPacketQueue::AVPacketQueue(int min_count, int max_count)
 		: m_MinCount(min_count), m_MaxCount(max_count), m_Packets(max_count),

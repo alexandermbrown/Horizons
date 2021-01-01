@@ -9,7 +9,7 @@ struct AVFormatContext;
 struct AVPacket;
 struct AVStream;
 
-namespace li
+namespace Li
 {
 	class AVPacketQueue
 	{

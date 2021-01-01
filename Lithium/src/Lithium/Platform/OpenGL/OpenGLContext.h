@@ -4,7 +4,7 @@
 #include "Lithium/Renderer/GraphicsContext.h"
 #include <SDL.h>
 
-namespace li
+namespace Li
 {
 	class OpenGLContext : public GraphicsContext
 	{

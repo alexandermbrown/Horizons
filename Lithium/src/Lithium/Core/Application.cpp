@@ -7,20 +7,19 @@
 #include "Lithium/Resources/ResourceManager.h"
 #include "Lithium/Audio/AudioManager.h"
 #include "Lithium/Localization/Localization.h"
-#include "Lithium/UI/UI.h"
 
 #include "SDL.h"
 #ifndef LI_DIST
 #include "imgui.h"
 #endif
 
-namespace li 
+namespace Li 
 {
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
-		: m_Running(false), m_LayerStack(), m_EventHandled(false), m_Window(nullptr), m_RendererAPI(props.API),
-		m_Input(), m_FocusedLayer(nullptr), m_LayersDirty(false), m_CurrentScene(nullptr), m_NextScene(nullptr)
+		: m_Running(false), m_LayerStack(), m_EventHandled(false), m_RendererAPI(props.API),
+		m_Input(), m_CurrentScene(nullptr), m_NextScene(nullptr), m_TransitionFinished(true), m_CallOnTransition(false)
 	{
 		LI_CORE_ASSERT(s_Instance == nullptr, "Instance of Application already exists!");
 		s_Instance = this;
@@ -31,20 +30,19 @@ namespace li
 			return;
 		}
 
-		SDL_version compiledVersion;
-
-		SDL_VERSION(&compiledVersion);
+		SDL_version compiled_version;
+		SDL_VERSION(&compiled_version);
 		LI_CORE_INFO("SDL compiled ver {0}.{1}.{2}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
 
 #ifdef LI_DEBUG
-		SDL_version linkedVersion;
-		SDL_GetVersion(&linkedVersion);
-		LI_CORE_INFO("SDL linked ver {0}.{1}.{2}", linkedVersion.major, linkedVersion.minor, linkedVersion.patch);
+		SDL_version linked_version;
+		SDL_GetVersion(&linked_version);
+		LI_CORE_INFO("SDL linked ver {0}.{1}.{2}", linked_version.major, linked_version.minor, linked_version.patch);
 
 		LI_CORE_ASSERT(
-			linkedVersion.major == SDL_MAJOR_VERSION &&
-			linkedVersion.minor == SDL_MINOR_VERSION &&
-			linkedVersion.patch == SDL_PATCHLEVEL,
+			linked_version.major == SDL_MAJOR_VERSION &&
+			linked_version.minor == SDL_MINOR_VERSION &&
+			linked_version.patch == SDL_PATCHLEVEL,
 			"SDL compiled and linked to two different versions!"
 		);
 #endif
@@ -61,12 +59,14 @@ namespace li
 
 	Application::~Application()
 	{
+		m_CurrentScene.reset();
+		m_NextScene.reset();
+
 		ResourceManager::Shutdown();
-		UI::Shutdown();
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
 
-		delete m_Window;
+		m_Window.reset();
 
 		SDL_Quit();
 	}
@@ -78,95 +78,80 @@ namespace li
 
 		while (m_Running)
 		{
-			//////////////////////
-			// Propagate Events //
-			//////////////////////
-			SDL_Event sdlEvent;
-			while (SDL_PollEvent(&sdlEvent))
-			{
-				OnEvent(&sdlEvent);
-			}
-
 			//////////////////////////
 			// Calculate Delta Time //
 			//////////////////////////
+			std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
+			Duration::us dt = Duration::Cast<Duration::us>(current_time - m_LastUpdateTime);
+			m_LastUpdateTime = current_time;
 
-			std::chrono::time_point<std::chrono::steady_clock> currentTime = std::chrono::steady_clock::now();
-			duration::us dt = duration::cast<duration::us>(currentTime - m_LastUpdateTime);
-			m_LastUpdateTime = currentTime;
+			//////////////////////
+			// Propagate Events //
+			//////////////////////
+			SDL_Event sdl_event;
+			while (SDL_PollEvent(&sdl_event))
+				OnEvent(&sdl_event);
 
-
-			//////////////////
-			// Update Scene //
-			//////////////////
-
-			if (m_CurrentScene)
+			//////////////////////
+			// Transition Scene //
+			//////////////////////
+			if (m_CallOnTransition)
 			{
-				m_CurrentScene->OnUpdate(dt);
-
-				if (m_NextScene && m_CurrentScene->Finished())
-				{
-					delete m_CurrentScene;
-					m_CurrentScene = m_NextScene;
-					m_CurrentScene->TransitionIn();
-					m_NextScene = nullptr;
-				}
+				if (m_CurrentScene)
+					m_CurrentScene->OnTransition();
+				m_CallOnTransition = false;
 			}
 
+			if (m_NextScene && m_TransitionFinished)
+			{
+				m_CurrentScene = std::move(m_NextScene);
+				m_CurrentScene->OnShow();
+			}
+			else if (!m_CurrentScene)
+				LI_CORE_WARN("No scene active.");
 
 			///////////////////
 			// Update Layers //
 			///////////////////
+			m_Window->GetContext()->BindDefaultRenderTarget();
+			m_Window->GetContext()->Clear();
 
-			bool reachedFocused = false;
-			if (m_FocusedLayer)
+			if (!m_FocusedLayer.empty())
 				m_Input.Disable();
 
-			m_LayersDirty = false;
-
-			for (Layer* layer : m_LayerStack)
+			bool reached_focused = false;
+			for (Unique<Layer>& layer : m_LayerStack)
 			{
-				if (m_FocusedLayer == layer && !reachedFocused)
+				if (m_FocusedLayer == layer->GetName() && !reached_focused)
 				{
 					m_Input.Enable();
-					reachedFocused = true;
+					reached_focused = true;
 				}
-
 				layer->OnUpdate(dt);
-
-				if (m_LayersDirty)
-					break;
 			}
 
-
+#ifndef LI_DIST
 			//////////////////
 			// Render ImGui //
 			//////////////////
-
-			reachedFocused = false;
-			if (m_FocusedLayer)
+			if (!m_FocusedLayer.empty())
 				m_Input.Disable();
 
-#ifndef LI_DIST
 			m_ImGuiRenderer->Begin();
-			for (Layer* layer : m_LayerStack)
+			reached_focused = false;
+			for (Unique<Layer>& layer : m_LayerStack)
 			{
-				if (m_FocusedLayer == layer && !reachedFocused)
+				if (m_FocusedLayer == layer->GetName() && !reached_focused)
 				{
 					m_Input.Enable();
-					reachedFocused = true;
+					reached_focused = true;
 				}
 				layer->OnImGuiRender();
-
-				if (m_LayersDirty)
-					break;
 			}
 			m_ImGuiRenderer->End();
 #endif
 			m_Window->SwapBuffers();
 		}
-
-		delete m_CurrentScene;
 	}
 
 	void Application::OnEvent(SDL_Event* event)
@@ -192,57 +177,13 @@ namespace li
 		m_EventHandled = false;
 	}
 
-	void Application::PushLayer(Layer* layer)
+	void Application::Transition(Unique<Scene> next_scene, bool instant)
 	{
-		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
-	}
+		LI_CORE_ASSERT(m_NextScene == nullptr, "Transition already in progress!");
 
-	void Application::PushOverlay(Layer* layer)
-	{
-		m_LayerStack.PushOverlay(layer);
-		layer->OnAttach();
-	}
-
-	void Application::PopLayer(Layer* layer)
-	{
-		m_LayersDirty = true;
-		m_LayerStack.PopLayer(layer);
-	}
-
-	void Application::PopOverlay(Layer* overlay)
-	{
-		m_LayersDirty = true;
-		m_LayerStack.PopOverlay(overlay);
-	}
-
-	void Application::Transition(Scene* nextScene)
-	{
-		m_NextScene = nullptr;
-		if (m_CurrentScene)
-		{
-			m_CurrentScene->TransitionOut();
-			if (m_CurrentScene->Finished())
-			{
-				delete m_CurrentScene;
-				m_CurrentScene = nextScene;
-				m_CurrentScene->TransitionIn();
-			}
-			else
-			{
-				m_NextScene = nextScene;
-			}
-		}
-		else
-		{
-			m_CurrentScene = nextScene;
-			nextScene->TransitionIn();
-		}
-	}
-
-	void Application::Exit()
-	{
-		m_Running = false;
+		m_CallOnTransition = true;
+		m_TransitionFinished = instant;
+		m_NextScene = std::move(next_scene);
 	}
 
 	void Application::OnWindowEvent(SDL_Event* event)

@@ -2,7 +2,7 @@
 
 #include "Lithium/Renderer/Buffer.h"
 
-namespace li
+namespace Li
 {
 	class OpenGLVertexBuffer : public VertexBuffer
 	{

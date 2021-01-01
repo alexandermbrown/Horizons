@@ -1,17 +1,15 @@
 #pragma once
 
-namespace li
+#include "Lithium/Core/Core.h"
+
+namespace Li
 {
 	class Scene
 	{
 	public:
 		virtual ~Scene() = default;
 
-		virtual void TransitionIn() = 0;
-		virtual void TransitionOut() = 0;
-
-		virtual void OnUpdate(li::duration::us dt) = 0;
-
-		virtual bool Finished() = 0;
+		virtual void OnShow() = 0;
+		virtual void OnTransition() = 0;
 	};
 }

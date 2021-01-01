@@ -2,20 +2,19 @@
 #include "GameLayer.h"
 
 #include "Horizons.h"
-#include "Horizons/Gameplay/Components.h"
+#include "Horizons/Scripting/ScriptScene.h"
+#include "Horizons/Gameplay/TransformComponent.h"
 #include "Horizons/Rendering/RenderingSystem.h"
 #include "Horizons/Rendering/RenderingComponents.h"
 #include "Horizons/Gameplay/TransformUpdateSystem.h"
 #include "Horizons/Gameplay/CameraControllerSystem.h"
 
 #include "Horizons/Gameplay/Player/PlayerComponents.h"
-#include "Horizons/Gameplay/Components.h"
 
 #include "glm/gtc/type_ptr.hpp"
-#include "imgui.h"
 
 GameLayer::GameLayer()
-	: Layer("GameLayer"), m_TerrainStore(11), m_TerrainRenderer(&m_TerrainStore, 3), m_Registry(), m_ReturnToMainMenu(false)
+	: Layer("GameLayer"), m_TerrainStore(11), m_TerrainRenderer(&m_TerrainStore, 3), m_Registry()
 {
 	m_TickThread.Begin(m_Registry);
 
@@ -23,8 +22,8 @@ GameLayer::GameLayer()
 
 	m_TerrainRenderer.LoadTerrain("data/worlds/test.terrain", { 0, 0 });
 
-	m_AudioSource = li::CreateRef<li::AudioSource>();
-	m_AudioSource->SetAudio(li::ResourceManager::Get<li::AudioBuffer>("audio_wind"));
+	m_AudioSource = Li::MakeRef<Li::AudioSource>();
+	m_AudioSource->SetAudio(Li::ResourceManager::Get<Li::AudioBuffer>("audio_wind"));
 	m_AudioSource->Play();
 }
 
@@ -35,17 +34,7 @@ GameLayer::~GameLayer()
 	m_TickThread.Finish(m_Registry);
 }
 
-void GameLayer::OnAttach()
-{
-	
-}
-
-void GameLayer::OnDetach()
-{
-	
-}
-
-void GameLayer::OnUpdate(li::duration::us dt)
+void GameLayer::OnUpdate(Li::Duration::us dt)
 {
 	m_TickThread.UpdateSync(m_Registry, dt);
 
@@ -68,10 +57,8 @@ void GameLayer::OnUpdate(li::duration::us dt)
 	cp::camera& camera = m_Registry.ctx<cp::camera>();
 
 	m_TerrainRenderer.RenderFramebuffer();
-
-	li::Application::Get()->GetWindow()->GetContext()->BindDefaultRenderTarget();
-	li::Application::Get()->GetWindow()->GetContext()->Clear();
-	li::Renderer::BeginScene(camera.camera);
+	
+	Li::Renderer::BeginScene(camera.camera);
 
 	m_TerrainRenderer.SubmitQuad();
 	RenderingSystem::Render(m_Registry);
@@ -79,7 +66,7 @@ void GameLayer::OnUpdate(li::duration::us dt)
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 	m_DebugPhysicsRenderer.SubmitLines(m_TickThread.GetDebugDrawQueue());
 #endif
-	li::Renderer::EndScene();
+	Li::Renderer::EndScene();
 }
 
 void GameLayer::OnEvent(SDL_Event* event)
@@ -92,15 +79,15 @@ void GameLayer::OnEvent(SDL_Event* event)
 		switch (event->key.keysym.scancode)
 		{
 		case SDL_SCANCODE_F11:
-			if (li::Application::Get()->GetWindow()->GetFullscreen() == li::FullscreenType::Windowed) {
-				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::FullscreenWindowed);
+			if (Li::Application::Get().GetWindow().GetFullscreen() == Li::FullscreenType::Windowed) {
+				Li::Application::Get().GetWindow().SetFullscreen(Li::FullscreenType::FullscreenWindowed);
 			}
 			else {
-				li::Application::Get()->GetWindow()->SetFullscreen(li::FullscreenType::Windowed);
+				Li::Application::Get().GetWindow().SetFullscreen(Li::FullscreenType::Windowed);
 			}
 			break;
 		case SDL_SCANCODE_ESCAPE:
-			m_ReturnToMainMenu = true;
+			Li::Application::Get().Transition(Li::MakeUnique<ScriptScene>("MainMenuScene"), true);
 			break;
 		}
 	}

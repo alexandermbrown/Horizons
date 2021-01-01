@@ -5,7 +5,7 @@
 #include "D3D11Context.h"
 #include "Lithium/Core/Application.h"
 
-namespace li
+namespace Li
 {
 	D3D11UniformBuffer::D3D11UniformBuffer(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout)
 		: m_Name(name), m_Slot(bindingSlot), m_Type(shaderType)
@@ -26,7 +26,7 @@ namespace li
 		desc.MiscFlags = 0;
 		desc.StructureByteStride = 0;
 
-		D3D11Context* context = (D3D11Context*)Application::Get()->GetWindow()->GetContext();
+		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 		m_ContextHandle = context->GetDeviceContext();
 
 		D3D11Call(context->GetDevice()->CreateBuffer(&desc, NULL, &m_Buffer));

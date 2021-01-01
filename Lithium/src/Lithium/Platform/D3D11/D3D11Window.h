@@ -7,21 +7,20 @@
 
 #include "D3D11Context.h"
 
-#include <SDL.h>
+#include "SDL.h"
 
-namespace li
+namespace Li
 {
 	class D3D11Window : public Window
 	{
 	public:
-
 		D3D11Window(const WindowProps& props);
 		virtual ~D3D11Window();
 
 		virtual void SwapBuffers() override;
 		virtual inline int GetWidth() const override { return m_Width; }
 		virtual inline int GetHeight() const override { return m_Height; }
-		virtual inline GraphicsContext* GetContext() const override { return m_Context; }
+		virtual inline GraphicsContext* GetContext() override { return m_Context.get(); }
 		virtual inline SDL_Window* GetWindow() const override { return m_Window; }
 		virtual uint32_t GetWindowID() const override { return m_ID; }
 
@@ -36,13 +35,13 @@ namespace li
 		virtual void SetSize(int width, int height) override;
 		virtual void SetPosition(int x, int y) override;
 
-		virtual void SetIcon(const std::string& path) override;
+		virtual void SetIcon(const char* path) override;
 
 		virtual void OnWindowResize(int width, int height) override;
 
 	private:
 		SDL_Window* m_Window;
-		D3D11Context* m_Context;
+		Unique<D3D11Context> m_Context;
 		uint32_t m_ID;
 
 		SDL_Surface* m_Icon;

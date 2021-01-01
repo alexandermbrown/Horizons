@@ -6,7 +6,7 @@
 
 #include "OpenGLCore.h"
 
-namespace li 
+namespace Li 
 {
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	{

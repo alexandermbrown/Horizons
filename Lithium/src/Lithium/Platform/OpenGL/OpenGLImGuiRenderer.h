@@ -4,7 +4,7 @@
 
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
-namespace li
+namespace Li
 {
 	class OpenGLImGuiRenderer : public ImGuiRenderer
 	{

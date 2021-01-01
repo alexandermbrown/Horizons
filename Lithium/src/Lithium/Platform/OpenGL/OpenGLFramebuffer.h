@@ -3,7 +3,7 @@
 #include "Lithium/Renderer/Framebuffer.h"
 #include "Lithium/Platform/OpenGL/OpenGLRenderbuffer.h"
 
-namespace li
+namespace Li
 {
 	class OpenGLFramebuffer : public Framebuffer
 	{
@@ -23,7 +23,7 @@ namespace li
 
 		uint32_t m_RendererID;
 		Ref<Texture2D> m_Texture;
-		Scope<OpenGLRenderbuffer> m_Renderbuffer;
+		Unique<OpenGLRenderbuffer> m_Renderbuffer;
 
 		int m_Width;
 		int m_Height;

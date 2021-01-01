@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace li
+namespace Li
 {
 	class D3D11UniformBuffer : public UniformBuffer
 	{

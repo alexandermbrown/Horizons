@@ -6,7 +6,7 @@
 #include "glm/glm.hpp"
 #include <string>
 
-namespace li
+namespace Li
 {
 	class TextureAtlas
 	{

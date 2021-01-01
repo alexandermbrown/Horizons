@@ -2,8 +2,7 @@
 #include "RenderingSystem.h"
 
 #include "RenderingComponents.h"
-#include "Horizons/Gameplay/Components.h"
-
+#include "Horizons/Gameplay/TransformComponent.h"
 
 void RenderingSystem::Render(entt::registry& registry)
 {
@@ -19,15 +18,15 @@ void RenderingSystem::Render(entt::registry& registry)
 
 		if (registry.has<cp::color>(entity) && registry.has<cp::texture>(entity))
 		{
-			li::Renderer::SubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color, transform.transform);
+			Li::Renderer::SubmitColoredTexture(registry.get<cp::texture>(entity).alias, registry.get<cp::color>(entity).color, transform.transform);
 		}
 		else if (registry.has<cp::color>(entity))
 		{
-			li::Renderer::SubmitColored(registry.get<cp::color>(entity).color, transform.transform);
+			Li::Renderer::SubmitColored(registry.get<cp::color>(entity).color, transform.transform);
 		}
 		else if (registry.has<cp::texture>(entity))
 		{
-			li::Renderer::SubmitTextured(registry.get<cp::texture>(entity).alias, transform.transform);
+			Li::Renderer::SubmitTextured(registry.get<cp::texture>(entity).alias, transform.transform);
 		}
 	}
 }

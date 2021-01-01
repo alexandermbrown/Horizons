@@ -1,9 +1,9 @@
 #pragma once
 
 #include "entt/entt.hpp"
+#include "SDL.h"
 
-namespace UIClickSystem
+namespace Systems::UIClick
 {
-	bool OnMouseDown(entt::registry& registry, int x, int y, int button);
-	bool OnMouseUp(entt::registry& registry, int x, int y, int button);
+	void OnEvent(entt::registry& registry, SDL_Event* event);
 }

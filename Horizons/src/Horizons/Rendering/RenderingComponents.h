@@ -18,12 +18,12 @@ namespace cp
 
 	struct label
 	{
-		li::Ref<li::Label> label_ref;
+		Li::Ref<Li::Label> label_ref;
 	};
 
 	struct camera
 	{
-		li::OrthographicCamera* camera;
+		Li::OrthographicCamera* camera;
 
 		float aspect_ratio = 1.0f;
 
@@ -40,7 +40,7 @@ namespace cp
 	struct flicker
 	{
 		float magnitude = 0.1f;
-		li::Timer timer;
+		Li::Timer timer;
 		float current;
 		float target;
 	};

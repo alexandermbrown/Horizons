@@ -3,21 +3,21 @@
 #include "Time.h"
 #include <stdint.h>
 
-namespace li
+namespace Li
 {
 	class Timer
 	{
 	public:
-		Timer(duration::us delay, bool completionValue = false, bool repeat = false);
+		Timer(Duration::us delay, bool completionValue = false, bool repeat = false);
 
-		bool Update(duration::us dt);
+		bool Update(Duration::us dt);
 
-		inline duration::us GetDelay() const
+		inline Duration::us GetDelay() const
 		{
 			return m_Delay;
 		}
 
-		inline duration::us GetElapsed() const
+		inline Duration::us GetElapsed() const
 		{
 			return m_Elapsed;
 		}
@@ -32,14 +32,14 @@ namespace li
 			return m_RepeatCount;
 		}
 
-		inline void SetDelay(duration::us delay)
+		inline void SetDelay(Duration::us delay)
 		{
 			m_Delay = delay;
 		}
 
 	private:
-		duration::us m_Delay;
-		duration::us m_Elapsed;
+		Duration::us m_Delay;
+		Duration::us m_Elapsed;
 
 		bool m_Repeat;
 		int m_RepeatCount;

@@ -111,7 +111,7 @@ void ConfigStore::LoadType(const char* str_type, uint32_t type, CSimpleIniA& ini
 		ConfigVar cvar = ConfigVar(key_name, type, true);
 		if (!cvar.SetFromString(value_str))
 		{
-			LI_CORE_ERROR("Failed to set cvar template of type {} to {}", str_type, value_str);
+			LI_ERROR("Failed to set cvar template of type {} to {}", str_type, value_str);
 			cvar.SetFromString("0");
 		}
 

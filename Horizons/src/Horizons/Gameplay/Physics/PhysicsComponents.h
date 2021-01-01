@@ -7,11 +7,13 @@
 #include "DebugDrawSystem.h"
 #endif
 
+#include "Lithium.h"
+
 namespace cp
 {
 	struct physics_world
 	{
-		b2World* world;
+		Li::Unique<b2World> world;
 	};
 
 	struct physics_body

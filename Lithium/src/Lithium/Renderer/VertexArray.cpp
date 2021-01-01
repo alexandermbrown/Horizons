@@ -11,19 +11,19 @@
 #include "Lithium/Platform/D3D11/D3D11VertexArray.h"
 #endif
 
-namespace li
+namespace Li
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
-		switch (Application::Get()->GetAPI())
+		switch (Application::Get().GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
-			return CreateRef<OpenGLVertexArray>();
+			return MakeRef<OpenGLVertexArray>();
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:
-			return CreateRef<D3D11VertexArray>();
+			return MakeRef<D3D11VertexArray>();
 #endif
 		}
 

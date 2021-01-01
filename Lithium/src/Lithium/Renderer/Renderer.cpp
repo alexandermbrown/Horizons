@@ -6,16 +6,16 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace li
+namespace Li
 {
-	Scope<Renderer::RendererData> Renderer::s_Data;
+	Unique<Renderer::RendererData> Renderer::s_Data;
 
 	void Renderer::Init()
 	{
-		s_Data = CreateScope<Renderer::RendererData>();
+		s_Data = MakeUnique<Renderer::RendererData>();
 
-		Application::Get()->GetWindow()->GetContext()->SetDepthTest(false);
-		Application::Get()->GetWindow()->GetContext()->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+		Application::Get().GetWindow().GetContext()->SetDepthTest(false);
+		Application::Get().GetWindow().GetContext()->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {
 			{ "u_ViewProj", ShaderDataType::Mat4 },
@@ -35,12 +35,10 @@ namespace li
 		
 		s_Data->Camera = nullptr;
 
-		s_Data->TextureShader = li::ResourceManager::Get<Shader>("shader_splash");
+		s_Data->TextureShader = Li::ResourceManager::Get<Shader>("shader_splash");
 
-		Window* window = Application::Get()->GetWindow();
-		float width = (float)window->GetWidth();
-		float height = (float)window->GetHeight();
-		s_Data->UICamera = CreateScope<OrthographicCamera>(0.0f, width, 0.0f, height);
+		Window& window = Application::Get().GetWindow();
+		s_Data->UICamera = MakeUnique<OrthographicCamera>(0.0f, (float)window.GetWidth(), 0.0f, (float)window.GetHeight());
 		
 		//////////////////////////////////
 		// Create Textured Quad Buffers //
@@ -79,13 +77,13 @@ namespace li
 		Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1, 4, &data);
 
 		// SETUP SCENE FLAT COLOR TEXTURE ALTAS
-		Ref<TextureAtlas> flatColorAtlas = CreateRef<TextureAtlas>(TextureAtlas(whiteTexture, {
+		Ref<TextureAtlas> flatColorAtlas = MakeRef<TextureAtlas>(TextureAtlas(whiteTexture, {
 			{ "texture_white", glm::vec4(0.5f) }
 		}));
 
-		s_Data->SceneRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.5f, 0.5f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
-		s_Data->UIRenderer = CreateScope<BatchRenderer>(glm::vec2{ 0.0f, 0.0f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
-		s_Data->SceneLineRenderer = CreateScope<LineBatchRenderer>(s_Data->ViewProjUB);
+		s_Data->SceneRenderer = MakeUnique<BatchRenderer>(glm::vec2{ 0.5f, 0.5f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
+		s_Data->UIRenderer = MakeUnique<BatchRenderer>(glm::vec2{ 0.0f, 0.0f }, s_Data->ViewProjUB, s_Data->TransformMatrixUB);
+		s_Data->SceneLineRenderer = MakeUnique<LineBatchRenderer>(s_Data->ViewProjUB);
 
 		s_Data->SceneRenderer->AddTextureAtlas(flatColorAtlas);
 		s_Data->UIRenderer->AddTextureAtlas(flatColorAtlas);
@@ -156,12 +154,12 @@ namespace li
 		RenderLabel(label, transform, color);
 	}
 
-	void li::Renderer::SubmitLine(const glm::vec4& color, const glm::vec3& point1, const glm::vec3& point2)
+	void Li::Renderer::SubmitLine(const glm::vec4& color, const glm::vec3& point1, const glm::vec3& point2)
 	{
 		s_Data->SceneLineRenderer->Submit(color, point1, point2);
 	}
 
-	void li::Renderer::SubmitCircle(const glm::vec4& color, const glm::vec3& center, float radius)
+	void Li::Renderer::SubmitCircle(const glm::vec4& color, const glm::vec3& center, float radius)
 	{
 		glm::vec3 prev_point = {
 				center.x + radius,
@@ -179,7 +177,7 @@ namespace li
 				center.y + std::sin(angle) * radius,
 				center.z
 			};
-			li::Renderer::SubmitLine(color, prev_point, current_point);
+			Li::Renderer::SubmitLine(color, prev_point, current_point);
 			prev_point = current_point;
 		}
 	}
@@ -239,8 +237,8 @@ namespace li
 		s_Data->TransformMatrixUB->Bind();
 		texture->Bind();
 		s_Data->QuadVA->Bind();
-		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);
-		Application::Get()->GetWindow()->GetContext()->DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
+		Application::Get().GetWindow().GetContext()->SetDrawMode(DrawMode::Triangles);
+		Application::Get().GetWindow().GetContext()->DrawIndexed(s_Data->QuadVA->GetIndexBuffer()->GetCount());
 	}
 
 	void Renderer::RenderLabel(const Ref<Label>& label, const glm::mat4& transform, const glm::vec4& color)
@@ -262,8 +260,8 @@ namespace li
 		s_Data->FontUB->Bind();
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
-		Application::Get()->GetWindow()->GetContext()->SetDrawMode(DrawMode::Triangles);
-		Application::Get()->GetWindow()->GetContext()->DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
+		Application::Get().GetWindow().GetContext()->SetDrawMode(DrawMode::Triangles);
+		Application::Get().GetWindow().GetContext()->DrawIndexed(vertexArray->GetIndexBuffer()->GetCount());
 		vertexArray->Unbind();
 	}
 }

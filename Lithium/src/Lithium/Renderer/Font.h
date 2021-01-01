@@ -9,7 +9,7 @@
 
 #include <unordered_map>
 
-namespace li
+namespace Li
 {
 	struct FontProperties
 	{

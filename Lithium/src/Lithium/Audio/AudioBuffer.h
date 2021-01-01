@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-namespace li
+namespace Li
 {
 	class AudioBuffer
 	{
