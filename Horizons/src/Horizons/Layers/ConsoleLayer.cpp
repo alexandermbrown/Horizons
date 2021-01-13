@@ -80,7 +80,7 @@ void ConsoleLayer::OnImGuiRender()
 	if (ImGui::GetIO().WantCaptureKeyboard)
 		Li::Application::Get().TakeFocus("Console");
 	else
-		Li::Application::Get().TakeFocus("");
+		Li::Application::Get().ReleaseFocus();
 }
 #endif
 
@@ -99,7 +99,7 @@ void ConsoleLayer::OnEvent(SDL_Event* event)
 			}
 			else
 			{
-				Li::Application::Get().TakeFocus(nullptr);
+				Li::Application::Get().ReleaseFocus();
 			}
 			
 			Li::Application::Get().EventHandled();

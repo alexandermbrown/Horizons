@@ -39,6 +39,7 @@ namespace Li
 		void OnEvent(SDL_Event* event);
 		inline void EventHandled() { m_EventHandled = true; }
 		inline void TakeFocus(const std::string& layer) { m_FocusedLayer = layer; }
+		inline void ReleaseFocus() { m_FocusedLayer = ""; }
 
 		inline void PushLayer(Unique<Layer> layer) { m_LayerStack.PushLayer(std::move(layer)); }
 		inline void PushOverlay(Unique<Layer> layer) { m_LayerStack.PushOverlay(std::move(layer)); }
