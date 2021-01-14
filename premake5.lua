@@ -116,13 +116,11 @@ project "Lithium"
         "openal-soft",
         "SDL2",
         "harfbuzz",
-
+        -- libav
         "avcodec",
         "avdevice",
         "avformat",
         "avutil",
-        "libcharset",
-        "libiconv",
         "opus",
         "swresample",
         "swscale"
@@ -132,8 +130,7 @@ project "Lithium"
         systemversion "latest"
 
         libdirs {
-            "Lithium/vendor/SDL2/lib/x64",
-            ("Lithium/vendor/libav/build/" .. outputdir)
+            "Lithium/vendor/SDL2/lib/win64",
         }
 
         defines {
@@ -144,7 +141,7 @@ project "Lithium"
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
-            -- For ffmpeg:
+            -- libav
             "Ws2_32.lib",
             "Strmiids.lib",
             "Secur32.lib",
@@ -152,6 +149,11 @@ project "Lithium"
             "mfuuid.lib",
             "bcrypt.lib"
         }
+    
+    filter { "system:windows", "configurations:Dist"}
+        libdirs "Lithium/vendor/libav/build/Release-windows-x86_64"
+    filter { "system:windows", "configurations:not Dist"}
+        libdirs ("Lithium/vendor/libav/build/" .. outputdir)
 
     filter "configurations:Debug"
         defines "LI_DEBUG"
@@ -160,11 +162,7 @@ project "Lithium"
         links "imgui"
         includedirs { "%{IncludeDir.imgui}" }
 
-        links {
-            "lzmad",
-            "vpxmdd",
-            "zlibd"
-        }
+        links "vpxmdd"
 
     filter "configurations:Release"
         defines "LI_RELEASE"
@@ -173,16 +171,14 @@ project "Lithium"
         links "imgui"
         includedirs { "%{IncludeDir.imgui}" }
 
-        links {
-            "lzma",
-            "vpxmd",
-            "zlib"
-        }
-    
+        links "vpxmd"
+
     filter "configurations:Dist"
         defines "LI_DIST"
         runtime "Release"
         optimize "on"
+
+        links "vpxmd"
 
 ------------------------------ Horizons ------------------------------
 
