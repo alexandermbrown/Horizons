@@ -1,16 +1,10 @@
 
 struct VERTEX_IN
 {
-	float2 position : POSITION;
+	float3 position : POSITION;
+	float texindex : TEXINDEX;
 	float2 texcoord : TEXCOORD;
-};
-
-struct INSTANCE_IN
-{
-	column_major float4x4 transform : I_TRANSFORM;
-	float4 atlasbounds : I_ATLASBOUNDS;
 	float4 color : COLOR;
-	float texindex : I_TEXINDEX;
 };
 
 struct PS_IN
@@ -26,17 +20,15 @@ cbuffer ViewProjectionMatrix : register(b0)
 	column_major float4x4 u_ViewProj;
 };
 
-PS_IN vs_main(VERTEX_IN vertex, INSTANCE_IN instance)
+PS_IN vs_main(VERTEX_IN input)
 {
 	PS_IN output;
 
-	output.position = mul(u_ViewProj, mul(instance.transform, float4(vertex.position, 0.0, 1.0)));
+	output.position = mul(u_ViewProj, float4(input.position, 1.0));
 
-	output.texcoord = float2(
-		instance.atlasbounds.x + instance.atlasbounds.z * vertex.texcoord.x,
-		instance.atlasbounds.y + instance.atlasbounds.w * vertex.texcoord.y);
-	output.color = instance.color;
-	output.texindex = int(instance.texindex);
+	output.texcoord = input.texcoord;
+	output.color = input.color;
+	output.texindex = int(input.texindex);
 
 	return output;
 }

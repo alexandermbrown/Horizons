@@ -2,9 +2,9 @@
 
 	<shaders>
 
-		<shader name="shader_instance">
-			<glsl>./res/shaders/Instanced.glsl</glsl>
-			<hlsl>./res/shaders/Instanced.hlsl</hlsl>
+		<shader name="shader_batched">
+			<glsl>./res/shaders/Batched.glsl</glsl>
+			<hlsl>./res/shaders/Batched.hlsl</hlsl>
 		</shader>
 
 		<shader name="shader_label">

@@ -9,100 +9,114 @@
 namespace Li
 {
 	BatchRenderer::BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer)
-		: m_QuadOrigin(quadOrigin), m_InstanceCount(0),
-		m_ViewProjUB(viewProjBuffer), m_TransformUB(transformBuffer)
+		: m_QuadCount(0), m_VertexArray(VertexArray::Create()),
+		m_ViewProjUB(viewProjBuffer), m_TransformUB(transformBuffer), m_Vertices(nullptr)
 	{
-		m_Shader = ResourceManager::Get<Shader>("shader_instance");
-		m_InstanceVA = VertexArray::Create();
+		static_assert(sizeof(BatchVertex) == sizeof(BatchVertex::Position) + sizeof(BatchVertex::TexCoord) + sizeof(BatchVertex::Color) + sizeof(BatchVertex::TexIndex));
+		static_assert(sizeof(BatchVertex[MaxBatchQuads * 4]) == sizeof(BatchVertex) * 4 * MaxBatchQuads);
 
-		float quadVertices[16] = {
-			-quadOrigin.x		, -quadOrigin.y			, 0.0f, 0.0f,
-			-quadOrigin.x + 1.0f, -quadOrigin.y			, 1.0f, 0.0f,
-			-quadOrigin.x + 1.0f, -quadOrigin.y + 1.0f	, 1.0f, 1.0f,
-			-quadOrigin.x		, -quadOrigin.y + 1.0f	, 0.0f, 1.0f
-		};
-		Ref<VertexBuffer> quadVB = VertexBuffer::Create(quadVertices, sizeof(quadVertices), BufferUsage::StaticDraw);
+		m_Shader = ResourceManager::Get<Shader>("shader_batched");
 
-		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
-		Ref<IndexBuffer> quadIB = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+		m_VertexPositions[0] = { -quadOrigin.x       , -quadOrigin.y       , 0.0f, 1.0f };
+		m_VertexPositions[1] = { -quadOrigin.x + 1.0f, -quadOrigin.y       , 0.0f, 1.0f };
+		m_VertexPositions[2] = { -quadOrigin.x + 1.0f, -quadOrigin.y + 1.0f, 0.0f, 1.0f };
+		m_VertexPositions[3] = { -quadOrigin.x       , -quadOrigin.y + 1.0f, 0.0f, 1.0f };
 
-		quadVB->SetLayout({
-			{ ShaderDataType::Float2, "POSITION", 7 },
-			{ ShaderDataType::Float2, "TEXCOORD", 8 }
-			});
+		std::vector<uint32_t> indices;
+		indices.resize(MaxBatchQuads * 6);
 
-		m_InstanceVA->SetIndexBuffer(quadIB);
-		m_InstanceVA->AddVertexBuffer(quadVB);
+		int offset = 0;
+		for (int index = 0; index < MaxBatchQuads * 6; index += 6)
+		{
+			indices[index]     = offset + 0;
+			indices[index + 1] = offset + 1;
+			indices[index + 2] = offset + 2;
+			indices[index + 3] = offset + 0;
+			indices[index + 4] = offset + 2;
+			indices[index + 5] = offset + 3;
+			offset += 4;
+		}
+		m_IndexBuffer = IndexBuffer::Create(indices.data(), MaxBatchQuads * 6, BufferUsage::StaticDraw);
 
-		static_assert(sizeof(BatchData) == sizeof(glm::mat4) + sizeof(glm::vec4) + sizeof(glm::vec4) + sizeof(float));
-		static_assert(sizeof(m_InstanceData) == sizeof(BatchData) * MaxBatchInstances);
-		
-		m_InstanceBuffer = VertexBuffer::Create(sizeof(m_InstanceData), BufferUsage::DynamicDraw);
-		m_InstanceBuffer->SetLayout({
-			{ ShaderDataType::Mat4, "I_TRANSFORM", 0, false, 1 },
-			{ ShaderDataType::Float4, "I_ATLASBOUNDS", 4, false, 1 },
-			{ ShaderDataType::Float4, "COLOR", 5, false, 1 },
-			{ ShaderDataType::Float, "I_TEXINDEX", 6, false, 1 }
-			});
-		m_InstanceVA->AddVertexBuffer(m_InstanceBuffer);
-		m_InstanceVA->Finalize(m_Shader);
+		m_Vertices = new BatchVertex[MaxBatchQuads * 4];
+		m_VertexBuffer = VertexBuffer::Create(sizeof(BatchVertex[MaxBatchQuads * 4]), BufferUsage::DynamicDraw);
+
+		m_VertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "POSITION", 0 },
+			{ ShaderDataType::Float, "TEXINDEX", 1 },
+			{ ShaderDataType::Float2, "TEXCOORD", 2 },
+			{ ShaderDataType::Float4, "COLOR", 3 }
+		});
+
+		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArray->Finalize(m_Shader);
+	}
+
+	BatchRenderer::~BatchRenderer()
+	{
+		if (m_Vertices)
+		{
+			delete[] m_Vertices;
+			m_Vertices = nullptr;
+		}
 	}
 
 	void BatchRenderer::AddTextureAtlas(Ref<TextureAtlas> atlas)
 	{
 		for (auto&& [texture, bounds] : atlas->GetEntries())
 		{
-			m_AtlasIndices[texture] = (int)m_Atlases.size();
+			m_Atlases[texture] = atlas;
 		}
-		m_Atlases.push_back(atlas);
 	}
 
 	void BatchRenderer::BeginScene()
 	{
-		m_InstanceCount = 0;
+		m_QuadCount = 0;
 		m_BatchAtlasCount = 0;
 	}
 
-	void BatchRenderer::EndScene()
-	{
-		Flush();
-	}
-
 	void BatchRenderer::Submit(
-		const std::string& texture_alias,
+		const std::string& texture_name,
 		const glm::vec4& color,
 		const glm::mat4& transform,
 		bool crop)
 	{
-		if (m_InstanceCount >= MaxBatchInstances)
+		if (m_QuadCount >= MaxBatchQuads)
 			Flush();
 
-		BatchData& instance = m_InstanceData[m_InstanceCount];
-
-		Ref<TextureAtlas> search_atlas = nullptr;
-		const Ref<TextureAtlas>& saved_atlas = m_Atlases[m_AtlasIndices[texture_alias]];
-		for (int i = 0; i < m_BatchAtlasCount; i++)
+		auto it = m_Atlases.find(texture_name);
+		if (it == m_Atlases.end())
 		{
-			const auto& batch_atlas = m_BatchAtlases[i];
-			if (batch_atlas == saved_atlas)
+			LI_CORE_ERROR("Texture {} not found.", texture_name);
+			return;
+		}
+
+		float tex_index;
+		bool found = false;
+		TextureAtlas* target_atlas = it->second.get();
+		for (int i = m_BatchAtlasCount - 1; i >= 0; --i)
+		{
+			TextureAtlas* batch_atlas = m_BatchAtlases[i];
+			if (batch_atlas == target_atlas)
 			{
-				search_atlas = batch_atlas;
-				instance.TextureIndex = (float)i;
+				found = true;
+				tex_index = (float)i;
+				break;
 			}
 		}
 
-		if (search_atlas == nullptr)
+		if (!found)
 		{
 			if (m_BatchAtlasCount >= m_BatchAtlases.size())
 				Flush();
 
-			m_BatchAtlases[m_BatchAtlasCount] = saved_atlas;
-			instance.TextureIndex = (float)m_BatchAtlasCount;
+			m_BatchAtlases[m_BatchAtlasCount] = target_atlas;
+			tex_index = static_cast<float>(m_BatchAtlasCount);
 			m_BatchAtlasCount++;
 		}
 		
-		instance.Transform = transform;
-		const glm::vec4& bounds = saved_atlas->GetBounds(texture_alias);
+		glm::vec4 bounds = target_atlas->GetBounds(texture_name);
 		if (crop)
 		{
 			float quad_width = transform[0][0];
@@ -113,36 +127,38 @@ namespace Li
 
 			glm::vec2 texture_scale;
 			if (quad_ratio > texture_ratio)
-			{
 				texture_scale = { 1.0f, texture_ratio / quad_ratio };
-			}
 			else
-			{
 				texture_scale = { quad_ratio / texture_ratio, 1.0f };
-			}
 
-			instance.AtlasBounds = {
+			bounds = {
 				bounds.x + bounds.z / 2.0f * (1.0f - texture_scale.x),
 				bounds.y + bounds.w / 2.0f * (1.0f - texture_scale.y),
 				bounds.z * texture_scale.x,
 				bounds.w * texture_scale.y
 			};
 		}
-		else
-		{
-			instance.AtlasBounds = bounds;
-		}
-		instance.Color = color;
 
-		m_InstanceCount++;
+		// Loop through each quad vertice.
+		for (int i = 0; i < 4; i++)
+		{
+			BatchVertex& vertex = m_Vertices[m_QuadCount * 4 + i];
+
+			vertex.Position = transform * m_VertexPositions[i];
+			vertex.TexCoord.x = bounds.x + bounds.z * m_TexCoords[i].x;
+			vertex.TexCoord.y = bounds.y + bounds.w * m_TexCoords[i].y;
+			vertex.Color = color;
+			vertex.TexIndex = tex_index;
+		}
+
+		m_QuadCount++;
 	}
 
 	void BatchRenderer::Flush()
 	{
-		if (m_InstanceCount > 0)
+		if (m_QuadCount > 0)
 		{
 			m_Shader->Bind();
-			m_Shader->SetTexture("u_Texture", 0);
 
 			// Bind all batch atlas textures.
 			for (int slot = 0; slot < m_BatchAtlasCount; slot++)
@@ -150,20 +166,20 @@ namespace Li
 				m_BatchAtlases[slot]->Bind(slot);
 			}
 
-			m_InstanceBuffer->SetSubData(
-				(float*)m_InstanceData.data(),
-				sizeof(BatchData) * m_InstanceCount,
+			m_VertexBuffer->SetSubData(
+				reinterpret_cast<float*>(m_Vertices),
+				sizeof(BatchVertex) * m_QuadCount * 4,
 				0, true
 			);
 
 			m_ViewProjUB->Bind();
 			m_TransformUB->Bind();
-			m_InstanceVA->Bind();
+			m_VertexArray->Bind();
 			Application::Get().GetWindow().GetContext()->SetDrawMode(Li::DrawMode::Triangles);
-			Application::Get().GetWindow().GetContext()->DrawIndexedInstanced(m_InstanceVA->GetIndexBuffer()->GetCount(), m_InstanceCount);
-			m_InstanceVA->Unbind();
+			Application::Get().GetWindow().GetContext()->DrawIndexed(m_QuadCount * 6);
+			m_VertexArray->Unbind();
 		}
-		m_InstanceCount = 0;
+		m_QuadCount = 0;
 		m_BatchAtlasCount = 0;
 	}
 }

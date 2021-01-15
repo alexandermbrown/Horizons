@@ -15,12 +15,13 @@ namespace Li
 	{
 	public:
 		BatchRenderer(glm::vec2 quadOrigin, const Ref<UniformBuffer>& viewProjBuffer, const Ref<UniformBuffer>& transformBuffer);
-		virtual ~BatchRenderer() = default;
+		virtual ~BatchRenderer();
 
 		void AddTextureAtlas(Ref<TextureAtlas> atlas);
 
 		void BeginScene();
-		void EndScene();
+		inline void EndScene() { Flush(); }
+
 		void Submit(
 			const std::string& texture_alias,
 			const glm::vec4& color,
@@ -30,34 +31,39 @@ namespace Li
 	private:
 		void Flush();
 
-		struct BatchData
+		struct BatchVertex
 		{
-			glm::mat4 Transform;
-			glm::vec4 AtlasBounds;
+			glm::vec3 Position;
+			float TexIndex;
+			glm::vec2 TexCoord;
 			glm::vec4 Color;
-			float TextureIndex;
 		};
 
-		static constexpr int MaxBatchInstances = 16384;
+		static constexpr int MaxBatchQuads = 16384;
 		static constexpr int MaxBatchTextures = 8;
-
-		glm::vec2 m_QuadOrigin;
 		
+		std::unordered_map<std::string, Ref<TextureAtlas>> m_Atlases;
+
 		Ref<Shader> m_Shader;
-		Ref<VertexBuffer> m_InstanceBuffer;
-		Ref<VertexArray> m_InstanceVA;
+		Ref<VertexBuffer> m_VertexBuffer;
+		Ref<IndexBuffer> m_IndexBuffer;
+		Ref<VertexArray> m_VertexArray;
 
 		Ref<UniformBuffer> m_ViewProjUB;
 		Ref<UniformBuffer> m_TransformUB;
 
-		uint32_t m_InstanceCount;
+		int m_QuadCount;
 		int m_BatchAtlasCount;
 
-		std::vector<Ref<TextureAtlas>> m_Atlases;
-		std::unordered_map<std::string, int> m_AtlasIndices;
+		BatchVertex* m_Vertices;
+		std::array<TextureAtlas*, MaxBatchTextures> m_BatchAtlases;
 
-		std::array<Ref<TextureAtlas>, MaxBatchTextures> m_BatchAtlases;
-		std::array<BatchData, MaxBatchInstances> m_InstanceData;
-		
+		glm::vec4 m_VertexPositions[4];
+		constexpr static glm::vec2 m_TexCoords[4] = {
+			{ 0.0f, 0.0f },
+			{ 1.0f, 0.0f },
+			{ 1.0f, 1.0f },
+			{ 0.0f, 1.0f }
+		};
 	};
 }

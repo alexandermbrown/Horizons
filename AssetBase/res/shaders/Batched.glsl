@@ -1,20 +1,16 @@
 #type vertex
 #version 420 core
 
-layout(location = 0) in mat4 I_TRANSFORM;
-layout(location = 4) in vec4 I_ATLASBOUNDS;
-layout(location = 5) in vec4 COLOR;
-layout(location = 6) in float I_TEXINDEX;
-
-layout(location = 7) in vec2 POSITION;
-layout(location = 8) in vec2 TEXCOORD;
+layout(location = 0) in vec3 POSITION;
+layout(location = 1) in float TEXINDEX;
+layout(location = 2) in vec2 TEXCOORD;
+layout(location = 3) in vec4 COLOR;
 
 layout(std140, binding = 0) uniform ViewProjectionMatrix
 {
 	mat4 u_ViewProj;
 };
 
-out vec4 v_AtlasBounds;
 out vec4 v_Color;
 out vec2 v_TexCoord;
 out float v_TexIndex;
@@ -22,11 +18,10 @@ out float v_TexIndex;
 void main()
 {
 	v_Color = COLOR;
-	v_TexCoord = vec2(I_ATLASBOUNDS.x + I_ATLASBOUNDS.z * TEXCOORD.x,
-		I_ATLASBOUNDS.y + I_ATLASBOUNDS.w * TEXCOORD.y);
-	v_TexIndex = I_TEXINDEX;
+	v_TexCoord = TEXCOORD;
+	v_TexIndex = TEXINDEX;
 
-	gl_Position = u_ViewProj * I_TRANSFORM * vec4(POSITION, 0.0, 1.0);
+	gl_Position = u_ViewProj * vec4(POSITION, 1.0);
 }
 
 #type fragment
