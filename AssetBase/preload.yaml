@@ -1,0 +1,13 @@
+
+shader_splash:
+  type: shader
+  glsl: "./res/shaders/Texture.glsl"
+  hlsl: "./res/shaders/Texture.hlsl"
+
+texture_horizons_splash:
+  type: texture2d
+  path: "./res/textures/ui/horizons_splash.png"
+  min_filter: LINEAR
+  mag_filter: LINEAR
+  wrap_s: CLAMP_TO_EDGE
+  wrap_t: CLAMP_TO_EDGE

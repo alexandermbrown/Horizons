@@ -1,40 +1,31 @@
 #include "pch.h"
 #include "AudioSegment.h"
 
+#include "OptionalField.h"
+
 namespace AssetBase
 {
-	flatbuffers::Offset<Assets::Audio> AudioSegment::Serialize(rapidxml::xml_node<>* audioNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
+	flatbuffers::Offset<Assets::Audio> SerializeAudio(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node audio, bool debug_mode)
 	{
-		flatbuffers::Offset<flatbuffers::String> name = NULL;
-		if (auto* name_attr = audioNode->first_attribute("name"))
-		{
-			name = builder.CreateString(name_attr->value());
-			std::cout << "Loading audio '" << name_attr->value() << "' ... ";
-		}
-		else throw "Attribute 'name' not found in audio.";
+		flatbuffers::Offset<flatbuffers::String> name_offset = builder.CreateString(name);
 
-		std::filesystem::path audioPath;
-		if (auto* node = audioNode->first_node("source"))
-			audioPath = node->value();
-		else throw "Missing <source> in audio.\n";
+		std::filesystem::path audio_path = base_path.parent_path() / GetOptionalString(audio, "path");
 
-		std::ifstream audioFile(basePath.parent_path() / audioPath, std::ios::in | std::ios::binary);
-		if (!audioFile.is_open()) {
-			throw "Failed to open audio file.\n";
-		}
+		std::ifstream audio_file(audio_path, std::ios::in | std::ios::binary);
+		if (!audio_file.is_open())
+			throw std::runtime_error("Failed to open audio file " + audio_path.string());
 
-		audioFile.ignore(std::numeric_limits<std::streamsize>::max());
-		size_t fileSize = audioFile.gcount();
-		audioFile.clear();
-		audioFile.seekg(0, std::ios_base::beg);
+		audio_file.ignore(std::numeric_limits<std::streamsize>::max());
+		size_t file_size = audio_file.gcount();
+		audio_file.clear();
+		audio_file.seekg(0, std::ios_base::beg);
 
-		uint8_t* fileData;
-		auto data = builder.CreateUninitializedVector(fileSize, &fileData);
+		uint8_t* file_data;
+		auto data = builder.CreateUninitializedVector(file_size, &file_data);
 
-		audioFile.read((char*)fileData, fileSize);
-		audioFile.close();
+		audio_file.read((char*)file_data, file_size);
+		audio_file.close();
 
-		std::cout << "done.\n";
-		return Assets::CreateAudio(builder, name, data);
+		return Assets::CreateAudio(builder, name_offset, data);
 	}
 }

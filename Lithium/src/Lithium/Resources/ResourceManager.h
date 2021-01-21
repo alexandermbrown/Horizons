@@ -26,50 +26,54 @@ namespace Li
 
 		static void PrintInfo();
 
-		template<typename T>
-		static Ref<T> Get(const std::string& name)
+		static Ref<Texture2D> GetTexture2D(const std::string& name)
 		{
-			LI_CORE_ASSERT(false, "Invalid resource.");
-			return nullptr;
+			return GetResource(s_Data->Textures, name, "texture_default");
 		}
 
-		template<>
-		static Ref<Texture2D> Get<Texture2D>(const std::string& name)
+		static Ref<Shader> GetShader(const std::string& name)
 		{
-			LI_CORE_ASSERT(s_Data->Textures.find(name) != s_Data->Textures.end(), "Texture not found.");
-			return s_Data->Textures.at(name);
+			return GetResource(s_Data->Shaders, name, nullptr);
 		}
 
-		template<>
-		static Ref<Shader> Get<Shader>(const std::string& name)
+		static Ref<TextureAtlas> GetTextureAtlas(const std::string& name)
 		{
-			LI_CORE_ASSERT(s_Data->Shaders.find(name) != s_Data->Shaders.end(), "Shader not found.");
-			return s_Data->Shaders.at(name);
+			return GetResource(s_Data->TextureAtlases, name, "atlas_default");
 		}
 
-		template<>
-		static Ref<TextureAtlas> Get<TextureAtlas>(const std::string& name)
+		static Ref<Font> GetFont(const std::string& name)
 		{
-			LI_CORE_ASSERT(s_Data->TextureAtlases.find(name) != s_Data->TextureAtlases.end(), "Texture atlas not found.");
-			return s_Data->TextureAtlases.at(name);
+			return GetResource(s_Data->Fonts, name, "Lato-Regular");
 		}
 
-		template<>
-		static Ref<Font> Get<Font>(const std::string& name)
+		static Ref<AudioBuffer> GetAudioBuffer(const std::string& name)
 		{
-			LI_CORE_ASSERT(s_Data->Fonts.find(name) != s_Data->Fonts.end(), "Font not found.");
-			return s_Data->Fonts.at(name);
-		}
-
-		template<>
-		static Ref<AudioBuffer> Get<AudioBuffer>(const std::string& name)
-		{
-			LI_CORE_ASSERT(s_Data->Audio.find(name) != s_Data->Audio.end(), "Audio not found.");
-			return s_Data->Audio.at(name);
+			return GetResource(s_Data->Audio, name, nullptr);
 		}
 
 	private:
-		template<class T>
+		template<typename T>
+		using ResourceMap = std::unordered_map<std::string, Ref<T>>;
+
+		template<typename T>
+		static Ref<T> GetResource(const ResourceMap<T>& map, const std::string& name, const char* default)
+		{
+			auto it = map.find(name);
+			if (it == map.end())
+			{
+				LI_CORE_ERROR("Resource {} not found.", name);
+
+				if (default)
+				{
+					LI_CORE_ASSERT(map.find(default) != map.end(), "Default does not exist!");
+					return map.at(default);
+				}
+				else return nullptr;
+			}
+			return it->second;
+		}
+
+		template<typename T>
 		using VecIterator = flatbuffers::VectorIterator<flatbuffers::Offset<T>, const T*>;
 
 		struct StaggeredLoadData
@@ -87,11 +91,11 @@ namespace Li
 
 		struct ResourceData
 		{
-			std::unordered_map<std::string, Ref<Texture2D>> Textures;
-			std::unordered_map<std::string, Ref<Shader>> Shaders;
-			std::unordered_map<std::string, Ref<TextureAtlas>> TextureAtlases;
-			std::unordered_map<std::string, Ref<Font>> Fonts;
-			std::unordered_map<std::string, Ref<AudioBuffer>> Audio;
+			ResourceMap<Texture2D> Textures;
+			ResourceMap<Shader> Shaders;
+			ResourceMap<TextureAtlas> TextureAtlases;
+			ResourceMap<Font> Fonts;
+			ResourceMap<AudioBuffer> Audio;
 
 			StaggeredLoadData LoadData;
 		};

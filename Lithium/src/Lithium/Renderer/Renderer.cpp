@@ -35,7 +35,7 @@ namespace Li
 		
 		s_Data->Camera = nullptr;
 
-		s_Data->TextureShader = Li::ResourceManager::Get<Shader>("shader_splash");
+		s_Data->TextureShader = Li::ResourceManager::GetShader("shader_splash");
 
 		Window& window = Application::Get().GetWindow();
 		s_Data->UICamera = MakeUnique<OrthographicCamera>(0.0f, (float)window.GetWidth(), 0.0f, (float)window.GetHeight());
@@ -70,7 +70,7 @@ namespace Li
 
 	void Renderer::InitPostResourceLoad()
 	{
-		s_Data->FontShader = ResourceManager::Get<Shader>("shader_label");
+		s_Data->FontShader = ResourceManager::GetShader("shader_label");
 
 		// SETUP WHITE TEXTURE
 		uint32_t data = 0xffffffff;

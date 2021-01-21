@@ -77,7 +77,7 @@ table Audio {
 
 table LocaleEntry {
 	key:string;
-	value:[short];
+	value:string;
 }
 
 table Locale {

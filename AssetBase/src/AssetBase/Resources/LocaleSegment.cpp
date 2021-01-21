@@ -1,56 +1,23 @@
 #include "pch.h"
 #include "LocaleSegment.h"
 
-#include "simpleini/simpleini.h"
-
-#include <locale>
-#include <codecvt>
+#include "OptionalField.h"
 
 namespace AssetBase
 {
-	flatbuffers::Offset<Assets::Locale> LocaleSegment::Serialize(rapidxml::xml_node<>* localeNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
+	flatbuffers::Offset<Assets::Locale> SerializeLocale(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node locale, bool debug_mode)
 	{
-		flatbuffers::Offset<flatbuffers::String> name_offset = NULL;
-		char* name = nullptr;
-		if (auto* name_attr = localeNode->first_attribute("name"))
-		{
-			name = name_attr->value();
-			name_offset = builder.CreateString(name);
-			std::cout << "Loading locale '" << name << "' ... ";
-		}
-		else throw "Attribute 'name' not found in locale.";
-
-		std::filesystem::path filePath;
-		if (auto* node = localeNode->first_node("source"))
-			filePath = node->value();
-		else throw "Missing <source> in locale.\n";
-
-		CSimpleIniW ini;
-		ini.SetUnicode();
-		if (ini.LoadFile(filePath.c_str()) < 0)
-			throw "Failed to open ini source.";
-
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		std::wstring wname = converter.from_bytes(name);
-
-		CSimpleIniW::TNamesDepend iniKeys;
-		ini.GetAllKeys(wname.c_str(), iniKeys);
+		std::filesystem::path locale_path(base_path.parent_path() / GetOptionalString(locale, "path"));
+		YAML::Node locale_file = YAML::LoadFile(locale_path.string());
 
 		std::vector<flatbuffers::Offset<Assets::LocaleEntry>> entries;
-		for (const auto& key : iniKeys)
+		for (const std::pair<YAML::Node, YAML::Node>& entry : locale_file)
 		{
-			const wchar_t* value = ini.GetValue(wname.c_str(), key.pItem);
-			
-			auto key_offset = builder.CreateString(converter.to_bytes(key.pItem));
-
-			static_assert(sizeof(wchar_t) == sizeof(int16_t));
-			auto value_offset = builder.CreateVector((int16_t*)value, wcslen(value) + 1);
-
-			entries.push_back(Assets::CreateLocaleEntry(builder, key_offset, value_offset));
+			auto key = builder.CreateString(entry.first.Scalar());
+			auto value = builder.CreateString(entry.second.as<std::string>());
+			entries.push_back(Assets::CreateLocaleEntry(builder, key, value));
 		}
-		auto entries_offset = builder.CreateVector(entries);
 
-		std::cout << "done.\n";
-		return Assets::CreateLocale(builder, name_offset, entries_offset);
+		return Assets::CreateLocaleDirect(builder, name.c_str(), &entries);
 	}
 }

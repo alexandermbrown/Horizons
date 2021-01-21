@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "AssetSerial.h"
 
-#include "rapidxml/rapidxml.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include "Texture2DSegment.h"
 #include "ShaderSegment.h"
@@ -10,74 +10,51 @@
 #include "AudioSegment.h"
 #include "LocaleSegment.h"
 
-#define ASSETBASE_PUSH_SEGMENT(type, parentNode, path, debug) if (parentNode)\
-for (rapidxml::xml_node<>* node = parentNode->first_node(); node; node = node->next_sibling())\
-	m_Segments.push_back(std::make_shared<type>(node, path, debug))
+#include "OptionalField.h"
 
 namespace AssetBase
 {
-	AssetSerial::AssetSerial(const std::filesystem::path& path, bool debugMode)
-		: m_Builder(1024)
+	AssetSerial::AssetSerial(const std::filesystem::path& path, bool debug_mode)
 	{
 		std::cout << "Building from resource definition file " << path.string() << "\n";
-		std::ifstream xmlFile(path.string());
-
-		if (!xmlFile.is_open()) {
-			throw "Error opening xml file.";
-		}
-
-		std::string line = "";
-		std::string rawXML;
-		while (std::getline(xmlFile, line)) {
-			rawXML += line + "\n";
-		}
-		xmlFile.close();
-
-		rapidxml::xml_document<> doc;
-		doc.parse<0>((char*)rawXML.c_str());
-
-		rapidxml::xml_node<>* root = doc.first_node();
+		
+		YAML::Node resources = YAML::LoadFile(path.string());
+		if (!resources || !resources.IsMap())
+			throw "Invalid YAML file.";
 
 		std::vector<flatbuffers::Offset<Assets::Texture2D>> textures;
-		if (auto parent = root->first_node("textures"))
-		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				textures.push_back(Texture2DSegment::Serialize(node, path, m_Builder, debugMode));
-		}
-
 		std::vector<flatbuffers::Offset<Assets::Shader>> shaders;
-		if (auto parent = root->first_node("shaders"))
-		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				shaders.push_back(ShaderSegment::Serialize(node, path, m_Builder, debugMode));
-		}
-
 		std::vector<flatbuffers::Offset<Assets::TextureAtlas>> atlases;
-		if (auto parent = root->first_node("texture_atlases"))
-		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				atlases.push_back(TextureAtlasSegment::Serialize(node, path, m_Builder, debugMode));
-		}
-
 		std::vector<flatbuffers::Offset<Assets::Font>> fonts;
-		if (auto parent = root->first_node("fonts"))
-		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				fonts.push_back(FontSegment::Serialize(node, path, m_Builder, debugMode));
-		}
-
 		std::vector<flatbuffers::Offset<Assets::Audio>> audio;
-		if (auto parent = root->first_node("audio"))
-		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				audio.push_back(AudioSegment::Serialize(node, path, m_Builder, debugMode));
-		}
-
 		std::vector<flatbuffers::Offset<Assets::Locale>> locales;
-		if (auto parent = root->first_node("locales"))
+
+		for (const std::pair<YAML::Node, YAML::Node>& resource : resources)
 		{
-			for (rapidxml::xml_node<>* node = parent->first_node(); node; node = node->next_sibling())
-				locales.push_back(LocaleSegment::Serialize(node, path, m_Builder, debugMode));
+			const std::string& name = resource.first.Scalar();
+
+			std::string type = GetOptionalString(resource.second, "type");
+			std::cout << "Loading " << type << " " << name << " ... ";
+
+			if (type == "texture2d")
+				textures.push_back(SerializeTexture2D(m_Builder, path, name, resource.second, debug_mode));
+			else if (type == "shader")
+				shaders.push_back(SerializeShader(m_Builder, path, name, resource.second, debug_mode));
+			else if (type == "texture_atlas")
+				atlases.push_back(SerializeTextureAtlas(m_Builder, path, name, resource.second, debug_mode));
+			else if (type == "font")
+				fonts.push_back(SerializeFont(m_Builder, path, name, resource.second, debug_mode));
+			else if (type == "audio")
+				audio.push_back(SerializeAudio(m_Builder, path, name, resource.second, debug_mode));
+			else if (type == "locale")
+				locales.push_back(SerializeLocale(m_Builder, path, name, resource.second, debug_mode));
+			else
+			{
+				std::cout << "Resource " << name << ": invalid type "<< type << "\n";
+				continue;
+			}
+
+			std::cout << "done.         \n";
 		}
 
 		auto bundle = Assets::CreateAssetBundleDirect(m_Builder, &textures, &shaders, &atlases, &fonts, &audio, &locales);

@@ -1,90 +1,64 @@
 #include "pch.h"
 #include "Texture2DSegment.h"
 
+#include "OptionalField.h"
+
 namespace AssetBase
 {
-	Assets::FilterType ConvertFilterType(const char* type)
+	Assets::FilterType ConvertFilterType(const std::string& type)
 	{
-		if (!strcmp(type, "NEAREST")) 
+		if (type == "NEAREST")
 			return Assets::FilterType_Nearest;
-		else if (!strcmp(type, "LINEAR"))
+		else if (type == "LINEAR")
 			return Assets::FilterType_Linear;
-		else if (!strcmp(type, "NEAREST_MIPMAP_NEAREST"))
+		else if (type == "NEAREST_MIPMAP_NEAREST")
 			return Assets::FilterType_NearestMipmapNearest;
-		else if (!strcmp(type, "LINEAR_MIPMAP_NEAREST"))
+		else if (type == "LINEAR_MIPMAP_NEAREST")
 			return Assets::FilterType_LinearMipmapNearest;
-		else if (!strcmp(type, "NEAREST_MIPMAP_LINEAR"))
+		else if (type == "NEAREST_MIPMAP_LINEAR")
 			return Assets::FilterType_NearestMipmapLinear;
-		throw "Unknown filter type!";
+		throw std::runtime_error("Unknown filter type " + type);
 	}
 
-	Assets::WrapType ConvertWrapType(const char* type)
+	Assets::WrapType ConvertWrapType(const std::string& type)
 	{
-		if (!strcmp(type, "REPEAT"))
+		if (type == "REPEAT")
 			return Assets::WrapType_Repeat;
-		else if (!strcmp(type, "MIRRORED_REPEAT"))
+		else if (type == "MIRRORED_REPEAT")
 			return Assets::WrapType_MirroredRepeat;
-		else if (!strcmp(type, "CLAMP_TO_EDGE"))
+		else if (type == "CLAMP_TO_EDGE")
 			return Assets::WrapType_ClampToEdge;
-		else if (!strcmp(type, "CLAMP_TO_BORDER"))
+		else if (type == "CLAMP_TO_BORDER")
 			return Assets::WrapType_ClampToBorder;
-		throw "Unknown wrap type!";
+		throw std::runtime_error("Unknown wrap type " + type);
 	}
 
-	flatbuffers::Offset<Assets::Texture2D> Texture2DSegment::Serialize(rapidxml::xml_node<>* textureNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
+	flatbuffers::Offset<Assets::Texture2D> SerializeTexture2D(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node texture, bool debug_mode)
 	{
-		flatbuffers::Offset<flatbuffers::String> name = NULL;
-		if (auto* name_attr = textureNode->first_attribute("name"))
-		{
-			name = builder.CreateString(name_attr->value());
-			std::cout << "Loading texture '" << name_attr->value() << "' ... ";
-		}
-		else throw "Attribute 'name' not found in texture.";
+		flatbuffers::Offset<flatbuffers::String> name_offset = builder.CreateString(name);
+
+		std::filesystem::path image_path(base_path.parent_path() / GetOptionalString(texture, "path"));
+		Assets::FilterType min_filter = ConvertFilterType(GetOptionalString(texture, "min_filter"));
+		Assets::FilterType mag_filter = ConvertFilterType(GetOptionalString(texture, "mag_filter"));
+		Assets::WrapType wrap_s = ConvertWrapType(GetOptionalString(texture, "wrap_s"));
+		Assets::WrapType wrap_t = ConvertWrapType(GetOptionalString(texture, "wrap_t"));
 		
-		Assets::FilterType min_filter = Assets::FilterType_Error;
-		Assets::FilterType mag_filter = Assets::FilterType_Error;
-		Assets::WrapType wrap_s = Assets::WrapType_Error;
-		Assets::WrapType wrap_t = Assets::WrapType_Error;
+		std::ifstream image_file(image_path, std::ios::in | std::ios::binary);
+		if (!image_file.is_open())
+			throw std::runtime_error("Error opening texture source file.");
 
-		std::filesystem::path imagePath;
-		if (auto* node = textureNode->first_node("source"))
-			imagePath = node->value();
-		else throw "Missing <source> in texture.\n";
+		image_file.ignore(std::numeric_limits<std::streamsize>::max());
 
-		if (auto* node = textureNode->first_node("min_filter"))
-			min_filter = ConvertFilterType(node->value());
-		else throw "Missing <min_filter> in texture.\n";
+		size_t image_size = image_file.gcount();
+		image_file.clear();
+		image_file.seekg(0, std::ios_base::beg);
 
-		if (auto* node = textureNode->first_node("mag_filter"))
-			mag_filter = ConvertFilterType(node->value());
-		else throw "Missing <mag_filter> in texture.\n";
+		uint8_t* image_data;
+		auto data = builder.CreateUninitializedVector(image_size, &image_data);
 
-		if (auto* node = textureNode->first_node("wrap_s"))
-			wrap_s = ConvertWrapType(node->value());
-		else throw "Missing <wrap_s> in texture.\n";
+		image_file.read((char*)&image_data[0], image_size);
+		image_file.close();
 
-		if (auto* node = textureNode->first_node("wrap_t"))
-			wrap_t = ConvertWrapType(node->value());
-		else throw "Missing <wrap_t> in texture.\n";
-
-		std::ifstream imageFile(basePath.parent_path() / imagePath, std::ios::in | std::ios::binary);
-		if (!imageFile.is_open()) {
-			throw "Error opening texture source file.";
-		}
-
-		imageFile.ignore(std::numeric_limits<std::streamsize>::max());
-
-		size_t imageSize = imageFile.gcount();
-		imageFile.clear();
-		imageFile.seekg(0, std::ios_base::beg);
-
-		uint8_t* imageData;
-		auto data = builder.CreateUninitializedVector(imageSize, &imageData);
-
-		imageFile.read((char*)&imageData[0], imageSize);
-		imageFile.close();
-
-		std::cout << "done.\n";
-		return Assets::CreateTexture2D(builder, name, min_filter, mag_filter, wrap_s, wrap_t, data);
+		return Assets::CreateTexture2D(builder, name_offset, min_filter, mag_filter, wrap_s, wrap_t, data);
 	}
 }

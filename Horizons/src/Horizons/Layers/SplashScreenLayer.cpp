@@ -9,7 +9,7 @@
 SplashScreenLayer::SplashScreenLayer()
 	: Layer("SplashScreen")
 {
-	m_Texture = Li::ResourceManager::Get<Li::Texture2D>("texture_horizons_splash");
+	m_Texture = Li::ResourceManager::GetTexture2D("texture_horizons_splash");
 
 	CalculateTransform();
 }
@@ -28,9 +28,9 @@ void SplashScreenLayer::OnUpdate(Li::Duration::us dt)
 		// Instead, change the below function to set the shaders used for instancing, fonts, etc.
 		// In future, move the ResourceManager into Horizons and remove any references in Lithium.
 		Li::Renderer::InitPostResourceLoad();
-		Li::Renderer::AddTextureAtlas(Li::ResourceManager::Get<Li::TextureAtlas>("atlas_test"));
-		Li::Renderer::AddTextureAtlas(Li::ResourceManager::Get<Li::TextureAtlas>("space_scene_1"));
-		Li::Renderer::AddTextureAtlas(Li::ResourceManager::Get<Li::TextureAtlas>("atlas_terrain_earth"));
+		Li::Renderer::AddTextureAtlas(Li::ResourceManager::GetTextureAtlas("atlas_default"));
+		Li::Renderer::AddTextureAtlas(Li::ResourceManager::GetTextureAtlas("atlas_space_scene_1"));
+		Li::Renderer::AddTextureAtlas(Li::ResourceManager::GetTextureAtlas("atlas_terrain_earth"));
 
 		app.GetTerrainData().LoadTypes();
 

@@ -1,63 +1,33 @@
 #include "pch.h"
 #include "TextureAtlasSegment.h"
 
-#include "Helpers.h"
+#include "Convert.h"
+#include "OptionalField.h"
 
 namespace AssetBase
 {
-	flatbuffers::Offset<Assets::TextureAtlas> TextureAtlasSegment::Serialize(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode)
+	flatbuffers::Offset<Assets::TextureAtlas> SerializeTextureAtlas(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node atlas, bool debug_mode)
 	{
-		flatbuffers::Offset<flatbuffers::String> name = NULL;
-		if (auto* name_attr = atlasNode->first_attribute("name"))
-		{
-			name = builder.CreateString(name_attr->value());
-			std::cout << "Loading texture atlas '" << name_attr->value() << "' ... ";
-		}
-		else throw "Attribute 'name' not found in texture atlas.";
+		std::string texture = GetOptionalString(atlas, "texture");
 
-		flatbuffers::Offset<flatbuffers::String> texture = NULL;
-		if (auto* texture_node = atlasNode->first_node("texture"))
-		{
-			texture = builder.CreateString(texture_node->value());
-		}
-		else throw "Node <texture> not found in texture atlas.";
+		YAML::Node entries_node = atlas["entries"];
+		if (!entries_node)
+			throw std::runtime_error("Atlas " + name + " missing field 'entries'");
 
 		std::vector<flatbuffers::Offset<Assets::AtlasEntry>> entries;
-		if (auto* entries_node = atlasNode->first_node("entries"))
+		for (const std::pair<YAML::Node, YAML::Node>& entry : entries_node)
 		{
-			for (rapidxml::xml_node<>* entryNode = entries_node->first_node(); entryNode; entryNode = entryNode->next_sibling())
-			{
-				flatbuffers::Offset<flatbuffers::String> alias = NULL;
+			flatbuffers::Offset<flatbuffers::String> alias = builder.CreateString(entry.first.Scalar());
 
-				if (auto* alias_attr = entryNode->first_attribute("alias"))
-					alias = builder.CreateString(alias_attr->value());
-				else throw "Attribute 'alias' not found in texture atlas entry.";
+			float x = Convert::StringToFloat(GetOptionalString(entry.second, "x"), "x");
+			float y = Convert::StringToFloat(GetOptionalString(entry.second, "y"), "y");
+			float width = Convert::StringToFloat(GetOptionalString(entry.second, "width"), "width");
+			float height = Convert::StringToFloat(GetOptionalString(entry.second, "height"), "height");
 
-				float x, y, width, height;
-
-				if (auto* attr = entryNode->first_attribute("x"))
-					x = Helpers::StringToFloat(attr->value(), "entry.x");
-				else throw "Attribute 'x' not found in texture atlas entry.";
-
-				if (auto* attr = entryNode->first_attribute("y"))
-					y = Helpers::StringToFloat(attr->value(), "entry.y");
-				else throw "Attribute 'y' not found in texture atlas entry.";
-
-				if (auto* attr = entryNode->first_attribute("width"))
-					width = Helpers::StringToFloat(attr->value(), "entry.width");
-				else throw "Attribute 'width' not found in texture atlas entry.";
-
-				if (auto* attr = entryNode->first_attribute("height"))
-					height = Helpers::StringToFloat(attr->value(), "entry.height");
-				else throw "Attribute 'height' not found in texture atlas entry.";
-
-				Assets::Vec4 bounds = Assets::Vec4(x, y, width, height);
-				entries.push_back(Assets::CreateAtlasEntry(builder, alias, &bounds));
-			}
+			Assets::Vec4 bounds(x, y, width, height);
+			entries.push_back(Assets::CreateAtlasEntry(builder, alias, &bounds));
 		}
-		auto entries_offset = builder.CreateVector(entries);
 
-		std::cout << "done.\n";
-		return Assets::CreateTextureAtlas(builder, name, texture, entries_offset);
+		return Assets::CreateTextureAtlasDirect(builder, name.c_str(), texture.c_str(), &entries);
 	}
 }

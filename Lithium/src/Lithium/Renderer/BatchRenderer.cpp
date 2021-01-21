@@ -15,7 +15,7 @@ namespace Li
 		static_assert(sizeof(BatchVertex) == sizeof(BatchVertex::Position) + sizeof(BatchVertex::TexCoord) + sizeof(BatchVertex::Color) + sizeof(BatchVertex::TexIndex));
 		static_assert(sizeof(BatchVertex[MaxBatchQuads * 4]) == sizeof(BatchVertex) * 4 * MaxBatchQuads);
 
-		m_Shader = ResourceManager::Get<Shader>("shader_batched");
+		m_Shader = ResourceManager::GetShader("shader_batched");
 
 		m_VertexPositions[0] = { -quadOrigin.x       , -quadOrigin.y       , 0.0f, 1.0f };
 		m_VertexPositions[1] = { -quadOrigin.x + 1.0f, -quadOrigin.y       , 0.0f, 1.0f };

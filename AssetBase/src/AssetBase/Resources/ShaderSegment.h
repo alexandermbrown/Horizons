@@ -1,18 +1,12 @@
 #pragma once
 
-#include "Segment.h"
-
-
-#include "rapidxml/rapidxml.hpp"
-
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
+#include "yaml-cpp/yaml.h"
+
+#include <filesystem>
 
 namespace AssetBase
 {
-	class ShaderSegment
-	{
-	public:
-		static flatbuffers::Offset<Assets::Shader> Serialize(rapidxml::xml_node<>* shaderNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
-	};
+	flatbuffers::Offset<Assets::Shader> SerializeShader(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node shader, bool debug_mode);
 }

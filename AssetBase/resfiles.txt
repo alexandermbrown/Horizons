@@ -1,2 +1,2 @@
-preload.xml output/preload.lab
-resources.xml output/resources.lab
+preload.yaml output/preload.lab
+resources.yaml output/resources.lab

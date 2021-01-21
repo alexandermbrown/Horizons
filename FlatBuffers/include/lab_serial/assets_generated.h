@@ -945,15 +945,15 @@ struct LocaleEntry FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *key() const {
     return GetPointer<const flatbuffers::String *>(VT_KEY);
   }
-  const flatbuffers::Vector<int16_t> *value() const {
-    return GetPointer<const flatbuffers::Vector<int16_t> *>(VT_VALUE);
+  const flatbuffers::String *value() const {
+    return GetPointer<const flatbuffers::String *>(VT_VALUE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_KEY) &&
            verifier.VerifyString(key()) &&
            VerifyOffset(verifier, VT_VALUE) &&
-           verifier.VerifyVector(value()) &&
+           verifier.VerifyString(value()) &&
            verifier.EndTable();
   }
 };
@@ -965,7 +965,7 @@ struct LocaleEntryBuilder {
   void add_key(flatbuffers::Offset<flatbuffers::String> key) {
     fbb_.AddOffset(LocaleEntry::VT_KEY, key);
   }
-  void add_value(flatbuffers::Offset<flatbuffers::Vector<int16_t>> value) {
+  void add_value(flatbuffers::Offset<flatbuffers::String> value) {
     fbb_.AddOffset(LocaleEntry::VT_VALUE, value);
   }
   explicit LocaleEntryBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -983,7 +983,7 @@ struct LocaleEntryBuilder {
 inline flatbuffers::Offset<LocaleEntry> CreateLocaleEntry(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> key = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int16_t>> value = 0) {
+    flatbuffers::Offset<flatbuffers::String> value = 0) {
   LocaleEntryBuilder builder_(_fbb);
   builder_.add_value(value);
   builder_.add_key(key);
@@ -993,9 +993,9 @@ inline flatbuffers::Offset<LocaleEntry> CreateLocaleEntry(
 inline flatbuffers::Offset<LocaleEntry> CreateLocaleEntryDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *key = nullptr,
-    const std::vector<int16_t> *value = nullptr) {
+    const char *value = nullptr) {
   auto key__ = key ? _fbb.CreateString(key) : 0;
-  auto value__ = value ? _fbb.CreateVector<int16_t>(*value) : 0;
+  auto value__ = value ? _fbb.CreateString(value) : 0;
   return Assets::CreateLocaleEntry(
       _fbb,
       key__,

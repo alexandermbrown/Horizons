@@ -13,7 +13,7 @@ namespace Li
 		static_assert(MaxBatchVertices % 2 == 0);
 		static_assert(sizeof(LineVertex) == sizeof(glm::vec3) + sizeof(glm::vec4));
 
-		m_Shader = ResourceManager::Get<Shader>("shader_line");
+		m_Shader = ResourceManager::GetShader("shader_line");
 
 		m_VertexBuffer = VertexBuffer::Create(sizeof(LineVertex) * MaxBatchVertices, BufferUsage::DynamicDraw);
 		m_VertexBuffer->SetLayout({

@@ -1,0 +1,124 @@
+
+### Shaders ###
+shader_batched:
+  type: shader
+  glsl: './res/shaders/Batched.glsl'
+  hlsl: './res/shaders/Batched.hlsl'
+
+shader_label:
+  type: shader
+  glsl: './res/shaders/Label.glsl'
+  hlsl: './res/shaders/Label.hlsl'
+
+shader_line:
+  type: shader
+  glsl: './res/shaders/Line.glsl'
+  hlsl: './res/shaders/Line.hlsl'
+
+shader_debug_physics:
+  type: shader
+  glsl: './res/shaders/DebugPhysics.glsl'
+  hlsl: './res/shaders/DebugPhysics.hlsl'
+
+shader_terrain:
+  type: shader
+  glsl: './res/shaders/Terrain.glsl'
+  hlsl: './res/shaders/Terrain.hlsl'
+
+### Textures ###
+texture_default:
+  type: texture2d
+  path: './res/textures/default.png'
+  min_filter: NEAREST
+  mag_filter: NEAREST
+  wrap_s: REPEAT
+  wrap_t: REPEAT
+
+texture_horizons_splash:
+  type: texture2d
+  path: './res/textures/ui/horizons_splash.png'
+  min_filter: LINEAR
+  mag_filter: NEAREST
+  wrap_s: CLAMP_TO_EDGE
+  wrap_t: CLAMP_TO_EDGE
+
+texture_terrain_test:
+  type: texture2d
+  path: './res/textures/terrain_test.png'
+  min_filter: NEAREST
+  mag_filter: NEAREST
+  wrap_s: REPEAT
+  wrap_t: REPEAT
+
+texture_space_scene_1:
+  type: texture2d
+  path: './res/textures/ui/space_scene_1.png'
+  min_filter: LINEAR
+  mag_filter: NEAREST
+  wrap_s: CLAMP_TO_EDGE
+  wrap_t: CLAMP_TO_EDGE
+
+### Fonts ###
+Lato-Regular:
+  type: font
+  path: './res/fonts/Lato/Lato-Regular.ttf'
+  glyph_width: 64
+  texture_width: 2048
+
+Lora-Regular:
+  type: font
+  path: './res/fonts/Lora/Lora-Regular.ttf'
+  glyph_width: 64
+  texture_width: 2048
+
+Tomorrow-Regular:
+  type: font
+  path: './res/fonts/Tomorrow/Tomorrow-Regular.ttf'
+  glyph_width: 64
+  texture_width: 2048
+
+### Texture Atlases ###
+atlas_default:
+  type: texture_atlas
+  texture: texture_default
+  entries:
+    test_small: { x: 0.0, y: 0.0, width: 1.0, height: 1.0 }
+
+atlas_terrain_earth:
+  type: texture_atlas
+  texture: texture_terrain_test
+  entries:
+    terrain_dirt: { x: 0.0, y: 0.5, width: 0.5, height: 0.25 }
+    terrain_grass: { x: 0.5, y: 0.0, width: 0.5, height: 0.25 }
+    terrain_stone: { x: 0.0, y: 0.0, width: 0.5, height: 0.25 }
+    terrain_sand: { x: 0.5, y: 0.5, width: 0.5, height: 0.25 }
+
+atlas_space_scene_1:
+  type: texture_atlas
+  texture: texture_space_scene_1
+  entries:
+    space_scene_1_star_glow: { x: 0.0, y: 0.75, width: 0.5, height: 0.25 }
+    space_scene_1_stars: { x: 0.5, y: 0.75, width: 0.5, height: 0.25 }
+    space_scene_1_nebula: { x: 0.0, y: 0.5, width: 0.5, height: 0.25 }
+
+### Audio ###
+audio_wind:
+  type: audio
+  path: './res/audio/wind.ogg'
+
+audio_laser_splat1:
+  type: audio
+  path: './res/audio/laser_splat1.ogg'
+
+audio_ship_startup_spin:
+  type: audio
+  path: './res/audio/ship_startup_spin.ogg'
+
+### Locales ###
+en-us:
+  type: locale
+  path: './res/locales/en-us.yaml'
+
+test:
+  type: locale
+  path: './res/locales/test.yaml'

@@ -1,16 +1,16 @@
 workspace "Horizons"
-    architecture "x86_64"
-    startproject "Horizons"
+	architecture "x86_64"
+	startproject "Horizons"
 
-    configurations {
-        "Debug",
-        "Release",
-        "Dist"
-    }
+	configurations {
+		"Debug",
+		"Release",
+		"Dist"
+	}
 
-    flags {
-        "MultiProcessorCompile"
-    }
+	flags {
+		"MultiProcessorCompile"
+	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -34,6 +34,7 @@ IncludeDir["libav"] = "Lithium/vendor/libav/include"
 IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
 IncludeDir["flatbuffers"] = "AssetBase/vendor/flatbuffers/include"
+IncludeDir["yamlcpp"] = "AssetBase/vendor/yaml-cpp/include"
 IncludeDir["lab_serial"] = "FlatBuffers/include"
 
 IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
@@ -59,6 +60,7 @@ include "Lithium/vendor/libvorbis"
 include "Lithium/vendor/openal-soft"
 include "Lithium/vendor/harfbuzz"
 include "AssetBase/vendor/msdfgen"
+include "AssetBase/vendor/yaml-cpp"
 include "GameServer/vendor/yojimbo"
 include "ServerManager/vendor/libb64"
 include "Horizons/vendor/box2d"
@@ -68,385 +70,380 @@ group  ""
 ------------------------------ Lithium ----------------------------------
 
 project "Lithium"
-    location "Lithium"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "off"
+	location "Lithium"
+	kind "StaticLib"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
 
-    targetdir ("build/" .. outputdir .. "/%{prj.name}")
-    objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("build/" .. outputdir .. "/%{prj.name}")
+	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
-    pchheader "lipch.h"
-    pchsource "Lithium/src/lipch.cpp"
+	pchheader "lipch.h"
+	pchsource "Lithium/src/lipch.cpp"
 
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/vendor/stb_image/**.h",
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
-        "%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
-        "%{prj.name}/vendor/glm/glm/**.h",
-    }
+		"%{prj.name}/vendor/glm/glm/**.h",
+	}
 
-    includedirs {
-        "%{prj.name}/src",
-        "%{IncludeDir.spdlog}",
-        "%{IncludeDir.SDL2}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}",
-        "%{IncludeDir.zlib}",
-        "%{IncludeDir.openal}",
-        "%{IncludeDir.libogg}",
-        "%{IncludeDir.libvorbis}",
-        "%{IncludeDir.readerwriterqueue}",
-        "%{IncludeDir.flatbuffers}",
-        "%{IncludeDir.lab_serial}",
-        "%{IncludeDir.harfbuzz}",
-        "%{IncludeDir.utfcpp}",
-        "%{IncludeDir.libav}"
-    }
+	includedirs {
+		"%{prj.name}/src",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.SDL2}",
+		"%{IncludeDir.glad}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.zlib}",
+		"%{IncludeDir.openal}",
+		"%{IncludeDir.libogg}",
+		"%{IncludeDir.libvorbis}",
+		"%{IncludeDir.readerwriterqueue}",
+		"%{IncludeDir.flatbuffers}",
+		"%{IncludeDir.lab_serial}",
+		"%{IncludeDir.harfbuzz}",
+		"%{IncludeDir.utfcpp}",
+		"%{IncludeDir.libav}"
+	}
 
-    links {
-        "glad",
-        "zlib",
-        "libvorbis",
-        "openal-soft",
-        "SDL2",
-        "harfbuzz",
-        -- libav
-        "avcodec",
-        "avdevice",
-        "avformat",
-        "avutil",
-        "opus",
-        "swresample",
-        "swscale"
-    }
+	links {
+		"glad",
+		"zlib",
+		"libvorbis",
+		"openal-soft",
+		"SDL2",
+		"harfbuzz",
+		-- libav
+		"avcodec",
+		"avdevice",
+		"avformat",
+		"avutil",
+		"opus",
+		"swresample",
+		"swscale"
+	}
 
-    filter "system:windows"
-        systemversion "latest"
+	filter "system:windows"
+		systemversion "latest"
 
-        libdirs {
-            "Lithium/vendor/SDL2/lib/win64",
-        }
+		libdirs {
+			"Lithium/vendor/SDL2/lib/win64",
+		}
 
-        defines {
-            "LI_PLATFORM_WINDOWS"
-        }
+		defines {
+			"LI_PLATFORM_WINDOWS"
+		}
 
-        links {
-            "d3d11.lib",
-            "dxgi.lib",
-            "d3dcompiler.lib",
-            -- libav
-            "Ws2_32.lib",
-            "Strmiids.lib",
-            "Secur32.lib",
-            "mfplat.lib",
-            "mfuuid.lib",
-            "bcrypt.lib"
-        }
-    
-    filter { "system:windows", "configurations:Dist"}
-        libdirs "Lithium/vendor/libav/build/Release-windows-x86_64"
-    filter { "system:windows", "configurations:not Dist"}
-        libdirs ("Lithium/vendor/libav/build/" .. outputdir)
+		links {
+			"d3d11.lib",
+			"dxgi.lib",
+			"d3dcompiler.lib",
+			-- libav
+			"Ws2_32.lib",
+			"Strmiids.lib",
+			"Secur32.lib",
+			"mfplat.lib",
+			"mfuuid.lib",
+			"bcrypt.lib"
+		}
 
-    filter "configurations:Debug"
-        defines "LI_DEBUG"
-        runtime "Debug"
-        symbols "on"
-        links "imgui"
-        includedirs { "%{IncludeDir.imgui}" }
+	filter { "system:windows", "configurations:Dist"}
+		libdirs "Lithium/vendor/libav/build/Release-windows-x86_64"
+	filter { "system:windows", "configurations:not Dist"}
+		libdirs ("Lithium/vendor/libav/build/" .. outputdir)
 
-        links "vpxmdd"
+	filter "configurations:Debug"
+		defines "LI_DEBUG"
+		runtime "Debug"
+		symbols "on"
+		links "imgui"
+		includedirs { "%{IncludeDir.imgui}" }
 
-    filter "configurations:Release"
-        defines "LI_RELEASE"
-        runtime "Release"
-        optimize "on"
-        links "imgui"
-        includedirs { "%{IncludeDir.imgui}" }
+		links "vpxmdd"
 
-        links "vpxmd"
+	filter "configurations:Release"
+		defines "LI_RELEASE"
+		runtime "Release"
+		optimize "on"
+		links "imgui"
+		includedirs { "%{IncludeDir.imgui}" }
 
-    filter "configurations:Dist"
-        defines "LI_DIST"
-        runtime "Release"
-        optimize "on"
+		links "vpxmd"
 
-        links "vpxmd"
+	filter "configurations:Dist"
+		defines "LI_DIST"
+		runtime "Release"
+		optimize "on"
+
+		links "vpxmd"
 
 ------------------------------ Horizons ------------------------------
 
 project "Horizons"
-    location "Horizons"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "off"
-    dpiawareness "HighPerMonitor"
+	location "Horizons"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
+	dpiawareness "HighPerMonitor"
 
-    targetdir ("build/" .. outputdir .. "/%{prj.name}")
-    objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("build/" .. outputdir .. "/%{prj.name}")
+	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
-    pchheader "pch.h"
-    pchsource "Horizons/src/pch.cpp"
-    
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
+	pchheader "pch.h"
+	pchsource "Horizons/src/pch.cpp"
+	
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
 
-    includedirs {
-        "Lithium/src",
-        "Horizons/src",
-        "%{IncludeDir.spdlog}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.SDL2}",
-        "%{IncludeDir.entt}",
-        "%{IncludeDir.box2d}",
-        "%{IncludeDir.readerwriterqueue}",
-        "%{IncludeDir.layout}",
-        "%{IncludeDir.simpleini}",
-        "%{IncludeDir.steam}",
-        "%{IncludeDir.flatbuffers}",
-        "%{IncludeDir.lab_serial}",
-        "%{IncludeDir.harfbuzz}",
-        "%{IncludeDir.lua}",
-        "%{IncludeDir.sol}",
-        "%{IncludeDir.nativefiledialog}"
-    }
+	includedirs {
+		"Lithium/src",
+		"Horizons/src",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.SDL2}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.box2d}",
+		"%{IncludeDir.readerwriterqueue}",
+		"%{IncludeDir.layout}",
+		"%{IncludeDir.simpleini}",
+		"%{IncludeDir.steam}",
+		"%{IncludeDir.flatbuffers}",
+		"%{IncludeDir.lab_serial}",
+		"%{IncludeDir.harfbuzz}",
+		"%{IncludeDir.lua}",
+		"%{IncludeDir.sol}",
+		"%{IncludeDir.nativefiledialog}"
+	}
 
-    links {
-        "Lithium",
-        "box2d",
-        "lua51",
-        "luajit",
-        "nativefiledialog"
-    }
+	links {
+		"Lithium",
+		"box2d",
+		"lua51",
+		"luajit",
+		"nativefiledialog"
+	}
 
-    filter "system:windows"
-        systemversion "latest"
-        
-        defines {
-            "LI_PLATFORM_WINDOWS",
-            "HZ_PLATFORM_WINDOWS"
-        }
+	filter "system:windows"
+		systemversion "latest"
 
-        libdirs { 
-            "Horizons/vendor/steam/lib/win64",
-            "Horizons/vendor/lua/lib/win64"
-        }
-        links { "steam_api64" }
-        
-    filter "configurations:Debug"
-        defines {
-            "LI_DEBUG",
-            "HZ_DEBUG"
-        }
-        runtime "Debug"
-        symbols "on"
-        includedirs { "%{IncludeDir.imgui}" }
+		defines {
+			"LI_PLATFORM_WINDOWS",
+			"HZ_PLATFORM_WINDOWS"
+		}
 
-    filter "configurations:Release"
-        defines {
-            "LI_RELEASE",
-            "HZ_RELEASE"
-        }
-        runtime "Release"
-        optimize "on"
-        includedirs { "%{IncludeDir.imgui}" }
+		libdirs { 
+			"Horizons/vendor/steam/lib/win64",
+			"Horizons/vendor/lua/lib/win64"
+		}
+		links { "steam_api64" }
 
-    filter "configurations:Dist"
-        defines {
-            "LI_DIST",
-            "HZ_DIST"
-        }
-        runtime "Release"
-        optimize "on"
+	filter "configurations:Debug"
+		defines {
+			"LI_DEBUG",
+			"HZ_DEBUG"
+		}
+		runtime "Debug"
+		symbols "on"
+		includedirs { "%{IncludeDir.imgui}" }
+
+	filter "configurations:Release"
+		defines {
+			"LI_RELEASE",
+			"HZ_RELEASE"
+		}
+		runtime "Release"
+		optimize "on"
+		includedirs { "%{IncludeDir.imgui}" }
+
+	filter "configurations:Dist"
+		defines {
+			"LI_DIST",
+			"HZ_DIST"
+		}
+		runtime "Release"
+		optimize "on"
 
 ------------------------------ AssetBase ------------------------------
 
 project "AssetBase"
-    location "AssetBase"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "off"
+	location "AssetBase"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
 
-    targetdir ("build/" .. outputdir .. "/%{prj.name}")
-    objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("build/" .. outputdir .. "/%{prj.name}")
+	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
-    pchheader "pch.h"
-    pchsource "AssetBase/src/pch.cpp"
+	pchheader "pch.h"
+	pchsource "AssetBase/src/pch.cpp"
 
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/vendor/rapidxml/rapidxml/**.hpp",
-        "%{prj.name}/vendor/zlib/**.h",
-        "%{prj.name}/vendor/zlib/**.c"
-    }
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
 
-    includedirs {
-        "AssetBase/src",
-        "Lithium/src",
-        "AssetBase/vendor/rapidxml",
-        "%{IncludeDir.zlib}",
-        "%{IncludeDir.glm}",
-        "%{IncludeDir.freetype}",
-        "%{IncludeDir.msdfgen}",
-        "%{IncludeDir.simpleini}",
-        "%{IncludeDir.flatbuffers}",
-        "%{IncludeDir.lab_serial}"
-    }
+	includedirs {
+		"AssetBase/src",
+		"Lithium/src",
+		"%{IncludeDir.zlib}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.freetype}",
+		"%{IncludeDir.msdfgen}",
+		"%{IncludeDir.flatbuffers}",
+		"%{IncludeDir.lab_serial}",
+		"%{IncludeDir.yamlcpp}"
+	}
 
-    links {
-        "msdfgen",
-        "zlib"
-    }
-    
-    debugargs { "./resources.xml", "./resources.lab" }
+	links {
+		"msdfgen",
+		"zlib",
+		"yaml-cpp"
+	}
 
-    filter "system:windows"
-        systemversion "latest"
+	filter "system:windows"
+		systemversion "latest"
 
-        links {
-            "d3d11.lib",
-            "dxgi.lib",
-            "d3dcompiler.lib"
-        }
-        
-    filter "configurations:Debug"
-        defines "LI_DEBUG"
-        runtime "Debug"
-        symbols "on"
+		links {
+			"d3d11.lib",
+			"dxgi.lib",
+			"d3dcompiler.lib"
+		}
 
-    filter "configurations:Release"
-        defines "LI_RELEASE"
-        runtime "Release"
-        optimize "on"
+	filter "configurations:Debug"
+		defines "LI_DEBUG"
+		runtime "Debug"
+		symbols "on"
 
-    filter "configurations:Dist"
-        defines "LI_DIST"
-        runtime "Release"
-        optimize "on"
+	filter "configurations:Release"
+		defines "LI_RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "LI_DIST"
+		runtime "Release"
+		optimize "on"
 
 ------------------------------ GameServer ------------------------------
 
 project "GameServer"
-    location "GameServer"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "off"
+	location "GameServer"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
 
-    targetdir ("build/" .. outputdir .. "/%{prj.name}")
-    objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("build/" .. outputdir .. "/%{prj.name}")
+	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
-    pchheader "pch.h"
-    pchsource "GameServer/src/pch.cpp"
-    
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
+	pchheader "pch.h"
+	pchsource "GameServer/src/pch.cpp"
 
-    includedirs {
-        "GameServer/src",
-        "GameServer/vendor",
-        "%{IncludeDir.yojimbo}",
-        "%{IncludeDir.nlohmann_json}",
-        "%{IncludeDir.libb64}",
-        "%{IncludeDir.steam}"
-    }
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
 
-    links {
-        "yojimbo",
-        "libb64"
-    }
+	includedirs {
+		"GameServer/src",
+		"GameServer/vendor",
+		"%{IncludeDir.yojimbo}",
+		"%{IncludeDir.nlohmann_json}",
+		"%{IncludeDir.libb64}",
+		"%{IncludeDir.steam}"
+	}
 
-    filter "system:windows"
-        systemversion "latest"
+	links {
+		"yojimbo",
+		"libb64"
+	}
 
-        libdirs { "Horizons/vendor/steam/lib/win64" }
-        links { "steam_api64" }
-        
-    filter "configurations:Debug"
-        defines "LI_DEBUG"
-        runtime "Debug"
-        symbols "on"
+	filter "system:windows"
+		systemversion "latest"
 
-    filter "configurations:Release"
-        defines "LI_RELEASE"
-        runtime "Release"
-        optimize "on"
+		libdirs { "Horizons/vendor/steam/lib/win64" }
+		links { "steam_api64" }
 
-    filter "configurations:Dist"
-        defines "LI_DIST"
-        runtime "Release"
-        optimize "on"
+	filter "configurations:Debug"
+		defines "LI_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "LI_RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "LI_DIST"
+		runtime "Release"
+		optimize "on"
 
 ------------------------------ ServerManager ------------------------------
 
 project "ServerManager"
-    location "ServerManager"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "off"
+	location "ServerManager"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "off"
 
-    targetdir ("build/" .. outputdir .. "/%{prj.name}")
-    objdir ("build-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("build/" .. outputdir .. "/%{prj.name}")
+	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
 
-    pchheader "pch.h"
-    pchsource "ServerManager/src/pch.cpp"
-    
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
-    }
+	pchheader "pch.h"
+	pchsource "ServerManager/src/pch.cpp"
 
-    includedirs {
-        "ServerManager/src",
-        "%{IncludeDir.httplib}",
-        "%{IncludeDir.yojimbo}",
-        "%{IncludeDir.nlohmann_json}",
-        "%{IncludeDir.openssl}",
-        "%{IncludeDir.libb64}",
-        "%{IncludeDir.steam}"
-    }
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
 
-    links {
-        "libcrypto",
-        "libssl",
-        "libb64"
-    }
+	includedirs {
+		"ServerManager/src",
+		"%{IncludeDir.httplib}",
+		"%{IncludeDir.yojimbo}",
+		"%{IncludeDir.nlohmann_json}",
+		"%{IncludeDir.openssl}",
+		"%{IncludeDir.libb64}",
+		"%{IncludeDir.steam}"
+	}
 
-    filter "system:windows"
-        systemversion "latest"
+	links {
+		"libcrypto",
+		"libssl",
+		"libb64"
+	}
 
-        libdirs {
-            "ServerManager/vendor/OpenSSL/vc-win64a/lib",
-            "Horizons/vendor/steam/lib/win64"
-        }
-        links { "steam_api64" }
-        
-    filter "configurations:Debug"
-        defines "LI_DEBUG"
-        runtime "Debug"
-        symbols "on"
+	filter "system:windows"
+		systemversion "latest"
 
-    filter "configurations:Release"
-        defines "LI_RELEASE"
-        runtime "Release"
-        optimize "on"
+		libdirs {
+			"ServerManager/vendor/OpenSSL/vc-win64a/lib",
+			"Horizons/vendor/steam/lib/win64"
+		}
+		links { "steam_api64" }
 
-    filter "configurations:Dist"
-        defines "LI_DIST"
-        runtime "Release"
-        optimize "on"
+	filter "configurations:Debug"
+		defines "LI_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "LI_RELEASE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "LI_DIST"
+		runtime "Release"
+		optimize "on"

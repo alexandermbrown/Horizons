@@ -22,7 +22,7 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 	});
 	m_AtlasBoundsUB->BindToSlot();
 
-	m_TerrainShader = Li::ResourceManager::Get<Li::Shader>("shader_terrain");
+	m_TerrainShader = Li::ResourceManager::GetShader("shader_terrain");
 
 	struct ChunkVertex
 	{
@@ -150,7 +150,7 @@ void TerrainRenderer::RenderFramebuffer()
 		const TerrainType& terrain1 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[1]);
 		const TerrainType& terrain2 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[2]);
 		const TerrainType& terrain3 = Li::Application::Get<Horizons>().GetTerrainData().GetTerrainPrototype(chunk.Tiles[3]);
-		Li::Ref<Li::TextureAtlas> atlas = Li::ResourceManager::Get<Li::TextureAtlas>(terrain0.Atlas);
+		Li::Ref<Li::TextureAtlas> atlas = Li::ResourceManager::GetTextureAtlas(terrain0.Atlas);
 
 		m_AtlasBoundsUB->SetFloat4("u_AtlasBounds0", atlas->GetBounds(terrain0.Name));
 		m_AtlasBoundsUB->SetFloat4("u_AtlasBounds1", atlas->GetBounds(terrain1.Name));

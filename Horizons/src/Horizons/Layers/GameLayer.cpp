@@ -23,7 +23,7 @@ GameLayer::GameLayer()
 	m_TerrainRenderer.LoadTerrain("data/worlds/test.terrain", { 0, 0 });
 
 	m_AudioSource = Li::MakeRef<Li::AudioSource>();
-	m_AudioSource->SetAudio(Li::ResourceManager::Get<Li::AudioBuffer>("audio_wind"));
+	m_AudioSource->SetAudio(Li::ResourceManager::GetAudioBuffer("audio_wind"));
 	m_AudioSource->Play();
 }
 

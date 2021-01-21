@@ -30,7 +30,7 @@ namespace Li
 	{
 		if (m_Texture == nullptr)
 		{
-			m_Texture = ResourceManager::Get<Texture2D>(m_TextureAlias);
+			m_Texture = ResourceManager::GetTexture2D(m_TextureAlias);
 		}
 		m_Texture->Bind(slot);
 	}

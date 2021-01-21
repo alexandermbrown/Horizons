@@ -1,17 +1,12 @@
 #pragma once
 
-#include "rapidxml/rapidxml.hpp"
-
 #include "flatbuffers/flatbuffers.h"
 #include "lab_serial/assets_generated.h"
+#include "yaml-cpp/yaml.h"
 
 #include <filesystem>
 
 namespace AssetBase
 {
-	class TextureAtlasSegment
-	{
-	public:
-		static flatbuffers::Offset<Assets::TextureAtlas> Serialize(rapidxml::xml_node<>* atlasNode, const std::filesystem::path& basePath, flatbuffers::FlatBufferBuilder& builder, bool debugMode);
-	};
+	flatbuffers::Offset<Assets::TextureAtlas> SerializeTextureAtlas(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node atlas, bool debug_mode);
 }
