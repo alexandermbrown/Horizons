@@ -21,14 +21,12 @@ namespace Li
 	class Font
 	{
 	public:
-
-		Font(const std::string& name, const FontProperties& props, std::unordered_map<uint32_t, glm::vec2>&& textureOffsets, Ref<Texture2D> texture, const char* ttfData, uint32_t ttfSize);
+		Font(const std::string& name, const FontProperties& props, std::unordered_map<uint32_t, glm::vec2>&& texture_offsets, Ref<Texture2D> texture, const char* ttf_data, uint32_t ttf_size);
 		virtual ~Font();
 
 		inline Ref<Texture2D> GetTexture() const { return m_Texture; }
 		inline const FontProperties& GetProperties() const { return m_Properties; }
 		glm::vec2 GetTextureOffset(int16_t character) const;
-		
 
 		hb_font_t* GetHBFont(int pointSize);
 
@@ -54,7 +52,6 @@ namespace Li
 	class Label
 	{
 	public:
-
 		Label(const char* utf8_text, int point_size, Ref<Font> font, bool dynamic, int excess = 0);
 		virtual ~Label();
 
