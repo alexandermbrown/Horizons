@@ -55,7 +55,8 @@ static const float G4 = (5.0f - std::sqrt(5.0f)) / 20.0f;
 
 Li::Ref<Li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int height, int cell_size, int octaves, float persistence, float aspect_ratio)
 {
-	uint8_t* data = new uint8_t[(size_t)width * (size_t)height];
+	std::vector<uint8_t> pixels;
+	pixels.resize((size_t)width * (size_t)height);
 
 	LI_ASSERT(width / cell_size <= 256 && height / cell_size <= 256, "Width and height must be less than 256.");
 
@@ -64,22 +65,22 @@ Li::Ref<Li::Texture2D> SimplexNoise::GenerateSimplexNoiseTexture(int width, int 
 		for (int x = 0; x < width; x++)
 		{
 			// Create a tileable texture by sampling from two circles in four dimensional noise space.
+			constexpr float pi = static_cast<float>(M_PI);
 			float x_frac = (float)x / (float)width;
 			float y_frac = (float)y / (float)height;
-			float x_angle = x_frac * 2.0f * (float)M_PI;
-			float y_angle = y_frac * 2.0f * (float)M_PI;
-			float sx = (std::sin(x_angle) + 1.0f) * 128.0f / (float)cell_size / (float)M_PI * (float)width / (float)height;
-			float sy = (std::cos(x_angle) + 1.0f) * 128.0f / (float)cell_size / (float)M_PI * (float)width / (float)height;
-			float sz = (std::sin(y_angle) + 1.0f) * 128.0f / (float)cell_size / (float)M_PI * aspect_ratio;
-			float sw = (std::cos(y_angle) + 1.0f) * 128.0f / (float)cell_size / (float)M_PI * aspect_ratio;
+			float x_angle = x_frac * 2.0f * pi;
+			float y_angle = y_frac * 2.0f * pi;
+			float sx = (std::sin(x_angle) + 1.0f) * 128.0f / (float)cell_size / pi * (float)width / (float)height;
+			float sy = (std::cos(x_angle) + 1.0f) * 128.0f / (float)cell_size / pi * (float)width / (float)height;
+			float sz = (std::sin(y_angle) + 1.0f) * 128.0f / (float)cell_size / pi * aspect_ratio;
+			float sw = (std::cos(y_angle) + 1.0f) * 128.0f / (float)cell_size / pi * aspect_ratio;
 
 			float value = OctaveSimplex(sx, sy, sz, sw, octaves, persistence);
-			data[x + y * width] = (uint8_t)((value + 1.0f) * 128.0f);
+			pixels[x + y * width] = (uint8_t)((value + 1.0f) * 128.0f);
 		}
 	}
 
-	Li::Ref<Li::Texture2D> texture = Li::Texture2D::Create(width, height, 1, data, Li::WrapType::Repeat, Li::WrapType::Repeat, Li::FilterType::Linear, Li::FilterType::Nearest);
-	delete[] data;
+	Li::Ref<Li::Texture2D> texture = Li::Texture2D::Create(width, height, 1, pixels.data(), Li::WrapType::Repeat, Li::WrapType::Repeat, Li::FilterType::Linear, Li::FilterType::Nearest);
 	return texture;
 }
 
