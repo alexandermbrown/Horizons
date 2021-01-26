@@ -56,10 +56,10 @@ namespace AssetBase
 		float distance_gradient;
 
 		bool use_cache = false;
-		std::filesystem::path cachePath = "./.lab-cache/fonts/" + name + ".cache";
-		if (std::filesystem::exists(cachePath))
+		std::filesystem::path cache_path = "./.lab-cache/fonts/" + name + ".cache";
+		if (std::filesystem::exists(cache_path))
 		{
-			std::ifstream cache_file(cachePath.string(), std::ios::in | std::ios::binary);
+			std::ifstream cache_file(cache_path, std::ios::in | std::ios::binary);
 
 			cache_file.seekg(0, std::ios::end);
 			int file_size = (int)cache_file.tellg();
@@ -178,13 +178,14 @@ namespace AssetBase
 			auto cache_font = Assets::CreateFont(cacheBuidler, cache_name, glyph_width, texture_width, distance_gradient, cache_glyphs_offset, cache_image_offset);
 			cacheBuidler.Finish(cache_font, "FONT");
 
-			std::ofstream cacheFile(cachePath.string(), std::ios::out | std::ios::trunc | std::ios::binary);
-			if (!cacheFile.is_open() || !cacheFile.good()) {
+			std::filesystem::create_directories(cache_path);
+			std::ofstream cache_file(cache_path, std::ios::out | std::ios::trunc | std::ios::binary);
+			if (!cache_file.is_open() || !cache_file.good()) {
 				throw "Failed to write cache file!";
 			}
 
-			cacheFile.write((const char*)cacheBuidler.GetBufferPointer(), cacheBuidler.GetSize());
-			cacheFile.close();
+			cache_file.write((const char*)cacheBuidler.GetBufferPointer(), cacheBuidler.GetSize());
+			cache_file.close();
 		}
 
 		return Assets::CreateFont(builder, name_offset, glyph_width, texture_width, distance_gradient, glyphs_offset, image, ttf);
