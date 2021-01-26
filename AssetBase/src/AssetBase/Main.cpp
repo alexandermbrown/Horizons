@@ -32,12 +32,12 @@ int main(int argc, char* argv[])
 			std::cout << msg << std::endl;
 			break;
 		}
-		catch (std::runtime_error error) {
-			std::cout << error.what() << std::endl;
+		catch (YAML::Exception error) {
+			std::cout << "[YAML Exception] " << error.what() << std::endl;
 			break;
 		}
-		catch (YAML::Exception error) {
-			std::cout << "[YAML] " << error.what() << std::endl;
+		catch (std::runtime_error error) {
+			std::cout << error.what() << std::endl;
 			break;
 		}
 	}
