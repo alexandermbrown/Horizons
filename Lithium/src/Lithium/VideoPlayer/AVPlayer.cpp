@@ -50,12 +50,12 @@ namespace Li
 		m_Frame = av_frame_alloc();
 		if (!m_Frame)
 		{
-			LI_CORE_ERROR("Failed to allocate memory for frame ({})", path);
+			Log::CoreError("Failed to allocate memory for frame ({})", path);
 			FreeInternal();
 			return false;
 		}
 
-		LI_CORE_INFO("Opened {}: width={} height={}", path, m_Video.Width, m_Video.Height);
+		Log::CoreInfo("Opened {}: width={} height={}", path, m_Video.Width, m_Video.Height);
 		m_Open = true;
 		m_Playing = true;
 		m_Elapsed = Duration::us(0);
@@ -74,19 +74,19 @@ namespace Li
 		m_Video.CodecCtx = avcodec_alloc_context3(m_Video.Codec);
 		if (!m_Video.CodecCtx)
 		{
-			LI_CORE_ERROR("Failed to allocate memory for video codec context ({})", path);
+			Log::CoreError("Failed to allocate memory for video codec context ({})", path);
 			FreeInternal();
 			return false;
 		}
 		if (avcodec_parameters_to_context(m_Video.CodecCtx, m_Reader->GetVideoStream()->codecpar) < 0)
 		{
-			LI_CORE_ERROR("Failed to fill video codec parameters ({})", path);
+			Log::CoreError("Failed to fill video codec parameters ({})", path);
 			FreeInternal();
 			return false;
 		}
 		if (avcodec_open2(m_Video.CodecCtx, m_Video.Codec, NULL) < 0)
 		{
-			LI_CORE_ERROR("Failed to open codec through avcodec_open2 ({})", path);
+			Log::CoreError("Failed to open codec through avcodec_open2 ({})", path);
 			FreeInternal();
 			return false;
 		}
@@ -95,7 +95,7 @@ namespace Li
 		m_Video.SwsContext = sws_getContext(m_Video.Width, m_Video.Height, m_Video.CodecCtx->pix_fmt, m_Video.Width, m_Video.Height, AV_PIX_FMT_RGBA, 2, NULL, NULL, NULL);
 		if (!m_Video.SwsContext)
 		{
-			LI_CORE_ERROR("Failed to create color space context ({})", path);
+			Log::CoreError("Failed to create color space context ({})", path);
 			FreeInternal();
 			return false;
 		}
@@ -119,26 +119,26 @@ namespace Li
 		if (!m_Audio.Codec)
 		{
 			FreeAudioInternal();
-			LI_CORE_ERROR("Failed to find Opus codec ({})", path);
+			Log::CoreError("Failed to find Opus codec ({})", path);
 			return false;
 		}
 		m_Audio.CodecCtx = avcodec_alloc_context3(m_Audio.Codec);
 		if (!m_Audio.CodecCtx)
 		{
 			FreeAudioInternal();
-			LI_CORE_ERROR("Failed allocate audio codec context ({})", path);
+			Log::CoreError("Failed allocate audio codec context ({})", path);
 			return false;
 		}
 		if (avcodec_parameters_to_context(m_Audio.CodecCtx, m_Reader->GetAudioStream()->codecpar) < 0)
 		{
-			LI_CORE_ERROR("Failed to fill audio codec parameters ({})", path);
+			Log::CoreError("Failed to fill audio codec parameters ({})", path);
 			FreeInternal();
 			return false;
 		}
 		if (avcodec_open2(m_Audio.CodecCtx, m_Audio.Codec, NULL) < 0)
 		{
 			FreeAudioInternal();
-			LI_CORE_ERROR("Failed to open audio codec through avcodec_open2 ({})", path);
+			Log::CoreError("Failed to open audio codec through avcodec_open2 ({})", path);
 			return false;
 		}
 
@@ -157,7 +157,7 @@ namespace Li
 			{
 				m_Audio.HasAudio = false;
 				FreeAudioInternal();
-				LI_CORE_ERROR("Failed to allocate memory for audio resampler ({})", path);
+				Log::CoreError("Failed to allocate memory for audio resampler ({})", path);
 				return false;
 			}
 
@@ -187,7 +187,7 @@ namespace Li
 			{
 				m_Audio.HasAudio = false;
 				FreeAudioInternal();
-				LI_CORE_ERROR("Failed to init audio resampler ({})", path);
+				Log::CoreError("Failed to init audio resampler ({})", path);
 				return false;
 			}
 		}
@@ -227,7 +227,7 @@ namespace Li
 			else if (m_Reader->IsFinished())
 				m_Playing = false;
 			else
-				LI_CORE_WARN("No video packet ready.");
+				Log::CoreWarn("No video packet ready.");
 		}
 
 		// AUDIO //
@@ -248,7 +248,7 @@ namespace Li
 				av_packet_free(&packet);
 			}
 			else if (!m_Reader->IsFinished())
-				LI_CORE_WARN("No audio packet ready.");
+				Log::CoreWarn("No audio packet ready.");
 		}
 
 		return m_Playing;
@@ -294,19 +294,19 @@ namespace Li
 	{
 		if (avcodec_send_packet(m_Video.CodecCtx, packet) < 0)
 		{
-			LI_CORE_ERROR("An error occurred while sending video packet to decoder.");
+			Log::CoreError("An error occurred while sending video packet to decoder.");
 			return false;
 		}
 
 		int result = avcodec_receive_frame(m_Video.CodecCtx, m_Frame);
 		if (result == AVERROR(EAGAIN) || result == AVERROR_EOF)
 		{
-			LI_CORE_ERROR("Video should not raise EAGAIN or EOF");
+			Log::CoreError("Video should not raise EAGAIN or EOF");
 			return false;
 		}
 		else if (result < 0)
 		{
-			LI_CORE_ERROR("An error occurred while receiving frame from decoder.");
+			Log::CoreError("An error occurred while receiving frame from decoder.");
 			return false;
 		}
 
@@ -337,7 +337,7 @@ namespace Li
 	{
 		if (avcodec_send_packet(m_Audio.CodecCtx, packet) < 0)
 		{
-			LI_CORE_ERROR("An error occurred while sending audio packet to decoder.");
+			Log::CoreError("An error occurred while sending audio packet to decoder.");
 			return false;
 		}
 
@@ -346,12 +346,12 @@ namespace Li
 			return true;
 		else if (result == AVERROR_EOF)
 		{
-			LI_CORE_WARN("Video ended with EOF on audio packet");
+			Log::CoreWarn("Video ended with EOF on audio packet");
 			return false;
 		}
 		else if (result < 0)
 		{
-			LI_CORE_ERROR("An error occurred while receiving frame from decoder.");
+			Log::CoreError("An error occurred while receiving frame from decoder.");
 			return false;
 		}
 
@@ -364,7 +364,7 @@ namespace Li
 		}
 		else if (m_Audio.DiscardCount > 0)
 		{
-			LI_CORE_WARN("Discarded {} audio packets", m_Audio.DiscardCount);
+			Log::CoreWarn("Discarded {} audio packets", m_Audio.DiscardCount);
 			m_Audio.DiscardCount = 0;
 		}
 
@@ -380,7 +380,7 @@ namespace Li
 					m_Audio.Channels, m_Frame->nb_samples, m_Audio.OutFormat, 0);
 				if (result < 0 || m_Audio.DstData == nullptr)
 				{
-					LI_CORE_ERROR("Failed to allocate samples for audio resampling");
+					Log::CoreError("Failed to allocate samples for audio resampling");
 					return true;
 				}
 			}
@@ -397,7 +397,7 @@ namespace Li
 			result = swr_convert(m_Audio.SwrCtx, m_Audio.DstData, out_num_samples, const_cast<const uint8_t**>(m_Frame->data), m_Frame->nb_samples);
 			if (result < 0)
 			{
-				LI_CORE_ERROR("An error occurred while resampling audio.");
+				Log::CoreError("An error occurred while resampling audio.");
 				return true;
 			}
 
@@ -418,7 +418,7 @@ namespace Li
 		{
 			if (m_Audio.Queue == nullptr)
 			{
-				LI_CORE_WARN("Non-resampled audio is not tested.");
+				Log::CoreWarn("Non-resampled audio is not tested.");
 				m_Audio.Queue = MakeUnique<AudioQueue>(m_Audio.OutBytesPerSample, m_Audio.Channels, m_Audio.Frequency, m_Frame->nb_samples, m_Audio.Frequency);
 			}
 

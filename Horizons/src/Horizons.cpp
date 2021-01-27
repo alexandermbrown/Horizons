@@ -43,16 +43,25 @@ Horizons::Horizons(Li::RendererAPI renderer_api)
 	LI_ASSERT(game_to_app != ((uint32_t)-1), "Failed to create user event.");
 	LI_ASSERT(app_to_game != ((uint32_t)-1), "Failed to create user event.");
 
-	m_ConfigStore.Add(ConfigVar{ "event_game_to_app", game_to_app, HZ_CVAR_UNSIGNED, false });
-	m_ConfigStore.Add(ConfigVar{ "event_app_to_game", app_to_game, HZ_CVAR_UNSIGNED, false });
-
-	m_ConfigStore.Add(ConfigVar{ "app_state", 0, HZ_CVAR_UNSIGNED,  false });
+	// TODO: add unsigned int.
+	m_ConfigStore.Set<int>("event_game_to_app", game_to_app);
+	m_ConfigStore.Set<int>("event_app_to_game", app_to_game);
+	m_ConfigStore.Set<int>("app_state", static_cast<int>(AppState::None));
 
 	Transition(Li::MakeUnique<SplashScreenScene>(), true);
 }
 
 Horizons::~Horizons()
 {
+	// Save window size.
+	AppState app_state = static_cast<AppState>(m_ConfigStore.Get<int>("app_state"));
+	if (app_state != AppState::None && app_state != AppState::SplashScreen)
+	{
+		Li::Window& window = GetWindow();
+		m_ConfigStore.Set<int>("window_width", window.GetWidth());
+		m_ConfigStore.Set<int>("window_height", window.GetHeight());
+	}
+
 	ClearScene();
 	ClearLayers();
 	NoiseStore::Shutdown();
@@ -61,20 +70,19 @@ Horizons::~Horizons()
 
 void Horizons::LoadConfig()
 {
-	m_ConfigStore.LoadTemplate("data/config/config_default.ini");
+	m_ConfigLoader.RegisterDefaults("data/config/config_default.yaml");
 
 #ifdef HZ_PLATFORM_WINDOWS
 	// Get the location of %APPDATA% in Windows.
-	wchar_t* path;
-	SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
+	PWSTR path_str;
+	SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path_str);
 
-	std::wstring path_str = path;
-	path_str += L"\\Horizons\\config\\config.ini";
+	std::filesystem::path path(path_str);
+	path /= "Horizons/config/config.yaml";
 
-	m_ConfigStore.LoadConfigFile(path_str.c_str());
-#else
-	// TODO: Support other platforms.
-#error Other platforms not supported.
+	m_ConfigStore = m_ConfigLoader.LoadStore(path);
+
+	CoTaskMemFree(static_cast<LPVOID>(path_str));
 #endif
 }
 
@@ -82,13 +90,15 @@ void Horizons::SaveConfig()
 {
 #ifdef HZ_PLATFORM_WINDOWS
 	// Get the location of %APPDATA% in Windows.
-	wchar_t* path;
-	SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, NULL, &path);
+	PWSTR path_str;
+	SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path_str);
 
-	std::wstring path_str = path;
-	path_str += L"\\Horizons\\config\\config.ini";
+	std::filesystem::path path(path_str);
+	path /= "Horizons/config/config.yaml";
 
-	m_ConfigStore.SaveConfigFile(path_str.c_str());
+	m_ConfigLoader.SaveStore(m_ConfigStore, path);
+
+	CoTaskMemFree(static_cast<LPVOID>(path_str));
 #endif
 }
 

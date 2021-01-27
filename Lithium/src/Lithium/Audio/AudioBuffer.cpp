@@ -48,7 +48,7 @@ namespace Li
 		OggVorbis_File file;
 		if (ov_fopen(filename.c_str(), &file))
 		{
-			LI_CORE_ERROR("Failed to load {}. Not a valid Ogg bitstream.\n", filename);
+			Log::CoreError("Failed to load {}. Not a valid Ogg bitstream.\n", filename);
 			return nullptr;
 		}
 
@@ -83,7 +83,7 @@ namespace Li
 
 		if (ov_open_callbacks(&file_handle, &file, nullptr, 0, callbacks) < 0)
 		{
-			LI_CORE_ERROR("Failed to load audio. Not a valid Ogg bitstream.\n");
+			Log::CoreError("Failed to load audio. Not a valid Ogg bitstream.\n");
 			return nullptr;
 		}
 

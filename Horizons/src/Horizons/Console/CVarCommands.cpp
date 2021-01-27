@@ -3,10 +3,11 @@
 #include "Horizons.h"
 #include "Lithium.h"
 
+#ifdef HZ_CONSOLE_ENABLED
+#include "Horizons/Config/ConfigConvert.h"
 #include "Horizons/Core/UserEvents.h"
 #include "Horizons/Core/AppState.h"
 
-#ifdef HZ_CONSOLE_ENABLED
 #include "CVarCommands.h"
 
 Li::Ref<Command> CreateCVarSetCommand()
@@ -24,94 +25,78 @@ Li::Ref<Command> CreateCVarSetCommand()
 		}
 	};
 
-	Li::Ref<Command> set = Li::MakeRef<Command>("set", "Sets the contents of a cvar.", layout, [](std::vector<CommandValue>&& args, std::string* error_out)
+	Li::Ref<Command> set = Li::MakeRef<Command>("set", "Sets the contents of a config variable.", layout,
+		[](std::vector<CommandValue>&& args, std::string* error_out)
+	{
+		LI_ASSERT(args.size() == 2, "Incorrect number of arguments supplied to set command.");
+		ConfigStore& store = Li::Application::Get<Horizons>().GetConfig();
+
+		auto it = store.find(args[0].StringValue);
+		if (it == store.end())
 		{
-			LI_ASSERT(args.size() == 2, "Incorrect number of arguments supplied to set command.");
-			ConfigStore& store = Li::Application::Get<Horizons>().GetConfig();
-			if (store.Contains(args[0].StringValue))
-			{
-				auto& var = store.Get(args[0].StringValue);
-				if (var.SetFromString(args[1].StringValue))
-				{
-					if (store.Get("app_state").GetUnsigned() == (uint32_t)AppState::InGame)
-					{
-						// Create event to change the variable in the game thread.
-						SDL_Event event;
-						SDL_zero(event);
-						event.type = store.Get("event_app_to_game").GetUnsigned();
-						event.user.code = (uint32_t)UserEvent::SetConfig;
+			*error_out = "Config variable " + args[0].StringValue + " not found.";
+			return;
+		}
 
-						size_t size = args[0].StringValue.length() + 1;
-						event.user.data1 = new char[size];
-						strcpy_s((char*)event.user.data1, size, args[0].StringValue.c_str());
+		if (!ConfigVariantSetFromString(it->second, args[1].StringValue))
+		{
+			*error_out = "Failed to set config variable " + args[0].StringValue + " to " + args[1].StringValue;
+			return;
+		}
 
-						switch (var.GetFlags())
-						{
-						case HZ_CVAR_BOOL:
-							event.user.data2 = new bool(var.GetBool());
-							break;
+		if (store.Get<int>("app_state") == static_cast<int>(AppState::InGame))
+		{
+			// Create event to change the variable in the game thread.
+			SDL_Event event;
+			SDL_zero(event);
+			event.type = store.Get<int>("event_app_to_game");
+			event.user.code = (uint32_t)UserEvent::SetConfig;
 
-						case HZ_CVAR_INT:
-							event.user.data2 = new int(var.GetInt());
-							break;
+			event.user.data1 = new std::string(args[0].StringValue);
 
-						case HZ_CVAR_UNSIGNED:
-							event.user.data2 = new unsigned int(var.GetUnsigned());
-							break;
-
-						case HZ_CVAR_FLOAT:
-							event.user.data2 = new float(var.GetFloat());
-							break;
-
-						default:
-							LI_ERROR("Unknown CVAR type!");
-							break;
-						}
-
-						SDL_PushEvent(&event);
-						LI_TRACE("Pushed change event for console variable {}", args[0].StringValue);
-					}
-				}
-				else
-				{
-					*error_out = "Failed to set CVar " + args[0].StringValue + " to " + args[1].StringValue;
-				}
-			}
+			if (std::holds_alternative<bool>(it->second))
+				event.user.data2 = new bool(std::get<bool>(it->second));
+			else if (std::holds_alternative<int>(it->second))
+				event.user.data2 = new int(std::get<int>(it->second));
+			else if (std::holds_alternative<float>(it->second))
+				event.user.data2 = new float(std::get<float>(it->second));
+			else if (std::holds_alternative<std::string>(it->second))
+				event.user.data2 = new std::string(std::get<std::string>(it->second));
 			else
-			{
-				*error_out = "CVar " + args[0].StringValue + " not found.";
-			}
-		});
+				Li::Log::Error("Unknown config variable type!");
+
+			SDL_PushEvent(&event);
+			Li::Log::Trace("Pushed change event for console variable {}", args[0].StringValue);
+		}
+	});
 
 	return set;
 }
 
 Li::Ref<Command> CreateCVarGetCommand()
 {
-	CommandLayout layout = {
-		{
+	CommandLayout layout = {{
 		"name",
 		"The name of the cvar.",
 		CommandArgType::String
-		}
-	};
+	}};
 
-	Li::Ref<Command> get = Li::MakeRef<Command>("get", "Gets the contents of a cvar.", layout, [](std::vector<CommandValue>&& args, std::string* error_out)
+	Li::Ref<Command> get = Li::MakeRef<Command>("get", "Gets the contents of a config variable.", layout,
+		[](std::vector<CommandValue>&& args, std::string* error_out)
+	{
+		LI_ASSERT(args.size() == 1, "Incorrect number of arguments supplied to get command.");
+		ConfigStore& store = Li::Application::Get<Horizons>().GetConfig();
+
+		auto it = store.find(args[0].StringValue);
+		if (it != store.end())
 		{
-			LI_ASSERT(args.size() == 1, "Incorrect number of arguments supplied to get command.");
-			ConfigStore& store = Li::Application::Get<Horizons>().GetConfig();
-			if (store.Contains(args[0].StringValue))
-			{
-				Li::Application::Get<Horizons>().GetConsole().WriteLine(
-					store.Get(args[0].StringValue).GetString(),
-					{ 1.0f, 1.0f, 1.0f, 1.0f }
-				);
-			}
-			else
-			{
-				*error_out = "CVar " + args[0].StringValue + " not found.";
-			}
-		});
+			Li::Application::Get<Horizons>().GetConsole().WriteLine(
+				VariantToString(it->second),
+				{ 1.0f, 1.0f, 1.0f, 1.0f }
+			);
+		}
+		else *error_out = "Config variable " + args[0].StringValue + " not found.";
+	});
 
 	return get;
 }

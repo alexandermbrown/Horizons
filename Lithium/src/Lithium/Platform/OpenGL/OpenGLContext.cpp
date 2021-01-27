@@ -20,10 +20,10 @@ namespace Li
 	{
 		switch (severity)
 		{
-		case GL_DEBUG_SEVERITY_HIGH:         LI_CORE_CRITICAL(message); return;
-		case GL_DEBUG_SEVERITY_MEDIUM:       LI_CORE_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          LI_CORE_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: LI_CORE_TRACE(message); return;
+		case GL_DEBUG_SEVERITY_HIGH:         Log::CoreFatal(message); return;
+		case GL_DEBUG_SEVERITY_MEDIUM:       Log::CoreError(message); return;
+		case GL_DEBUG_SEVERITY_LOW:          Log::CoreWarn(message); return;
+		case GL_DEBUG_SEVERITY_NOTIFICATION: Log::CoreTrace(message); return;
 		}
 
 		LI_CORE_ASSERT(false, "Unknown severity level!");
@@ -35,12 +35,12 @@ namespace Li
 		m_Context = SDL_GL_CreateContext(windowHandle);
 
 		SDL_GL_MakeCurrent(m_WindowHandle, m_Context);
-		LI_CORE_RUN_ASSERT(gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to load OpenGL loader!");
+		LI_CORE_VERIFY(gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to load OpenGL loader!");
 
-		LI_CORE_INFO("OpenGL Info:");
-		GLCall(LI_CORE_INFO("    Vendor: {0}", glGetString(GL_VENDOR)));
-		GLCall(LI_CORE_INFO("    Renderer: {0}", glGetString(GL_RENDERER)));
-		GLCall(LI_CORE_INFO("    Version: OpenGL {0}", glGetString(GL_VERSION)));
+		Log::CoreInfo("OpenGL Info:");
+		GLCall(Log::CoreInfo("    Vendor: {0}", glGetString(GL_VENDOR)));
+		GLCall(Log::CoreInfo("    Renderer: {0}", glGetString(GL_RENDERER)));
+		GLCall(Log::CoreInfo("    Version: OpenGL {0}", glGetString(GL_VERSION)));
 
 #ifdef LI_ENABLE_ASSERTS
 		int versionMajor;

@@ -3,6 +3,7 @@
 #include "DiagnosticsLayer.h"
 
 #include "Horizons.h"
+#include "Horizons/Config/ConfigConvert.h"
 
 #include "imgui.h"
 
@@ -132,11 +133,11 @@ void DiagnosticsLayer::OnImGuiRender()
 		ConfigStore& config = Li::Application::Get<Horizons>().GetConfig();
 
 		ImGui::BeginChild("cvar_list");
-		for (auto& [name, var] : config)
+		for (auto&& [name, var] : config)
 		{
 			ImGui::Text(name.c_str());
 			ImGui::SameLine(ImGui::GetWindowWidth() - 50.0f);
-			ImGui::Text(var.GetString().c_str());
+			ImGui::Text(VariantToString(var).c_str());
 		}
 		ImGui::EndChild();
 

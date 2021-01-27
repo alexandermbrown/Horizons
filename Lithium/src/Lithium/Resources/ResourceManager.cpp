@@ -13,11 +13,11 @@ namespace Li
 
 	void ResourceManager::Load(const std::string& labFilePath)
 	{
-		LI_CORE_INFO("Loading asset base {}...", labFilePath);
+		Log::CoreInfo("Loading asset base {}...", labFilePath);
 		std::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
 
 		if (!inFile.good()) {
-			LI_CORE_ERROR("Error opening lithium asset base {}", labFilePath);
+			Log::CoreError("Error opening lithium asset base {}", labFilePath);
 			return;
 		}
 
@@ -31,7 +31,7 @@ namespace Li
 		const Assets::AssetBundle* asset_bundle = flatbuffers::GetRoot<Assets::AssetBundle>(buffer);
 		if (!asset_bundle->Verify(flatbuffers::Verifier(buffer, filesize))) 
 		{
-			LI_CORE_ERROR("Invalid lithium asset base {}", labFilePath);
+			Log::CoreError("Invalid lithium asset base {}", labFilePath);
 			return;
 		}
 
@@ -76,11 +76,11 @@ namespace Li
 
 	void ResourceManager::BeginStaggeredLoad(const std::string& labFilePath)
 	{
-		LI_CORE_INFO("Loading asset base {} staggered...", labFilePath);
+		Log::CoreInfo("Loading asset base {} staggered...", labFilePath);
 		std::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
 
 		if (!inFile.good()) {
-			LI_CORE_ERROR("Error opening lithium asset base {}", labFilePath);
+			Log::CoreError("Error opening lithium asset base {}", labFilePath);
 			return;
 		}
 
@@ -94,7 +94,7 @@ namespace Li
 		s_Data->LoadData.Bundle = flatbuffers::GetRoot<Assets::AssetBundle>(s_Data->LoadData.Buffer);
 		if (!s_Data->LoadData.Bundle->Verify(flatbuffers::Verifier(s_Data->LoadData.Buffer, filesize)))
 		{
-			LI_CORE_ERROR("Invalid lithium asset base {}", labFilePath);
+			Log::CoreError("Invalid lithium asset base {}", labFilePath);
 			return;
 		}
 		
@@ -173,7 +173,7 @@ namespace Li
 	{
 		if (s_Data->LoadData.Buffer)
 		{
-			LI_CORE_WARN("Load data buffer not freed.");
+			Log::CoreWarn("Load data buffer not freed.");
 			delete[] s_Data->LoadData.Buffer;
 		}
 		s_Data.reset();
@@ -181,15 +181,15 @@ namespace Li
 
 	void ResourceManager::PrintInfo()
 	{
-		LI_CORE_INFO("--------------------------------");
-		LI_CORE_INFO("           Asset Info");
-		LI_CORE_INFO("--------------------------------");
-		LI_CORE_INFO("    # Textures        | {}", s_Data->Textures.size());
-		LI_CORE_INFO("    # Shaders         | {}", s_Data->Shaders.size());
-		LI_CORE_INFO("    # TextureAtlases  | {}", s_Data->TextureAtlases.size());
-		LI_CORE_INFO("    # Fonts           | {}", s_Data->Fonts.size());
-		LI_CORE_INFO("    # Audio           | {}", s_Data->Audio.size());
-		LI_CORE_INFO("    # Locales         | {}", Localization::GetLocaleCount());
-		LI_CORE_INFO("--------------------------------");
+		Log::CoreInfo("--------------------------------");
+		Log::CoreInfo("           Asset Info");
+		Log::CoreInfo("--------------------------------");
+		Log::CoreInfo("    # Textures        | {}", s_Data->Textures.size());
+		Log::CoreInfo("    # Shaders         | {}", s_Data->Shaders.size());
+		Log::CoreInfo("    # TextureAtlases  | {}", s_Data->TextureAtlases.size());
+		Log::CoreInfo("    # Fonts           | {}", s_Data->Fonts.size());
+		Log::CoreInfo("    # Audio           | {}", s_Data->Audio.size());
+		Log::CoreInfo("    # Locales         | {}", Localization::GetLocaleCount());
+		Log::CoreInfo("--------------------------------");
 	}
 }

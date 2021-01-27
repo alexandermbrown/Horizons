@@ -18,31 +18,25 @@ TickThread::TickThread()
 
 void TickThread::Begin(entt::registry& registry)
 {
-	if (m_Started)
-	{
-		LI_ERROR("Tick thread already started!");
-	}
-	else
-	{
-		m_Started = true;
-		SyncEventReceiveSystem::Init(registry);
-		SyncTransformReceiveSystem::Init(registry);
+	LI_ASSERT(!m_Started, "Tick thread already started!");
+	m_Started = true;
+	SyncEventReceiveSystem::Init(registry);
+	SyncTransformReceiveSystem::Init(registry);
 
-		// Start up tick thread.
-		m_ThreadRun = true;
-		TickThreadInput threadData;
-		threadData.Running = &m_ThreadRun;
-		threadData.EventQueue = &m_EventQueue;
-		threadData.SyncQueue = &m_SyncQueue;
-		threadData.TransformQueue = &m_TransformQueue;
-		threadData.Config = Li::Application::Get<Horizons>().GetConfig();
+	// Start up tick thread.
+	m_ThreadRun = true;
+	TickThreadInput thread_data;
+	thread_data.Running = &m_ThreadRun;
+	thread_data.EventQueue = &m_EventQueue;
+	thread_data.SyncQueue = &m_SyncQueue;
+	thread_data.TransformQueue = &m_TransformQueue;
+	thread_data.Config = Li::Application::Get<Horizons>().GetConfig();
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-		m_TickThread = std::thread(TickThread::ThreadEntryPointDebugDraw, threadData, &m_DebugDrawQueue);
+	m_TickThread = std::thread(TickThread::ThreadEntryPointDebugDraw, thread_data, &m_DebugDrawQueue);
 #else
-		m_TickThread = std::thread(TickThread::ThreadEntryPoint, threadData);
+	m_TickThread = std::thread(TickThread::ThreadEntryPoint, thread_data);
 #endif
-	}
 }
 
 void TickThread::Finish(entt::registry& registry)
@@ -67,25 +61,17 @@ void TickThread::OnEvent(SDL_Event* event)
 
 int TickThread::ThreadEntryPoint(const TickThreadInput& data)
 {
-	LI_INFO("Tick thread starting...");
-
 	Game game(data);
 	game.Run();
-
-	LI_INFO("Tick thread closing...");
 
 	return 0;
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-int TickThread::ThreadEntryPointDebugDraw(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue)
+int TickThread::ThreadEntryPointDebugDraw(const TickThreadInput& data, DebugDrawCommandQueue* debug_draw_queue)
 {
-	LI_INFO("Tick thread starting...");
-
-	Game game(data, debugDrawQueue);
+	Game game(data, debug_draw_queue);
 	game.Run();
-
-	LI_INFO("Tick thread closing...");
 
 	return 0;
 }

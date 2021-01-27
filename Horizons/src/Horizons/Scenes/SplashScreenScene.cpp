@@ -2,7 +2,6 @@
 #include "SplashScreenScene.h"
 
 #include "Horizons/Layers/SplashScreenLayer.h"
-#include "Horizons/Layers/ConfigUpdateLayer.h"
 #include "Horizons/Layers/DiagnosticsLayer.h"
 
 #include "Horizons.h"
@@ -14,9 +13,8 @@ void SplashScreenScene::OnShow()
 {
 	Horizons& app = Li::Application::Get<Horizons>();
 
-	app.GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::SplashScreen);
+	app.GetConfig().Set<int>("app_state", static_cast<int>(AppState::SplashScreen));
 
-	app.PushLayer(Li::MakeUnique<ConfigUpdateLayer>());
 	app.PushLayer(Li::MakeUnique<SplashScreenLayer>());
 #ifndef HZ_DIST
 	app.PushOverlay(Li::MakeUnique<DiagnosticsLayer>());
@@ -32,11 +30,10 @@ void SplashScreenScene::OnShow()
 void SplashScreenScene::OnTransition()
 {
 	Horizons& app = Li::Application::Get<Horizons>();
-	app.PopLayer("ConfigUpdate");
 	app.PopLayer("SplashScreen");
 
-	int width = app.GetConfig().Get("window_width").GetInt();
-	int height = app.GetConfig().Get("window_height").GetInt();
+	int width = app.GetConfig().Get<int>("window_width");
+	int height = app.GetConfig().Get<int>("window_height");
 
 	Li::Window& window = app.GetWindow();
 	window.SetBordered(true);

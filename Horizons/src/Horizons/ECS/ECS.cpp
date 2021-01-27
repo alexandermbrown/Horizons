@@ -22,7 +22,7 @@ void ECS::AddSystem(const std::string& name)
 			m_OnDeinitFns.push_back(system->OnDeinit);
 	}
 	else
-		LI_ERROR("System {} does not exist!", name);
+		Li::Log::Error("System {} does not exist!", name);
 }
 
 void ECS::OnInit()

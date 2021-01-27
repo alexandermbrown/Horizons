@@ -61,7 +61,7 @@ namespace Li
 			auto it = map.find(name);
 			if (it == map.end())
 			{
-				LI_CORE_ERROR("Resource {} not found.", name);
+				Log::CoreError("Resource {} not found.", name);
 
 				if (default)
 				{

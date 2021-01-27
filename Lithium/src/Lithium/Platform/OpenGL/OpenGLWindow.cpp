@@ -52,7 +52,7 @@ namespace Li
 	void OpenGLWindow::SetVSync(bool enabled)
 	{
 		if (SDL_GL_SetSwapInterval(enabled ? -1 : 0) < 0)
-			LI_CORE_ERROR("Error setting VSync to {0}", enabled);
+			Log::CoreError("Error setting VSync to {0}", enabled);
 		m_VSync = enabled;
 	}
 
@@ -63,21 +63,21 @@ namespace Li
 		{
 		case Li::FullscreenType::Windowed:
 		{
-			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, 0), "Failed to turn to windowed.");
+			LI_CORE_VERIFY(!SDL_SetWindowFullscreen(m_Window, 0), "Failed to turn to windowed.");
 			break;
 		}
 		case Li::FullscreenType::Fullscreen:
 		{
-			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN), "Failed to turn to fullscreen.");
+			LI_CORE_VERIFY(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN), "Failed to turn to fullscreen.");
 			break;
 		}
 		case Li::FullscreenType::FullscreenWindowed:
 		{
-			LI_CORE_RUN_ASSERT(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP), "Failed to turn to fullscreen windowed.");
+			LI_CORE_VERIFY(!SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP), "Failed to turn to fullscreen windowed.");
 			break;
 		}
 		default:
-			LI_CORE_ERROR("Unknown fullscreen type {}.", type);
+			Log::CoreError("Unknown fullscreen type {}.", type);
 			break;
 		}
 	}
@@ -137,7 +137,7 @@ namespace Li
 		}
 		else
 		{
-			LI_CORE_ERROR("Image must have 3 or 4 chanels.");
+			Log::CoreError("Image must have 3 or 4 chanels.");
 			return;
 		}
 
@@ -145,13 +145,13 @@ namespace Li
 
 		if (!m_Icon)
 		{
-			LI_CORE_ERROR("Failed to create SDL_Surface.");
+			Log::CoreError("Failed to create SDL_Surface.");
 			return;
 		}
 
 		SDL_SetWindowIcon(m_Window, m_Icon);
 
-		LI_CORE_INFO("Set icon to {}", path);
+		Log::CoreInfo("Set icon to {}", path);
 	}
 
 	void OpenGLWindow::OnWindowResize(int width, int height)

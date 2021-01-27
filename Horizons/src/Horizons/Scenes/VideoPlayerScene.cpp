@@ -15,7 +15,7 @@
 VideoPlayerLayer::VideoPlayerLayer()
 	: Layer("VideoPlayer")
 {
-	LI_RUN_ASSERT(m_VideoPlayer.Open("data/videos/bowling.mkv"), "Failed to open video!");
+	LI_VERIFY(m_VideoPlayer.Open("data/videos/bowling.mkv"), "Failed to open video!");
 }
 
 void VideoPlayerLayer::OnUpdate(Li::Duration::us dt)

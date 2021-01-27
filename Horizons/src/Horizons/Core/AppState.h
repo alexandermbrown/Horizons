@@ -1,6 +1,6 @@
 #pragma once
 
-enum class AppState : unsigned int
+enum class AppState : int
 {
 	None = 0,
 	SplashScreen,

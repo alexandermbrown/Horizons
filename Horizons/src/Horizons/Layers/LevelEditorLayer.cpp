@@ -3,6 +3,7 @@
 #include "LevelEditorLayer.h"
 #include "Horizons/Scripting/ScriptScene.h"
 
+#include "Lithium.h"
 #include "imgui.h"
 #include "nfd.h"
 
@@ -144,11 +145,11 @@ void LevelEditorLayer::OnImGuiRender()
 				LPWSTR cmd = _tcsdup(TEXT("code.cmd .\\data\\scripts"));
 				if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 				{
-					LI_RUN_ASSERT(CloseHandle(pi.hProcess), "Failed to close process handle.");
-					LI_RUN_ASSERT(CloseHandle(pi.hThread), "Failed to close thread handle.");
-					LI_INFO("Successfully launched Visual Studio Code.");
+					LI_VERIFY(CloseHandle(pi.hProcess), "Failed to close process handle.");
+					LI_VERIFY(CloseHandle(pi.hThread), "Failed to close thread handle.");
+					Li::Log::Info("Successfully launched Visual Studio Code.");
 				}
-				else LI_ERROR("Failed to launch vs code: error {}", GetLastError());
+				else Li::Log::Error("Failed to launch vs code: error {}", GetLastError());
 #endif
 			}
 
@@ -289,7 +290,7 @@ void LevelEditorLayer::FileOpenDialog()
 		}
 	}
 	else if (result == NFD_ERROR)
-		LI_ERROR(NFD_GetError());
+		Li::Log::Error(NFD_GetError());
 }
 
 void LevelEditorLayer::FileSave()
@@ -304,7 +305,7 @@ void LevelEditorLayer::FileSaveAs()
 	if (result == NFD_OKAY)
 		m_Viewport.FileSaveAs(path);
 	else if (result == NFD_ERROR)
-		LI_ERROR(NFD_GetError());
+		Li::Log::Error(NFD_GetError());
 }
 
 void LevelEditorLayer::UnsavedChangesDialog(int* button_id)
@@ -321,7 +322,7 @@ void LevelEditorLayer::UnsavedChangesDialog(int* button_id)
 	};
 
 	if (SDL_ShowMessageBox(&msg_box_data, button_id) < 0) {
-		LI_ERROR("Failed to show message box.");
+		Li::Log::Error("Failed to show message box.");
 		return;
 	}
 }

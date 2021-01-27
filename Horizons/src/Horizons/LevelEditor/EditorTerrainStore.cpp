@@ -23,7 +23,7 @@ bool EditorTerrainStore::LoadTerrain(const std::string& path, glm::ivec2 center)
 	m_TerrainFile.open(path, std::ios::in | std::ios::out | std::ios::binary);
 	if (!m_TerrainFile.is_open())
 	{
-		LI_ERROR("Failed to open terrain file {}", path);
+		Li::Log::Error("Failed to open terrain file {}", path);
 		return false;
 	}
 	m_TerrainPath = path;
@@ -38,7 +38,7 @@ bool EditorTerrainStore::LoadTerrain(const std::string& path, glm::ivec2 center)
 
 	m_StoreChunks = new StoreChunk[m_WorldWidth * m_WorldHeight];
 
-	LI_INFO("Loading {}x{} terrain in editor: {}", width, height, path);
+	Li::Log::Info("Loading {}x{} terrain in editor: {}", width, height, path);
 
 	for (int y = 0; y < m_WorldHeight; y++)
 	{
@@ -71,7 +71,7 @@ void EditorTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChunk
 	}
 	else
 	{
-		LI_ERROR("Chunk coordinate {},{} out of bounds.", store_coord.x, store_coord.y);
+		Li::Log::Error("Chunk coordinate {},{} out of bounds.", store_coord.x, store_coord.y);
 		AlphaValuesArray alpha_values = { 0.0f };
 		destination->AlphaVB->SetSubData((float*)alpha_values, sizeof(alpha_values), 0, true);
 	}
@@ -145,7 +145,7 @@ bool EditorTerrainStore::SaveAs(const std::string& path)
 		std::fstream new_file(path, std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
 		if (!new_file.is_open())
 		{
-			LI_ERROR("Failed to open terrain file {}", path);
+			Li::Log::Error("Failed to open terrain file {}", path);
 			return false;
 		}
 		m_TerrainFile.clear();
@@ -172,7 +172,7 @@ bool EditorTerrainStore::CreateEmptyTerrainFile(const std::string& path, glm::iv
 	std::ofstream new_file(path, std::ios::out | std::ios::binary | std::ios::trunc);
 	if (!new_file.is_open())
 	{
-		LI_ERROR("Failed to open terrain file {}", path);
+		Li::Log::Error("Failed to open terrain file {}", path);
 		return false;
 	}
 

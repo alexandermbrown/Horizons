@@ -9,25 +9,81 @@ namespace Li
 {
 	namespace Log
 	{
+		template<typename... Args>
+		inline void Trace(Args&&... args)
+		{
+			GetClientLogger()->trace(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void Debug(Args&&... args)
+		{
+			GetClientLogger()->debug(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void Info(Args&&... args)
+		{
+			GetClientLogger()->info(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void Warn(Args&&... args)
+		{
+			GetClientLogger()->warn(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void Error(Args&&... args)
+		{
+			GetClientLogger()->error(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void Fatal(Args&&... args)
+		{
+			GetClientLogger()->critical(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreTrace(Args&&... args)
+		{
+			GetCoreLogger()->trace(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreDebug(Args&&... args)
+		{
+			GetCoreLogger()->debug(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreInfo(Args&&... args)
+		{
+			GetCoreLogger()->info(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreWarn(Args&&... args)
+		{
+			GetCoreLogger()->warn(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreError(Args&&... args)
+		{
+			GetCoreLogger()->error(std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		inline void CoreFatal(Args&&... args)
+		{
+			GetCoreLogger()->critical(std::forward<Args>(args)...);
+		}
+
 		void InitLog();
 
-		Ref<spdlog::logger>& GetCoreLogger();
-		Ref<spdlog::logger>& GetClientLogger();
+		spdlog::logger* GetCoreLogger();
+		spdlog::logger* GetClientLogger();
 	};
 }
-
-// Core log macros
-#define LI_CORE_TRACE(...)    ::Li::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define LI_CORE_DTRACE(...)   ::Li::Log::GetCoreLogger()->debug(__VA_ARGS__)
-#define LI_CORE_INFO(...)     ::Li::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define LI_CORE_WARN(...)     ::Li::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define LI_CORE_ERROR(...)    ::Li::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define LI_CORE_CRITICAL(...) ::Li::Log::GetCoreLogger()->critical(__VA_ARGS__)
-
-// Client log macros
-#define LI_TRACE(...)         ::Li::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define LI_DTRACE(...)        ::Li::Log::GetClientLogger()->debug(__VA_ARGS__)
-#define LI_INFO(...)          ::Li::Log::GetClientLogger()->info(__VA_ARGS__)
-#define LI_WARN(...)          ::Li::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define LI_ERROR(...)         ::Li::Log::GetClientLogger()->error(__VA_ARGS__)
-#define LI_CRITICAL(...)      ::Li::Log::GetClientLogger()->critical(__VA_ARGS__)

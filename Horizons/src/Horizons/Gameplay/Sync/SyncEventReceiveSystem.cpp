@@ -82,7 +82,7 @@ void SyncEventReceiveSystem::Update(entt::registry& registry, SyncEventQueue* qu
 			else if (event.data1 == entt::type_info<cp::player>::id())
 				AddComponent<cp::player>(registry, event);
 
-			else LI_ERROR("Unknown component type {}", event.data1);
+			else Li::Log::Error("Unknown component type {}", event.data1);
 		}
 		else if (event.type == SyncType::RemoveComponent)
 		{
@@ -101,11 +101,11 @@ void SyncEventReceiveSystem::Update(entt::registry& registry, SyncEventQueue* qu
 			else if (event.data1 == entt::type_info<cp::player>::id())
 				RemoveComponent<cp::player>(registry, event);
 
-			else LI_ERROR("Unknown component type {}", event.data1);
+			else Li::Log::Error("Unknown component type {}", event.data1);
 		}
 		else
 		{
-			LI_ERROR("Unknown sync event type!");
+			Li::Log::Error("Unknown sync event type!");
 		}
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Horizons/Core/Core.h"
-#include "Horizons/Core/ConfigStore.h"
+#include "Horizons/Config/ConfigStore.h"
 #include "Horizons/Gameplay/Sync/Sync.h"
 #include "Horizons/Gameplay/Sync/SyncTransform.h"
 
@@ -22,7 +22,7 @@ public:
 
 	Game(const TickThreadInput& data);
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-	Game(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue);
+	Game(const TickThreadInput& data, DebugDrawCommandQueue* debug_draw_queue);
 #endif
 	~Game();
 

@@ -109,7 +109,7 @@ namespace Li
 			break;
 		}
 		default:
-			LI_CORE_ERROR("Unsupported graphics API!");
+			Log::CoreError("Unsupported graphics API!");
 		}
 
 		

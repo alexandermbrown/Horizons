@@ -26,9 +26,9 @@ Game::Game(const TickThreadInput& data)
 }
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW
-Game::Game(const TickThreadInput& data, DebugDrawCommandQueue* debugDrawQueue)
+Game::Game(const TickThreadInput& data, DebugDrawCommandQueue* debug_draw_queue)
 	: m_Running(false), m_EventQueue(data.EventQueue), m_SyncQueue(data.SyncQueue), m_TransformQueue(data.TransformQueue),
-	m_ConfigStore(data.Config), m_DebugDrawQueue(debugDrawQueue), m_AppRun(data.Running)
+	m_ConfigStore(data.Config), m_DebugDrawQueue(debug_draw_queue), m_AppRun(data.Running)
 {
 	LI_ASSERT(!s_Instance, "Game already created!");
 	s_Instance = this;
@@ -47,8 +47,8 @@ void Game::Run()
 	Init();
 
 	using namespace std::chrono_literals;
-	constexpr Li::Duration::ns dt_target(16666666ns);
-	constexpr Li::Duration::ns sleep_margin(5ms);
+	constexpr Li::Duration::ns dt_target = 16666666ns;
+	constexpr Li::Duration::ns sleep_margin = 5ms;
 
 	m_LastUpdateTime = std::chrono::steady_clock::now();
 	
@@ -82,7 +82,7 @@ void Game::Run()
 		}
 
 		if (current_delta - dt_target > 3ms)
-			LI_WARN("Tick thread not at 60hz. {}ms slow", Li::Duration::Cast<Li::Duration::ms>(current_delta - dt_target).count());
+			Li::Log::Warn("Tick thread not at 60hz. {}ms slow", Li::Duration::Cast<Li::Duration::ms>(current_delta - dt_target).count());
 
 		SDL_Event event;
 		while (m_EventQueue->try_dequeue(event))

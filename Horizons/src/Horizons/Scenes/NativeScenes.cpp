@@ -16,6 +16,6 @@ Li::Unique<Li::Scene> GetNativeScene(const std::string& name)
 		return Li::MakeUnique<VideoPlayerScene>();
 #endif
 
-	LI_ERROR("Unknown native scene {}", name);
+	Li::Log::Error("Unknown native scene {}", name);
 	return nullptr;
 }

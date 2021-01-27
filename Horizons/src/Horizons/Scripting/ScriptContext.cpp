@@ -23,12 +23,12 @@ void ScriptContext::InitApp(const char* lua_entry_path)
 		if (!result.valid())
 		{
 			sol::error error = result;
-			LI_ERROR("{}", error.what());
+			Li::Log::Error("{}", error.what());
 		}
 	}
 	catch (...)
 	{
-		LI_ERROR("Script Error!");
+		Li::Log::Error("Script Error!");
 	}
 }
 
@@ -44,12 +44,12 @@ void ScriptContext::LoadFunctions()
 	sol::table app = m_Lua["App"];
 
 	app.set_function("SetState", [](AppState app_state) {
-		LI_TRACE("Setting app state to {}", app_state);
-		Li::Application::Get<Horizons>().GetConfig().Get("app_state").SetUnsigned(static_cast<unsigned int>(app_state));
+		Li::Log::Trace("Setting app state to {}", app_state);
+		Li::Application::Get<Horizons>().GetConfig().Set<int>("app_state", static_cast<int>(app_state));
 	});
 
 	app.set_function("SetDebugUIBlockEvents", [](bool block) {
-		LI_TRACE("Setting debug ui block events to {}", block);
+		Li::Log::Trace("Setting debug ui block events to {}", block);
 #ifndef LI_DIST
 		Li::Application::Get<Horizons>().GetImGuiRenderer()->SetBlockEvents(block);
 #endif

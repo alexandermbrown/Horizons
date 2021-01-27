@@ -80,7 +80,7 @@ void NewTerrainModal::FileDialog()
 			m_Path = fs_path.replace_extension(".terrain").string();
 	}
 	else if (result == NFD_ERROR)
-		LI_ERROR(NFD_GetError());
+		Li::Log::Error(NFD_GetError());
 }
 
 #endif

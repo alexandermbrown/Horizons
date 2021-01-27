@@ -73,12 +73,12 @@ namespace Li
 			}
 			else
 			{
-				LI_CORE_ERROR("Could not read from file '{0}'", filepath);
+				Log::CoreError("Could not read from file '{0}'", filepath);
 			}
 		}
 		else
 		{
-			LI_CORE_ERROR("Could not open file '{0}'", filepath);
+			Log::CoreError("Could not open file '{0}'", filepath);
 		}
 
 		return result;
@@ -138,7 +138,7 @@ namespace Li
 
 				glDeleteShader(shader);
 
-				LI_CORE_ERROR("{0}", infoLog.data());
+				Log::CoreError("{0}", infoLog.data());
 				LI_CORE_ASSERT(false, "Shader compilation failure!");
 				break;
 			}
@@ -171,7 +171,7 @@ namespace Li
 				glDeleteShader(id);
 			}
 
-			LI_CORE_ERROR("{0}", infoLog.data());
+			Log::CoreError("{0}", infoLog.data());
 			LI_CORE_ASSERT(false, "Shader link failure!");
 			return;
 		}

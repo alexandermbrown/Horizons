@@ -89,28 +89,28 @@ void PlayerSystem::OnEvent(entt::registry& registry, SDL_Event* event)
 	{
 		ConfigStore& config = Game::Get()->GetConfig();
 
-		if (event->key.keysym.scancode == config.Get("keybind_move_left").GetInt())
+		if (event->key.keysym.scancode == config.Get<int>("keybind_move_left"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.left = true;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_right").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_right"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.right = true;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_up").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_up"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.up = true;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_down").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_down"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
@@ -122,28 +122,28 @@ void PlayerSystem::OnEvent(entt::registry& registry, SDL_Event* event)
 	{
 		ConfigStore& config = Game::Get()->GetConfig();
 
-		if (event->key.keysym.scancode == config.Get("keybind_move_left").GetInt())
+		if (event->key.keysym.scancode == config.Get<int>("keybind_move_left"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.left = false;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_right").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_right"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.right = false;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_up").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_up"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());
 
 			player.up = false;
 		}
-		else if (event->key.keysym.scancode == config.Get("keybind_move_down").GetInt())
+		else if (event->key.keysym.scancode == config.Get<int>("keybind_move_down"))
 		{
 			auto view = registry.view<cp::player>();
 			cp::player& player = view.get<cp::player>(view.front());

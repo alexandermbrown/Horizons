@@ -16,7 +16,7 @@ namespace Li
 	{
 		while (ALenum error = alGetError())
 		{
-			LI_CORE_ERROR("[OpenAL Error] {} : {} : {} : {}", error, function, file, line);
+			Log::CoreError("[OpenAL Error] {} : {} : {} : {}", error, function, file, line);
 			return false;
 		}
 		return true;

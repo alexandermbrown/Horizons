@@ -41,7 +41,7 @@ namespace Li
 		GLenum error = glGetError();
 		while (error != GL_NO_ERROR)
 		{
-			LI_CORE_ERROR("[OpenGL Error] {} : {} : {} : {}", GLErrorToString(error), function, file, line);
+			Log::CoreError("[OpenGL Error] {} : {} : {} : {}", GLErrorToString(error), function, file, line);
 			return false;
 		}
 		return true;

@@ -12,14 +12,14 @@ void TerrainData::LoadTypes()
 	sol::table app = lua["App"];
 	if (!app.valid())
 	{
-		LI_ERROR("Error reading global 'App'");
+		Li::Log::Error("Error reading global 'App'");
 		return;
 	}
 
 	sol::table terrain_list = app["terrain"];
 	if (!terrain_list.valid())
 	{
-		LI_ERROR("Error reading 'prototypes.terrain'");
+		Li::Log::Error("Error reading 'prototypes.terrain'");
 		return;
 	}
 
@@ -43,13 +43,13 @@ void TerrainData::LoadTypes()
 					terrain_struct.ID = id.value();
 				else
 				{
-					LI_ERROR("Unaliagned terrain id: {} at index {}. Ensure id and index are equal.", id.value(), index);
+					Li::Log::Error("Unaliagned terrain id: {} at index {}. Ensure id and index are equal.", id.value(), index);
 					break;
 				}
 			}
 			else
 			{
-				LI_ERROR("Error reading integer 'id' in terrain at index {}.", index);
+				Li::Log::Error("Error reading integer 'id' in terrain at index {}.", index);
 				break;
 			}
 			// Name.
@@ -58,7 +58,7 @@ void TerrainData::LoadTypes()
 				terrain_struct.Name = name.value();
 			else
 			{
-				LI_ERROR("Error reading string 'name' in terrain with id.", index);
+				Li::Log::Error("Error reading string 'name' in terrain with id.", index);
 				break;
 			}
 			// Atlas Name.
@@ -67,7 +67,7 @@ void TerrainData::LoadTypes()
 				terrain_struct.Atlas = atlas.value();
 			else
 			{
-				LI_ERROR("Error reading string 'atlas' in terrain with id {}.", index);
+				Li::Log::Error("Error reading string 'atlas' in terrain with id {}.", index);
 				break;
 			}
 			// Noise amplitude.
@@ -79,7 +79,7 @@ void TerrainData::LoadTypes()
 			if (terrain_struct.BlendWidth < 0.0f || terrain_struct.BlendWidth > 1.0f)
 			{
 				terrain_struct.BlendWidth = 0.0f;
-				LI_ERROR("Blend width ({}) in terrain with id {} must be between 0.0 and 1.0. ", terrain_struct.BlendWidth, index);
+				Li::Log::Error("Blend width ({}) in terrain with id {} must be between 0.0 and 1.0. ", terrain_struct.BlendWidth, index);
 			}
 			// Noise.
 			sol::optional<sol::table> noise_optional = terrain["noise"];
@@ -99,13 +99,13 @@ void TerrainData::LoadTypes()
 					}
 					else
 					{
-						LI_ERROR("Unknown noise type '{}' in terrain with id {}", type.value(), index);
+						Li::Log::Error("Unknown noise type '{}' in terrain with id {}", type.value(), index);
 						break;
 					}
 				}
 				else
 				{
-					LI_ERROR("Missing string 'type' in 'noise' in terrain with id {}", index);
+					Li::Log::Error("Missing string 'type' in 'noise' in terrain with id {}", index);
 				}
 			}
 			else
@@ -117,7 +117,7 @@ void TerrainData::LoadTypes()
 		}
 		else
 		{
-			LI_ERROR("Invalid element in terrain at index {}.", index);
+			Li::Log::Error("Invalid element in terrain at index {}.", index);
 			break;
 		}
 	}
@@ -131,7 +131,7 @@ const TerrainType& TerrainData::GetTerrainPrototype(uint16_t id) const
 		return m_Types.at(id);
 	else
 	{
-		LI_ERROR("ID out of range!");
+		Li::Log::Error("ID out of range!");
 		return m_Types.at(0);
 	}
 }

@@ -24,7 +24,7 @@ namespace Li
 			return Li::MakeUnique<D3D11Window>(props);
 #endif
 		default:
-			LI_CORE_ERROR("Unknown graphics API");
+			Log::CoreError("Unknown graphics API");
 			return nullptr;
 		}
 	}

@@ -22,7 +22,7 @@ ScriptScene::ScriptScene(const std::string& lua_class_name)
 			{
 				lua["App"]["current_scene"] = sol::lua_nil;
 				sol::error error = result;
-				LI_ERROR("{}", error.what());
+				Li::Log::Error("{}", error.what());
 				LI_DEBUG_BREAK();
 			}
 		}
@@ -30,14 +30,14 @@ ScriptScene::ScriptScene(const std::string& lua_class_name)
 		{
 			lua["App"]["current_scene"] = sol::lua_nil;
 			sol::error error = result;
-			LI_ERROR("{}", error.what());
+			Li::Log::Error("{}", error.what());
 			LI_DEBUG_BREAK();
 		}
 	}
 	else
 	{
 		lua["App"]["current_scene"] = sol::lua_nil;
-		LI_ERROR("Invalid or non-existent Lua scene {}.", lua_class_name);
+		Li::Log::Error("Invalid or non-existent Lua scene {}.", lua_class_name);
 		LI_DEBUG_BREAK();
 	}
 }
@@ -51,7 +51,7 @@ ScriptScene::~ScriptScene()
 		if (!result.valid())
 		{
 			sol::error error = result;
-			LI_ERROR("{}", error.what());
+			Li::Log::Error("{}", error.what());
 			LI_DEBUG_BREAK();
 		}
 	}
@@ -76,7 +76,7 @@ void CallOptionalMethod(const sol::table& table, const char* fn_name)
 		if (!result.valid())
 		{
 			sol::error error = result;
-			LI_ERROR("{}", error.what());
+			Li::Log::Error("{}", error.what());
 			LI_DEBUG_BREAK();
 		}
 	}

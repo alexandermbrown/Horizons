@@ -71,7 +71,7 @@ namespace Li
 	{
 		if (!m_Dynamic)
 		{
-			LI_CORE_ERROR("Label must be dynamic to set text!");
+			Log::CoreError("Label must be dynamic to set text!");
 			return;
 		}
 
@@ -82,7 +82,7 @@ namespace Li
 		bool resize = LoadLayout(utf8_text);
 		if (resize)
 		{
-			LI_CORE_WARN("Increasing text buffer size.");
+			Log::CoreWarn("Increasing text buffer size.");
 			CreateRenderingBuffers(true);
 		}
 		else

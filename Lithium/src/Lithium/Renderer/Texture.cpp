@@ -28,7 +28,7 @@ namespace Li
 #endif
 		}
 
-		LI_CORE_ERROR("Unknown RendererAPI!");
+		Log::CoreError("Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -48,7 +48,7 @@ namespace Li
 #endif
 		}
 
-		LI_CORE_ERROR("Unknown RendererAPI!");
+		Log::CoreError("Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -67,7 +67,7 @@ namespace Li
 #endif
 		}
 
-		LI_CORE_ERROR("Unknown RendererAPI!");
+		Log::CoreError("Unknown RendererAPI!");
 		return nullptr;
 	}
 }

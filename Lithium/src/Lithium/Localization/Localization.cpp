@@ -21,7 +21,7 @@ namespace Li
 				return;
 			}
 		}
-		LI_CORE_ERROR("Failed to find locale '{}'.", localeCode);
+		Log::CoreError("Failed to find locale '{}'.", localeCode);
 	}
 
 }

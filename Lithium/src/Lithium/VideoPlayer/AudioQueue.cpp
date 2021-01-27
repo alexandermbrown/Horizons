@@ -46,7 +46,7 @@ namespace Li
 
 			if (num_processed == m_Buffers.size() && m_Playing)
 			{
-				LI_CORE_WARN("Audio buffer ran out of audio!");
+				Log::CoreWarn("Audio buffer ran out of audio!");
 				play = m_Playing;
 			}
 
@@ -64,7 +64,7 @@ namespace Li
 					buffer_id = m_Buffers[m_CurrentBuffer]->GetBufferID();
 
 					if (m_Buffers.size() > NumBuffersTarget)
-						LI_CORE_WARN("Resizing audio queue to {} buffers", m_Buffers.size());
+						Log::CoreWarn("Resizing audio queue to {} buffers", m_Buffers.size());
 				}
 				else
 				{

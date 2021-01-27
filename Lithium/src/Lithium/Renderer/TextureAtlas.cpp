@@ -41,7 +41,7 @@ namespace Li
 		if (iter != m_Entries.end())
 			return iter->second;
 
-		LI_ERROR(false, "Alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
+		Li::Log::Error("Alias {} not found in texture atlas with texture '{}'", texture_alias, m_TextureAlias);
 		// Ensure we don't return a dangling pointer.
 		static const glm::vec4 default_bounds = { 0.0f, 0.0f, 1.0f, 1.0f };
 		return default_bounds;

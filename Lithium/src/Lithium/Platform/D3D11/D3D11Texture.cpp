@@ -73,7 +73,7 @@ namespace Li
 
 		if (desired_channels < 1 || desired_channels == 3 || desired_channels > 4)
 		{
-			LI_CORE_ERROR("Texture cannot have {} channels, defaulting to 4.", desired_channels);
+			Log::CoreError("Texture cannot have {} channels, defaulting to 4.", desired_channels);
 			desired_channels = 4;
 		}
 		m_Channels = desired_channels;

@@ -85,7 +85,7 @@ void Systems::UILayout::AddSibling(entt::registry& registry, entt::entity existi
 
 void Systems::UILayout::Rebuild(entt::registry& registry, entt::entity context_ent)
 {
-	LI_TRACE("Rebuilding UI...");
+	Li::Log::Trace("Rebuilding UI...");
 
 	cp::ui_context& context = registry.get<cp::ui_context>(context_ent);
 	cp::ui_element& root = registry.get<cp::ui_element>(context_ent);
@@ -134,7 +134,7 @@ void Systems::UILayout::RebuildChildren(entt::registry& registry, cp::ui_context
 
 void Systems::UILayout::Recalculate(entt::registry& registry, cp::ui_context& context)
 {
-	LI_TRACE("Recalculating UI...");
+	Li::Log::Trace("Recalculating UI...");
 
 	lay_run_context(context.context.get());
 

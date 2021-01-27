@@ -14,7 +14,7 @@ namespace Li
 		case BufferUsage::DynamicDraw:
 			return GL_DYNAMIC_DRAW;
 		default:
-			LI_CORE_ERROR("Unknown buffer usage {}.", usage);
+			Log::CoreError("Unknown buffer usage {}.", usage);
 			return 0;
 		}
 	}
@@ -34,7 +34,7 @@ namespace Li
 		case DrawMode::TriangleStrip:
 			return GL_TRIANGLE_STRIP;
 		default:
-			LI_CORE_ERROR("Unknown draw mode {}.", mode);
+			Log::CoreError("Unknown draw mode {}.", mode);
 			return 0;
 		}
 	}
@@ -52,7 +52,7 @@ namespace Li
 		case WrapType::ClampToBorder:
 			return GL_CLAMP_TO_BORDER;
 		default:
-			LI_CORE_ERROR("Unknown wrap type {}.", type);
+			Log::CoreError("Unknown wrap type {}.", type);
 			return 0;
 		}
 	}
@@ -72,7 +72,7 @@ namespace Li
 		case FilterType::NearestMipmapLinear:
 			return GL_NEAREST_MIPMAP_LINEAR;
 		default:
-			LI_CORE_ERROR("Unknown filter type {}.", type);
+			Log::CoreError("Unknown filter type {}.", type);
 			return 0;
 		}
 	}
@@ -123,7 +123,7 @@ namespace Li
 	//	case FramebufferTarget::DrawFramebuffer:
 	//		return GL_DRAW_FRAMEBUFFER;
 	//	default:
-	//		LI_CORE_ERROR("Unknown framebuffer target {}.", target);
+	//		Log::CoreError("Unknown framebuffer target {}.", target);
 	//		return 0;
 	//	}
 	//}
@@ -155,7 +155,7 @@ namespace Li
 	//	case FramebufferAttachment::DepthStencilAttachment:
 	//		return GL_DEPTH_STENCIL_ATTACHMENT;
 	//	default:
-	//		LI_CORE_ERROR("Unknown framebuffer attachment {}.", attachment);
+	//		Log::CoreError("Unknown framebuffer attachment {}.", attachment);
 	//		return 0;
 	//	}
 	//}
@@ -171,7 +171,7 @@ namespace Li
 	//	case ImageFormat::DepthStencil:
 	//		return GL_DEPTH_STENCIL;
 	//	default:
-	//		LI_CORE_ERROR("Unknown image format {}.", format);
+	//		Log::CoreError("Unknown image format {}.", format);
 	//		return 0;
 	//	}
 	//}
@@ -186,7 +186,7 @@ namespace Li
 	//	case InternalImageFormat::Depth24Stencil8:
 	//		return GL_DEPTH24_STENCIL8;
 	//	default:
-	//		LI_CORE_ERROR("Unknown image format {}.", format);
+	//		Log::CoreError("Unknown image format {}.", format);
 	//		return 0;
 	//	}
 	//}

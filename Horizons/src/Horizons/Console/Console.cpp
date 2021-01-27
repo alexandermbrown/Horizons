@@ -30,7 +30,7 @@ void Console::ExecuteCommand(const std::string& command)
 
 		if (!error.empty())
 		{
-			LI_ERROR(error);
+			Li::Log::Error(error);
 			WriteLine("[error] " + error, { 1.0f, 0.1f, 0.1f, 1.0f });
 		}
 	}

@@ -88,7 +88,7 @@ namespace Li
 		auto it = m_Atlases.find(texture_name);
 		if (it == m_Atlases.end())
 		{
-			LI_CORE_ERROR("Texture {} not found.", texture_name);
+			Log::CoreError("Texture {} not found.", texture_name);
 			return;
 		}
 

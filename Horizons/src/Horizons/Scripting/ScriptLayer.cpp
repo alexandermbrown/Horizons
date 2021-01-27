@@ -47,20 +47,20 @@ void ScriptLayer::InitLuaClass(const std::string& lua_class_name)
 			if (!m_Layer.valid())
 			{
 				sol::error error = result;
-				LI_ERROR("{}", error.what());
+				Li::Log::Error("{}", error.what());
 				LI_DEBUG_BREAK();
 			}
 		}
 		else
 		{
 			sol::error error = result;
-			LI_ERROR("{}", error.what());
+			Li::Log::Error("{}", error.what());
 			LI_DEBUG_BREAK();
 		}
 	}
 	else
 	{
-		LI_ERROR("Invalid or non-existent Lua layer {}.", lua_class_name);
+		Li::Log::Error("Invalid or non-existent Lua layer {}.", lua_class_name);
 		LI_DEBUG_BREAK();
 	}
 }
@@ -78,11 +78,11 @@ void ScriptLayer::InitSystems(const std::string& lua_class_name)
 			}
 			else
 			{
-				LI_WARN("({}) Expected string in system list but found {}",
+				Li::Log::Warn("({}) Expected string in system list but found {}",
 					lua_class_name, sol::type_name(system_pair.second.lua_state(), system_pair.second.get_type()));
 				LI_DEBUG_BREAK();
 			}
 		}
 	}
-	else LI_WARN("Systems list not found in layer {}", lua_class_name);
+	else Li::Log::Warn("Systems list not found in layer {}", lua_class_name);
 }

@@ -61,7 +61,7 @@ bool OnMouseDown(entt::registry& registry, int x, int y, int button)
 						sol::protected_function_result result = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
 						if (result.valid() && result.get_type() == sol::type::boolean)
 							clickHandled = result.get<bool>();
-						else LI_ERROR("Bad return from OnClick. Expected bool.");
+						else Li::Log::Error("Bad return from OnClick. Expected bool.");
 					}
 				}
 			}
@@ -79,7 +79,7 @@ bool OnMouseDown(entt::registry& registry, int x, int y, int button)
 				sol::protected_function_result result = click.OnMouseDownLuaFn(sol::light(registry), entity, click.mouse_button);
 				if (result.valid() && result.get_type() == sol::type::boolean)
 					mouseDownHandled = result.get<bool>();
-				else LI_ERROR("Bad return from OnMouseDown. Expected bool.");
+				else Li::Log::Error("Bad return from OnMouseDown. Expected bool.");
 
 				if (mouseDownHandled)
 					return true;
@@ -116,7 +116,7 @@ bool OnMouseUp(entt::registry& registry, int x, int y, int button)
 					sol::protected_function_result result = click.OnClickLuaFn(sol::light(registry), entity, click.mouse_button);
 					if (result.valid() && result.get_type() == sol::type::boolean)
 						clickHandled = result.get<bool>();
-					else LI_ERROR("Bad return from OnClick. Expected bool.");
+					else Li::Log::Error("Bad return from OnClick. Expected bool.");
 				}
 			}
 
@@ -130,7 +130,7 @@ bool OnMouseUp(entt::registry& registry, int x, int y, int button)
 					sol::protected_function_result result = click.OnMouseUpLuaFn(sol::light(registry), entity, click.mouse_button);
 					if (result.valid() && result.get_type() == sol::type::boolean)
 						mouseUpHandled = result.get<bool>();
-					else LI_ERROR("Bad return from OnMouseUp. Expected bool.");
+					else Li::Log::Error("Bad return from OnMouseUp. Expected bool.");
 				}
 			}
 		}

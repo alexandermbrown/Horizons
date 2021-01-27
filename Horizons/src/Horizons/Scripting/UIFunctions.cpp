@@ -106,7 +106,7 @@ void UIFunctions::LoadFunctions(sol::state& lua)
 			if (arg.is<lay_box_flags>())
 				flags |= arg.as<lay_box_flags>();
 			else
-				LI_ERROR("Expected UI.Contain enum in argument list but found {}",
+				Li::Log::Error("Expected UI.Contain enum in argument list but found {}",
 					sol::type_name(arg.lua_state(), arg.get_type()));
 		}
 
@@ -121,7 +121,7 @@ void UIFunctions::LoadFunctions(sol::state& lua)
 			if (arg.is<lay_layout_flags>())
 				flags |= arg.as<lay_layout_flags>();
 			else
-				LI_ERROR("Expected UI.Behave enum in argument list but found {}",
+				Li::Log::Error("Expected UI.Behave enum in argument list but found {}",
 					sol::type_name(arg.lua_state(), arg.get_type()));
 		}
 
@@ -151,7 +151,7 @@ void UIFunctions::LoadFunctions(sol::state& lua)
 			cp::label& label_cp = (*registry_ptr).emplace<cp::label>(element);
 			label_cp.label_ref = Li::MakeRef<Li::Label>(text.value(), pt_size.value(), Li::ResourceManager::GetFont(font.value()), dynamic.value_or(false), excess.value_or(0));
 		}
-		else LI_ERROR("Missing label data in UIElementSetLabel(..), entity {}", element);
+		else Li::Log::Error("Missing label data in UIElementSetLabel(..), entity {}", element);
 	});
 
 	UI.set_function("UIElementAddTextureCrop", [](sol::light<entt::registry> registry_ptr, entt::entity element)

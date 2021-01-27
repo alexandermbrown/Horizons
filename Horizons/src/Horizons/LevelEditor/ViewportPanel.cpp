@@ -140,7 +140,7 @@ bool ViewportPanel::FileNew(const std::string& path, glm::ivec2 world_size)
 bool ViewportPanel::FileOpen(const std::string& path)
 {
 	LI_ASSERT(!m_TerrainOpen, "Terrain must not be open.");
-	LI_TRACE("Opening terrain file {}", path);
+	Li::Log::Trace("Opening terrain file {}", path);
 	m_CameraFocus = EditorCameraSystem::GetCameraFocusPoint(m_Registry);
 	
 	m_TerrainOpen = m_TerrainRenderer.LoadTerrain(path, {
@@ -161,7 +161,7 @@ void ViewportPanel::FileSaveAs(const std::string& path)
 	// TODO: handle error in editor layer.
 	if (!m_TerrainStore.SaveAs(path))
 	{
-		LI_ERROR("Failed to save terrain as {}", path);
+		Li::Log::Error("Failed to save terrain as {}", path);
 	}
 }
 

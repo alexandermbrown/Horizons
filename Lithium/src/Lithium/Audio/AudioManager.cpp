@@ -22,19 +22,19 @@ namespace Li
 		ALCdevice* device = alcOpenDevice(device_name);
 		if (device == nullptr)
 		{
-			LI_CORE_ERROR("Failed to open audio device.");
+			Log::CoreError("Failed to open audio device.");
 			return false;
 		}
 		ALCcontext* context = alcCreateContext(device, nullptr);
 		if (context == nullptr)
 		{
-			LI_CORE_ERROR("Failed to create audio context.");
+			Log::CoreError("Failed to create audio context.");
 			alcCloseDevice(device);
 			return false;
 		}
 		if (alcMakeContextCurrent(context) == false)
 		{
-			LI_CORE_ERROR("Failed to make audio context current!");
+			Log::CoreError("Failed to make audio context current!");
 			alcDestroyContext(context);
 			alcCloseDevice(device);
 			return false;

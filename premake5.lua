@@ -220,7 +220,8 @@ project "Horizons"
 		"%{IncludeDir.harfbuzz}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.sol}",
-		"%{IncludeDir.nativefiledialog}"
+		"%{IncludeDir.nativefiledialog}",
+		"%{IncludeDir.yamlcpp}"
 	}
 
 	links {
@@ -228,7 +229,8 @@ project "Horizons"
 		"box2d",
 		"lua51",
 		"luajit",
-		"nativefiledialog"
+		"nativefiledialog",
+		"yaml-cpp"
 	}
 
 	filter "system:windows"

@@ -14,7 +14,7 @@ namespace Li
 		m_FormatCtx = avformat_alloc_context();
 		if (m_FormatCtx == nullptr)
 		{
-			LI_CORE_ERROR("Failed to allocate memory for libav format context ({})", path);
+			Log::CoreError("Failed to allocate memory for libav format context ({})", path);
 			throw "Failed to allocate memory for libav format context";
 		}
 		// Open media file for demuxing.
@@ -23,7 +23,7 @@ namespace Li
 		{
 			char errbuf[AV_ERROR_MAX_STRING_SIZE];
 			av_strerror(err, errbuf, AV_ERROR_MAX_STRING_SIZE);
-			LI_CORE_ERROR("Failed to open video: {} ({})", errbuf, path);
+			Log::CoreError("Failed to open video: {} ({})", errbuf, path);
 			throw "Failed to open video";
 		}
 		// Read packets of the media file to get stream info.
@@ -31,7 +31,7 @@ namespace Li
 		{
 			char errbuf[AV_ERROR_MAX_STRING_SIZE];
 			av_strerror(err, errbuf, AV_ERROR_MAX_STRING_SIZE);
-			LI_CORE_ERROR("Failed to find stream info: {} ({})", errbuf, path);
+			Log::CoreError("Failed to find stream info: {} ({})", errbuf, path);
 			throw "Failed to find stream info";
 		}
 
@@ -41,7 +41,7 @@ namespace Li
 		m_Packet = av_packet_alloc();
 		if (m_Packet == nullptr)
 		{
-			LI_CORE_ERROR("Failed to allocate memory for packet ({})", path);
+			Log::CoreError("Failed to allocate memory for packet ({})", path);
 			throw "Failed to allocate memory for packet";
 		}
 	}
@@ -71,14 +71,14 @@ namespace Li
 		m_VideoStreamIndex = av_find_best_stream(m_FormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 		if (m_VideoStreamIndex < 0)
 		{
-			LI_CORE_ERROR("Video stream not found ({})", path);
+			Log::CoreError("Video stream not found ({})", path);
 			throw "Video stream not found in media file";
 		}
 		// Check that stream is VP9 codec.
 		m_VideoStream = m_FormatCtx->streams[m_VideoStreamIndex];
 		if (m_VideoStream->codecpar->codec_id != AV_CODEC_ID_VP9)
 		{
-			LI_CORE_ERROR("Video stream codec must be VP9 ({})", path);
+			Log::CoreError("Video stream codec must be VP9 ({})", path);
 			throw "Video stream codec must be VP9";
 		}
 	}
@@ -91,7 +91,7 @@ namespace Li
 		m_AudioStream = m_FormatCtx->streams[m_AudioStreamIndex];
 		if (m_AudioStream->codecpar->codec_id != AV_CODEC_ID_OPUS)
 		{
-			LI_CORE_ERROR("Audio stream codec must be OPUS ({})", path);
+			Log::CoreError("Audio stream codec must be OPUS ({})", path);
 			m_AudioStreamIndex = -1;
 		}
 	}

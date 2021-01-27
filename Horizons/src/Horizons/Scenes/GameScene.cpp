@@ -9,7 +9,7 @@
 void GameScene::OnShow()
 {
 	Horizons& app = Li::Application::Get<Horizons>();
-	app.GetConfig().Get("app_state").SetUnsigned((unsigned int)AppState::InGame);
+	app.GetConfig().Set<int>("app_state", static_cast<int>(AppState::InGame));
 	app.PushLayer(Li::MakeUnique<GameLayer>());
 #ifndef LI_DIST
 	app.GetImGuiRenderer()->SetBlockEvents(true);

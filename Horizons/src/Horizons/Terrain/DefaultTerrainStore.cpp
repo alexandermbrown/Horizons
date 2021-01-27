@@ -21,7 +21,7 @@ bool DefaultTerrainStore::LoadTerrain(const std::string& path, glm::ivec2 center
 	m_TerrainFile.open(path, std::ios::in | std::ios::binary);
 	if (!m_TerrainFile.is_open())
 	{
-		LI_ERROR("Failed to open terrain file {}", path);
+		Li::Log::Error("Failed to open terrain file {}", path);
 		return false;
 	}
 	m_TerrainPath = path;
@@ -34,7 +34,7 @@ bool DefaultTerrainStore::LoadTerrain(const std::string& path, glm::ivec2 center
 	m_WorldWidth = width;
 	m_WorldHeight = height;
 
-	LI_INFO("Loading {}x{} terrain: {}", width, height, path);
+	Li::Log::Info("Loading {}x{} terrain: {}", width, height, path);
 	LoadInitialChunks(center);
 
 	// Start load thread.
@@ -81,7 +81,7 @@ void DefaultTerrainStore::LoadRenderChunkData(glm::ivec2 store_coord, RenderChun
 
 	// Fill the alpha buffer with 0 because the chunk has not been loaded into storage yet.
 	{
-		LI_WARN("Chunk ({}, {}) not loaded in store.", store_coord.x, store_coord.y);
+		Li::Log::Warn("Chunk ({}, {}) not loaded in store.", store_coord.x, store_coord.y);
 
 		float alpha_values[ChunkHeight + 1][ChunkWidth + 1][NumTilesPerChunk - 1] = { 0.0f };
 		destination->AlphaVB->SetSubData((float*)alpha_values, sizeof(alpha_values), 0, true);

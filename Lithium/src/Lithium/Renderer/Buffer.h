@@ -23,7 +23,7 @@ namespace Li
 		case ShaderDataType::Int4:     return 4 * 4;
 		}
 
-		LI_CORE_ERROR("Unknown ShaderDataType!");
+		Log::CoreError("Unknown ShaderDataType!");
 		return 0;
 	}
 
@@ -59,7 +59,7 @@ namespace Li
 			case ShaderDataType::Int4:    return 4;
 			}
 
-			LI_CORE_ERROR("Unknown ShaderDataType!");
+			Log::CoreError("Unknown ShaderDataType!");
 			return 0;
 		}
 
@@ -78,7 +78,7 @@ namespace Li
 			case ShaderDataType::Int4:    return 1;
 			}
 
-			LI_CORE_ERROR("Unknown ShaderDataType!");
+			Log::CoreError("Unknown ShaderDataType!");
 			return 0;
 		}
 	};

@@ -26,18 +26,18 @@ namespace Li
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
-			LI_CORE_ERROR("Failed to initialize SDL!");
+			Log::CoreError("Failed to initialize SDL!");
 			return;
 		}
 
 		SDL_version compiled_version;
 		SDL_VERSION(&compiled_version);
-		LI_CORE_INFO("SDL compiled ver {0}.{1}.{2}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
+		Log::CoreInfo("SDL compiled ver {0}.{1}.{2}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
 
 #ifdef LI_DEBUG
 		SDL_version linked_version;
 		SDL_GetVersion(&linked_version);
-		LI_CORE_INFO("SDL linked ver {0}.{1}.{2}", linked_version.major, linked_version.minor, linked_version.patch);
+		Log::CoreInfo("SDL linked ver {0}.{1}.{2}", linked_version.major, linked_version.minor, linked_version.patch);
 
 		LI_CORE_ASSERT(
 			linked_version.major == SDL_MAJOR_VERSION &&
@@ -108,7 +108,7 @@ namespace Li
 				m_CurrentScene->OnShow();
 			}
 			else if (!m_CurrentScene)
-				LI_CORE_WARN("No scene active.");
+				Log::CoreWarn("No scene active.");
 
 			///////////////////
 			// Update Layers //
@@ -195,7 +195,7 @@ namespace Li
 			{
 				int w, h;
 				SDL_GetWindowSize(m_Window->GetWindow(), &w, &h);
-				LI_CORE_INFO("Resizing renderer ({0}, {1})", w, h);
+				Log::CoreInfo("Resizing renderer ({0}, {1})", w, h);
 
 				m_Window->OnWindowResize(w, h);
 				m_Window->GetContext()->ResizeView(w, h);

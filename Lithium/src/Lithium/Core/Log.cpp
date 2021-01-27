@@ -18,13 +18,13 @@ namespace Li
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 
-	Ref<spdlog::logger>& Log::GetCoreLogger()
+	spdlog::logger* Log::GetCoreLogger()
 	{
-		return s_CoreLogger;
+		return s_CoreLogger.get();
 	}
 
-	Ref<spdlog::logger>& Log::GetClientLogger()
+	spdlog::logger* Log::GetClientLogger()
 	{
-		return s_ClientLogger;
+		return s_ClientLogger.get();
 	}
 }
