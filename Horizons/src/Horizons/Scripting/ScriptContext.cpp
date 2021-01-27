@@ -44,12 +44,10 @@ void ScriptContext::LoadFunctions()
 	sol::table app = m_Lua["App"];
 
 	app.set_function("SetState", [](AppState app_state) {
-		Li::Log::Trace("Setting app state to {}", app_state);
 		Li::Application::Get<Horizons>().GetConfig().Set<int>("app_state", static_cast<int>(app_state));
 	});
 
 	app.set_function("SetDebugUIBlockEvents", [](bool block) {
-		Li::Log::Trace("Setting debug ui block events to {}", block);
 #ifndef LI_DIST
 		Li::Application::Get<Horizons>().GetImGuiRenderer()->SetBlockEvents(block);
 #endif
