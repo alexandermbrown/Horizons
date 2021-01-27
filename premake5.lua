@@ -37,13 +37,6 @@ IncludeDir["flatbuffers"] = "AssetBase/vendor/flatbuffers/include"
 IncludeDir["yamlcpp"] = "AssetBase/vendor/yaml-cpp/include"
 IncludeDir["lab_serial"] = "FlatBuffers/include"
 
-IncludeDir["yojimbo"] = "GameServer/vendor/yojimbo"
-IncludeDir["nlohmann_json"] = "GameServer/vendor/nlohmann_json/include"
-
-IncludeDir["httplib"] = "ServerManager/vendor/httplib/include"
-IncludeDir["openssl"] = "ServerManager/vendor/OpenSSL/vc-win64a/include"
-IncludeDir["libb64"] = "ServerManager/vendor/libb64/include"
-
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
 IncludeDir["box2d"] = "Horizons/vendor/box2d/include"
 IncludeDir["steam"] = "Horizons/vendor/steam/include"
@@ -61,8 +54,6 @@ include "Lithium/vendor/openal-soft"
 include "Lithium/vendor/harfbuzz"
 include "AssetBase/vendor/msdfgen"
 include "AssetBase/vendor/yaml-cpp"
-include "GameServer/vendor/yojimbo"
-include "ServerManager/vendor/libb64"
 include "Horizons/vendor/box2d"
 include "Horizons/vendor/nativefiledialog"
 group  ""
@@ -319,121 +310,6 @@ project "AssetBase"
 			"dxgi.lib",
 			"d3dcompiler.lib"
 		}
-
-	filter "configurations:Debug"
-		defines "LI_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "LI_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "LI_DIST"
-		runtime "Release"
-		optimize "on"
-
------------------------------- GameServer ------------------------------
-
-project "GameServer"
-	location "GameServer"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "off"
-
-	targetdir ("build/" .. outputdir .. "/%{prj.name}")
-	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
-
-	pchheader "pch.h"
-	pchsource "GameServer/src/pch.cpp"
-
-	files {
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs {
-		"GameServer/src",
-		"GameServer/vendor",
-		"%{IncludeDir.yojimbo}",
-		"%{IncludeDir.nlohmann_json}",
-		"%{IncludeDir.libb64}",
-		"%{IncludeDir.steam}"
-	}
-
-	links {
-		"yojimbo",
-		"libb64"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-
-		libdirs { "Horizons/vendor/steam/lib/win64" }
-		links { "steam_api64" }
-
-	filter "configurations:Debug"
-		defines "LI_DEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		defines "LI_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "LI_DIST"
-		runtime "Release"
-		optimize "on"
-
------------------------------- ServerManager ------------------------------
-
-project "ServerManager"
-	location "ServerManager"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "off"
-
-	targetdir ("build/" .. outputdir .. "/%{prj.name}")
-	objdir ("build-int/" .. outputdir .. "/%{prj.name}")
-
-	pchheader "pch.h"
-	pchsource "ServerManager/src/pch.cpp"
-
-	files {
-		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
-	}
-
-	includedirs {
-		"ServerManager/src",
-		"%{IncludeDir.httplib}",
-		"%{IncludeDir.yojimbo}",
-		"%{IncludeDir.nlohmann_json}",
-		"%{IncludeDir.openssl}",
-		"%{IncludeDir.libb64}",
-		"%{IncludeDir.steam}"
-	}
-
-	links {
-		"libcrypto",
-		"libssl",
-		"libb64"
-	}
-
-	filter "system:windows"
-		systemversion "latest"
-
-		libdirs {
-			"ServerManager/vendor/OpenSSL/vc-win64a/lib",
-			"Horizons/vendor/steam/lib/win64"
-		}
-		links { "steam_api64" }
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"
