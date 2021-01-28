@@ -40,7 +40,7 @@ namespace Li
 		LI_CORE_ASSERT(m_InputLayout && m_D3DVertexBuffers.size() == m_VertexBufferStrides.size() 
 			&& m_D3DVertexBuffers.size() == m_VertexBufferOffsets.size(), "Did you remember to call Finalize()?");
 
-		m_ContextHandle->IASetInputLayout(m_InputLayout);
+		m_ContextHandle->IASetInputLayout(m_InputLayout.Get());
 		m_ContextHandle->IASetVertexBuffers(0, (UINT)m_D3DVertexBuffers.size(), m_D3DVertexBuffers.data(), m_VertexBufferStrides.data(), m_VertexBufferOffsets.data());
 		if (m_IndexBuffer) m_IndexBuffer->Bind();
 	}
@@ -94,7 +94,7 @@ namespace Li
 
 		LI_CORE_ASSERT(inputDesc.size() < 32, "Layout too large!");
 
-		Ref<D3D11Shader> d3dShader = std::static_pointer_cast<D3D11Shader>(shader);
-		D3D11Call( m_DeviceHandle->CreateInputLayout(inputDesc.data(), (uint32_t)inputDesc.size(), d3dShader->GetVSBufferData(), d3dShader->GetVSBufferSize(), &m_InputLayout) );
+		const Ref<D3D11Shader>& d3d_shader = std::static_pointer_cast<D3D11Shader>(shader);
+		D3D11Call( m_DeviceHandle->CreateInputLayout(inputDesc.data(), (uint32_t)inputDesc.size(), d3d_shader->GetVSBufferData(), d3d_shader->GetVSBufferSize(), &m_InputLayout) );
 	}
 }

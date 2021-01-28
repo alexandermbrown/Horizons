@@ -50,7 +50,7 @@ namespace Li
 		view_desc.Texture2D.MostDetailedMip = 0;
 		view_desc.Texture2D.MipLevels = texture_desc.MipLevels;
 
-		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture, &view_desc, &m_ResourceView));
+		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture.Get(), &view_desc, &m_ResourceView));
 
 		D3D11_SAMPLER_DESC sampler_desc;
 		sampler_desc.Filter = CalculateFilter(min_filter, mag_filter);
@@ -112,7 +112,7 @@ namespace Li
 		view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		view_desc.Texture2D.MostDetailedMip = 0;
 		view_desc.Texture2D.MipLevels = texture_desc.MipLevels;
-		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture, &view_desc, &m_ResourceView));
+		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture.Get(), &view_desc, &m_ResourceView));
 
 		D3D11_SAMPLER_DESC sampler_desc;
 		sampler_desc.Filter = CalculateFilter(min_filter, mag_filter);
@@ -172,7 +172,7 @@ namespace Li
 		view_desc.Texture2D.MostDetailedMip = 0;
 		view_desc.Texture2D.MipLevels = texture_desc.MipLevels;
 
-		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture, &view_desc, &m_ResourceView));
+		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture.Get(), &view_desc, &m_ResourceView));
 
 		D3D11_SAMPLER_DESC sampler_desc;
 		sampler_desc.Filter = CalculateFilter(min_filter, mag_filter);
@@ -188,17 +188,10 @@ namespace Li
 		D3D11Call(m_DeviceHandle->CreateSamplerState(&sampler_desc, &m_SamplerState));
 	}
 
-	D3D11Texture2D::~D3D11Texture2D()
-	{
-		m_ResourceView->Release();
-		m_Texture->Release();
-		m_SamplerState->Release();
-	}
-
 	void D3D11Texture2D::Resize(int width, int height)
 	{
-		m_Texture->Release();
-		m_ResourceView->Release();
+		m_Texture.Reset();
+		m_ResourceView.Reset();
 
 		D3D11_TEXTURE2D_DESC texture_desc;
 		texture_desc.Width = width;
@@ -224,7 +217,7 @@ namespace Li
 		view_desc.Texture2D.MostDetailedMip = 0;
 		view_desc.Texture2D.MipLevels = texture_desc.MipLevels;
 
-		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture, &view_desc, &m_ResourceView));
+		D3D11Call(m_DeviceHandle->CreateShaderResourceView(m_Texture.Get(), &view_desc, &m_ResourceView));
 	}
 
 	void D3D11Texture2D::SetData(const void* data, int width, int height, bool discard)
@@ -235,15 +228,15 @@ namespace Li
 
 		D3D11_MAPPED_SUBRESOURCE resource;
 		ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-		m_ContextHandle->Map(m_Texture, 0, discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &resource);
+		m_ContextHandle->Map(m_Texture.Get(), 0, discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &resource);
 		memcpy(resource.pData, data, (size_t)width * (size_t)height * (size_t)m_Channels);
-		m_ContextHandle->Unmap(m_Texture, 0);
+		m_ContextHandle->Unmap(m_Texture.Get(), 0);
 	}
 
 	void D3D11Texture2D::Bind(uint32_t slot) const
 	{
-		m_ContextHandle->PSSetShaderResources(slot, 1, &m_ResourceView);
-		m_ContextHandle->PSSetSamplers(slot, 1, &m_SamplerState);
+		m_ContextHandle->PSSetShaderResources(slot, 1, m_ResourceView.GetAddressOf());
+		m_ContextHandle->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
 	}
 
 	D3D11_FILTER D3D11Texture2D::CalculateFilter(FilterType min_filter, FilterType mag_filter)

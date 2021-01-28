@@ -27,9 +27,9 @@ namespace Li
 		virtual void SetDrawMode(DrawMode mode) override;
 		virtual void SwapBuffers() override;
 
-		ID3D11Device* GetDevice() { return m_Device.Get(); }
-		ID3D11DeviceContext* GetDeviceContext() { return m_DeviceContext.Get(); }
-		ID3D11DepthStencilView* GetDepthStencilView() { return m_DepthStencilView.Get(); }
+		inline const Microsoft::WRL::ComPtr<ID3D11Device>& GetDevice() { return m_Device; }
+		inline const Microsoft::WRL::ComPtr<ID3D11DeviceContext>& GetDeviceContext() { return m_DeviceContext; }
+		inline const Microsoft::WRL::ComPtr<ID3D11DepthStencilView>& GetDepthStencilView() { return m_DepthStencilView; }
 
 	private:
 		constexpr static int NumSwapChainBuffers = 2;
@@ -59,9 +59,3 @@ namespace Li
 		glm::vec4 m_ClearColor;
 	};
 }
-
-//LI_D3D_RELEASE(m_RasterState);
-//LI_D3D_RELEASE(m_RenderTargetView);
-//LI_D3D_RELEASE(m_DepthStencilView);
-//LI_D3D_RELEASE(m_DepthStencilState);
-//LI_D3D_RELEASE(m_DepthStencilBuffer);

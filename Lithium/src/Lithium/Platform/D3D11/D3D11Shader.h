@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include <d3d11.h>
+#include <wrl/client.h>
 #include <filesystem>
 
 namespace Li
@@ -11,11 +12,8 @@ namespace Li
 	class D3D11Shader : public Shader
 	{
 	public:
-#ifdef LI_DEBUG
-		D3D11Shader(const std::string& name, const std::filesystem::path& filepath);
-#endif
-		D3D11Shader(const std::string& name, const void* vs_bytecode, uint32_t vs_size, const void* ps_bytecode, uint32_t ps_size);
-		virtual ~D3D11Shader();
+		D3D11Shader(const std::string& name, const uint8_t* vs_bytecode, uint32_t vs_size, const uint8_t* ps_bytecode, uint32_t ps_size);
+		virtual ~D3D11Shader() = default;
 
 		virtual void Bind() const override;
 
@@ -23,19 +21,18 @@ namespace Li
 
 		virtual const std::string& GetName() const override { return m_Name; }
 
-		void* GetVSBufferData() const { return m_VSBufferData; }
-		uint32_t GetVSBufferSize() const { return m_VSBufferSize; }
+		const void* GetVSBufferData() const { return m_VSBufferData.data(); }
+		size_t GetVSBufferSize() const { return m_VSBufferData.size(); }
 
 	private:
 		std::string m_Name;
 
-		ID3D11VertexShader* m_VertexShader = nullptr;
-		ID3D11PixelShader* m_PixelShader = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
 
-		void* m_VSBufferData = nullptr;
-		uint32_t m_VSBufferSize = 0;
+		std::vector<uint8_t> m_VSBufferData;
 
-		ID3D11Device* m_DeviceHandle;
-		ID3D11DeviceContext* m_ContextHandle;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_DeviceHandle;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 	};
 }

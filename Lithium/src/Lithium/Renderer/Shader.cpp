@@ -11,7 +11,7 @@
 
 namespace Li
 {
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& glsl, const void* vs_bytecode, uint32_t vs_size, const void* ps_bytecode, uint32_t ps_size)
+	Ref<Shader> Shader::Create(const std::string& name, const std::string& glsl, const uint8_t* vs_bytecode, uint32_t vs_size, const uint8_t* ps_bytecode, uint32_t ps_size)
 	{
 		switch (Application::Get().GetAPI())
 		{

@@ -18,7 +18,7 @@ namespace Li
 		D3D11Context* context = (D3D11Context*)Application::Get().GetWindow().GetContext();
 
 		ImGui_ImplSDL2_InitForD3D(app.GetWindow().GetWindow());
-		ImGui_ImplDX11_Init(context->GetDevice(), context->GetDeviceContext());
+		ImGui_ImplDX11_Init(context->GetDevice().Get(), context->GetDeviceContext().Get());
 	}
 
 	D3D11ImGuiRenderer::~D3D11ImGuiRenderer()

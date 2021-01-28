@@ -3,11 +3,12 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/VertexArray.h"
 #include "Lithium/Renderer/Shader.h"
-
 #include "D3D11Buffer.h"
 
-#include <vector>
 #include <d3d11.h>
+#include <wrl/client.h>
+
+#include <vector>
 
 namespace Li
 {
@@ -31,14 +32,14 @@ namespace Li
 		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
 		Ref<IndexBuffer> m_IndexBuffer;
 
-		ID3D11InputLayout* m_InputLayout = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_InputLayout;
 
 		std::vector<ID3D11Buffer*> m_D3DVertexBuffers;
 
 		std::vector<unsigned int> m_VertexBufferStrides;
 		std::vector<unsigned int> m_VertexBufferOffsets;
 
-		ID3D11Device* m_DeviceHandle;
-		ID3D11DeviceContext* m_ContextHandle;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_DeviceHandle;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 	};
 }

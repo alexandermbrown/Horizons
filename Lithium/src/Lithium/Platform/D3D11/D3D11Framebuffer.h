@@ -4,6 +4,7 @@
 #include "Lithium/Platform/D3D11/D3D11Texture.h"
 
 #include <d3d11.h>
+#include <wrl/client.h>
 
 namespace Li
 {
@@ -11,7 +12,7 @@ namespace Li
 	{
 	public:
 		D3D11Framebuffer(int width, int height);
-		virtual ~D3D11Framebuffer();
+		virtual ~D3D11Framebuffer() = default;
 
 		virtual void Bind() const override;
 		virtual void SetClearColor(const glm::vec4& color) override { m_ClearColor = color; }
@@ -26,11 +27,12 @@ namespace Li
 
 		Ref<D3D11Texture2D> m_Texture;
 
-		ID3D11RenderTargetView* m_RenderTargetView;
-		ID3D11Device* m_DeviceHandle;
-		ID3D11DeviceContext* m_ContextHandle;
-		ID3D11Texture2D* m_DepthStencilBuffer;
-		ID3D11DepthStencilView* m_DepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+
+		Microsoft::WRL::ComPtr<ID3D11Device> m_DeviceHandle;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 
 		D3D11_VIEWPORT m_Viewport;
 

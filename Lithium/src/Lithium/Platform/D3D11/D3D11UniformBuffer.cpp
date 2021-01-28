@@ -34,9 +34,6 @@ namespace Li
 
 	D3D11UniformBuffer::~D3D11UniformBuffer()
 	{
-		m_Buffer->Release();
-		m_Buffer = nullptr;
-
 		delete[] m_GlslData;
 	}
 
@@ -104,11 +101,11 @@ namespace Li
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
 		// Disable GPU access to the vertex buffer data.
-		D3D11Call(m_ContextHandle->Map(m_Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+		D3D11Call(m_ContextHandle->Map(m_Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		// Set the vertex data.
 		memcpy(mappedResource.pData, m_GlslData, m_DataSize);
 		// Reenable GPU access to the data.
-		m_ContextHandle->Unmap(m_Buffer, 0);
+		m_ContextHandle->Unmap(m_Buffer.Get(), 0);
 	}
 
 	void D3D11UniformBuffer::Bind() const
@@ -116,13 +113,13 @@ namespace Li
 		switch (m_Type)
 		{
 		case ShaderType::Vertex:
-			m_ContextHandle->VSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			m_ContextHandle->VSSetConstantBuffers(m_Slot, 1, m_Buffer.GetAddressOf());
 			break;
 		case ShaderType::Geometry:
-			m_ContextHandle->GSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			m_ContextHandle->GSSetConstantBuffers(m_Slot, 1, m_Buffer.GetAddressOf());
 			break;
 		case ShaderType::Fragment:
-			m_ContextHandle->PSSetConstantBuffers(m_Slot, 1, &m_Buffer);
+			m_ContextHandle->PSSetConstantBuffers(m_Slot, 1, m_Buffer.GetAddressOf());
 			break;
 		}
 	}

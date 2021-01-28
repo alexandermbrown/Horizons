@@ -8,5 +8,3 @@
 #else
 #	define D3D11Call(x) x
 #endif
-
-#define LI_D3D_RELEASE(x) if (x) { x->Release(); x = nullptr; }

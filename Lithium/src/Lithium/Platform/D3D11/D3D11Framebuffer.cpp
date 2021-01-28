@@ -23,27 +23,21 @@ namespace Li
 		CreateBuffers(width, height);
 	}
 
-	D3D11Framebuffer::~D3D11Framebuffer()
-	{
-		m_RenderTargetView->Release();
-		m_RenderTargetView = nullptr;
-	}
-
 	void D3D11Framebuffer::Bind() const
 	{
-		m_ContextHandle->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
+		m_ContextHandle->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 		m_ContextHandle->RSSetViewports(1, &m_Viewport);
 	}
 
 	void D3D11Framebuffer::Clear() const
 	{
-		m_ContextHandle->ClearRenderTargetView(m_RenderTargetView, glm::value_ptr(m_ClearColor));
-		m_ContextHandle->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_ContextHandle->ClearRenderTargetView(m_RenderTargetView.Get(), glm::value_ptr(m_ClearColor));
+		m_ContextHandle->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
 	void D3D11Framebuffer::Resize(int width, int height)
 	{
-		m_RenderTargetView->Release();
+		m_RenderTargetView.Reset();
 
 		m_Size = { width, height };
 		m_Texture->Resize(width, height);
@@ -61,29 +55,29 @@ namespace Li
 		D3D11Call( m_DeviceHandle->CreateRenderTargetView(m_Texture->GetTexture(), &renderTargetDesc, &m_RenderTargetView) );
 
 		// Set up the description of the depth buffer.
-		D3D11_TEXTURE2D_DESC depthBufferDesc;
-		ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-		depthBufferDesc.Width = width;
-		depthBufferDesc.Height = height;
-		depthBufferDesc.MipLevels = 1;
-		depthBufferDesc.ArraySize = 1;
-		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthBufferDesc.SampleDesc.Count = 1;
-		depthBufferDesc.SampleDesc.Quality = 0;
-		depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		depthBufferDesc.CPUAccessFlags = 0;
-		depthBufferDesc.MiscFlags = 0;
+		D3D11_TEXTURE2D_DESC depth_buffer_desc;
+		ZeroMemory(&depth_buffer_desc, sizeof(depth_buffer_desc));
+		depth_buffer_desc.Width = width;
+		depth_buffer_desc.Height = height;
+		depth_buffer_desc.MipLevels = 1;
+		depth_buffer_desc.ArraySize = 1;
+		depth_buffer_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depth_buffer_desc.SampleDesc.Count = 1;
+		depth_buffer_desc.SampleDesc.Quality = 0;
+		depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+		depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depth_buffer_desc.CPUAccessFlags = 0;
+		depth_buffer_desc.MiscFlags = 0;
 
-		D3D11Call( m_DeviceHandle->CreateTexture2D(&depthBufferDesc, NULL, &m_DepthStencilBuffer) );
+		D3D11Call( m_DeviceHandle->CreateTexture2D(&depth_buffer_desc, NULL, &m_DepthStencilBuffer) );
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		depthStencilViewDesc.Texture2D.MipSlice = 0;
+		D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
+		ZeroMemory(&depth_stencil_view_desc, sizeof(depth_stencil_view_desc));
+		depth_stencil_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depth_stencil_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depth_stencil_view_desc.Texture2D.MipSlice = 0;
 
-		D3D11Call( m_DeviceHandle->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, &m_DepthStencilView) );
+		D3D11Call( m_DeviceHandle->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &depth_stencil_view_desc, &m_DepthStencilView) );
 
 		m_Viewport.Width = (float)width;
 		m_Viewport.Height = (float)height;

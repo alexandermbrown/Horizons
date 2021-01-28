@@ -3,6 +3,7 @@
 #include "Lithium/Renderer/Buffer.h"
 
 #include <d3d11.h>
+#include <wrl/client.h>
 
 namespace Li
 {
@@ -11,7 +12,7 @@ namespace Li
 	public:
 		D3D11VertexBuffer(uint32_t size, BufferUsage usage);
 		D3D11VertexBuffer(float* vertices, uint32_t size, BufferUsage usage);
-		virtual ~D3D11VertexBuffer();
+		virtual ~D3D11VertexBuffer() = default;
 
 		virtual void Bind() const override {};
 
@@ -20,15 +21,15 @@ namespace Li
 
 		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard) override;
 
-		inline ID3D11Buffer* GetBuffer() { return m_Buffer; }
+		inline ID3D11Buffer* GetBuffer() { return m_Buffer.Get(); }
 
 	private:
 		BufferLayout m_Layout;
-		ID3D11Buffer* m_Buffer = nullptr;
 		uint32_t m_Size;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 
-		ID3D11Device* m_DeviceHandle;
-		ID3D11DeviceContext* m_ContextHandle;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_DeviceHandle;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 	};
 
 	class D3D11IndexBuffer : public IndexBuffer
@@ -36,7 +37,7 @@ namespace Li
 	public:
 		D3D11IndexBuffer(uint32_t size, BufferUsage usage);
 		D3D11IndexBuffer(uint32_t* indices, uint32_t count, BufferUsage usage);
-		virtual ~D3D11IndexBuffer();
+		virtual ~D3D11IndexBuffer() = default;
 
 		virtual void Bind() const;
 		virtual void Unbind() const {};
@@ -46,11 +47,11 @@ namespace Li
 		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard) override;
 
 	private:
-		ID3D11Buffer* m_Buffer = nullptr;
 		uint32_t m_Size;
 		uint32_t m_Count;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 
-		ID3D11Device* m_DeviceHandle;
-		ID3D11DeviceContext* m_ContextHandle;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_DeviceHandle;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 	};
 }

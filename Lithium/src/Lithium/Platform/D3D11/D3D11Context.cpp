@@ -95,8 +95,7 @@ namespace Li
 
 		D3D11Call(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &depth_stencil_view_desc, &m_DepthStencilView));
 
-		ID3D11RenderTargetView* rtv = m_RenderTargetView.Get();
-		m_DeviceContext->OMSetRenderTargets(1, &rtv, m_DepthStencilView.Get());
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 
 		m_Viewport.Width = (float)width;
 		m_Viewport.Height = (float)height;
@@ -109,8 +108,7 @@ namespace Li
 
 	void D3D11Context::BindDefaultRenderTarget()
 	{
-		ID3D11RenderTargetView* rtv = m_RenderTargetView.Get();
-		m_DeviceContext->OMSetRenderTargets(1, &rtv, m_DepthStencilView.Get());
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
