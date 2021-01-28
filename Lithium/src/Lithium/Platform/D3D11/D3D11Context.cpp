@@ -17,16 +17,31 @@ namespace Li
 		device_flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-		constexpr D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
-		HRESULT result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, device_flags,
-			feature_levels, sizeof(feature_levels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &m_Device, NULL, &m_DeviceContext);
+		D3D_DRIVER_TYPE driver_types[] = {
+			D3D_DRIVER_TYPE_HARDWARE,
+			D3D_DRIVER_TYPE_WARP,
+			D3D_DRIVER_TYPE_REFERENCE
+		};
+		D3D_FEATURE_LEVEL feature_levels[] = {
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0
+		};
+
+		HRESULT result = E_FAIL;
+		D3D_FEATURE_LEVEL feature_level;
+		for (D3D_DRIVER_TYPE driver : driver_types)
+		{
+			result = D3D11CreateDevice(nullptr, driver, nullptr, device_flags,
+				feature_levels, sizeof(feature_levels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &m_Device, &feature_level, &m_DeviceContext);
+
+			if (SUCCEEDED(result))
+				break;
+		}
 
 		if (FAILED(result))
 			throw std::runtime_error("Failed to create Direct3D 11 Device.");
 
-		D3D_FEATURE_LEVEL aquired_feature_level = m_Device->GetFeatureLevel();
-
-		if (aquired_feature_level >= D3D_FEATURE_LEVEL_11_1 && IsWindows7SP1OrGreater())
+		if (feature_level >= D3D_FEATURE_LEVEL_11_1 && IsWindows7SP1OrGreater())
 			InitSwapChain1(hwnd, width, height);
 		else
 			InitSwapChain(hwnd, width, height);
