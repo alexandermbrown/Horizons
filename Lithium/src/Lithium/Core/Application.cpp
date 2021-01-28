@@ -61,7 +61,9 @@ namespace Li
 	{
 		m_CurrentScene.reset();
 		m_NextScene.reset();
-
+#ifndef LI_DIST
+		m_ImGuiRenderer.reset();
+#endif
 		ResourceManager::Shutdown();
 		AudioManager::Shutdown();
 		Renderer::Shutdown();
