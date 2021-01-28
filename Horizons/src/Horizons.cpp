@@ -104,10 +104,17 @@ void Horizons::SaveConfig()
 
 Li::Unique<Li::Application> Li::CreateApplication()
 {
-	// TODO: Add fallback to OpenGL on Windows.
+	try {
+		// TODO: Add fallback to OpenGL on Windows.
 #ifdef LI_PLATFORM_WINDOWS
-	return Li::MakeUnique<Horizons>(Li::RendererAPI::D3D11);
+		return Li::MakeUnique<Horizons>(Li::RendererAPI::D3D11);
 #else
-	return Li::MakeUnique<Horizons>(Li::RendererAPI::OpenGL);
+		return Li::MakeUnique<Horizons>(Li::RendererAPI::OpenGL);
 #endif
+	}
+	catch (const std::runtime_error& error)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error!", error.what(), NULL);
+		abort();
+	}
 }

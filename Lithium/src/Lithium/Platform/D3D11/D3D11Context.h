@@ -3,7 +3,8 @@
 #include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/GraphicsContext.h"
 
-#include <d3d11.h>
+#include <d3d11_2.h>
+#include <wrl/client.h>
 
 #include "glm/glm.hpp"
 
@@ -26,9 +27,9 @@ namespace Li
 		virtual void SetDrawMode(DrawMode mode) override;
 		virtual void SwapBuffers() override;
 
-		ID3D11Device* GetDevice() { return m_Device; }
-		ID3D11DeviceContext* GetDeviceContext() { return m_DeviceContext; }
-		ID3D11DepthStencilView* GetDepthStencilView() { return m_DepthStencilView; }
+		ID3D11Device* GetDevice() { return m_Device.Get(); }
+		ID3D11DeviceContext* GetDeviceContext() { return m_DeviceContext.Get(); }
+		ID3D11DepthStencilView* GetDepthStencilView() { return m_DepthStencilView.Get(); }
 
 	private:
 		constexpr static int NumSwapChainBuffers = 2;
@@ -42,19 +43,25 @@ namespace Li
 		void InitDebug();
 #endif
 
-		IDXGISwapChain* m_SwapChain = nullptr;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
 
-		ID3D11Device* m_Device = nullptr;
-		ID3D11DeviceContext* m_DeviceContext = nullptr;
-		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
-		ID3D11Texture2D* m_DepthStencilBuffer = nullptr;
-		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
-		ID3D11DepthStencilState* m_DepthStencilState = nullptr;
-		ID3D11RasterizerState* m_RasterState = nullptr;
-		ID3D11BlendState* m_BlendState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_Device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_DepthStencilState;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_RasterState;
+		Microsoft::WRL::ComPtr<ID3D11BlendState> m_BlendState;
 
 		D3D11_VIEWPORT m_Viewport;
 
 		glm::vec4 m_ClearColor;
 	};
 }
+
+//LI_D3D_RELEASE(m_RasterState);
+//LI_D3D_RELEASE(m_RenderTargetView);
+//LI_D3D_RELEASE(m_DepthStencilView);
+//LI_D3D_RELEASE(m_DepthStencilState);
+//LI_D3D_RELEASE(m_DepthStencilBuffer);
