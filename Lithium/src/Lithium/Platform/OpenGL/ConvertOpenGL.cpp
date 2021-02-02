@@ -1,8 +1,6 @@
 #include "lipch.h"
 #include "ConvertOpenGL.h"
 
-#include <glad/glad.h>
-
 namespace Li
 {
 	uint32_t ConvertOpenGL::BufferUsage(Li::BufferUsage usage)

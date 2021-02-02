@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Audio/AudioBuffer.h"
 #include <stdint.h>
 

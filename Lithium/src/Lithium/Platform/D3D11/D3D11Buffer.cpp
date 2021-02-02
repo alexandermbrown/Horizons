@@ -18,7 +18,6 @@ namespace Li
 
 		if (usage == BufferUsage::DynamicDraw)
 		{
-
 			D3D11_BUFFER_DESC buffer_desc;
 			buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
 			buffer_desc.ByteWidth = size;

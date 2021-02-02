@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Renderer/GraphicsContext.h"
 #include "Lithium/Renderer/RendererAPI.h"
 
-#include <SDL.h>
+#include "SDL.h"
 
 namespace Li
 {

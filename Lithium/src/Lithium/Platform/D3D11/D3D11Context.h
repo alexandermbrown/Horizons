@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/GraphicsContext.h"
 
 #include <d3d11_2.h>

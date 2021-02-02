@@ -1,6 +1,8 @@
 #include "lipch.h"
 #include "Input.h"
 
+#include "Lithium/Core/Assert.h"
+
 namespace Li
 {
 	Input::Input()

@@ -39,9 +39,12 @@ table Texture2D {
 
 table Shader {
 	name:string;
-	glsl:string;
+	glsl_vert:string;
+	glsl_frag:string;
+	glsl_comp:string;
 	hlsl_vs:[ubyte];
 	hlsl_ps:[ubyte];
+	hlsl_cs:[ubyte];
 }
 
 table AtlasEntry {

@@ -2,28 +2,19 @@
 ### Shaders ###
 shader_batched:
   type: shader
-  glsl: './res/shaders/Batched.glsl'
-  hlsl: './res/shaders/Batched.hlsl'
+  path: "./res/shaders/batched"
 
 shader_label:
   type: shader
-  glsl: './res/shaders/Label.glsl'
-  hlsl: './res/shaders/Label.hlsl'
+  path: "./res/shaders/label"
 
 shader_line:
   type: shader
-  glsl: './res/shaders/Line.glsl'
-  hlsl: './res/shaders/Line.hlsl'
-
-shader_debug_physics:
-  type: shader
-  glsl: './res/shaders/DebugPhysics.glsl'
-  hlsl: './res/shaders/DebugPhysics.hlsl'
+  path: "./res/shaders/line"
 
 shader_terrain:
   type: shader
-  glsl: './res/shaders/Terrain.glsl'
-  hlsl: './res/shaders/Terrain.hlsl'
+  path: "./res/shaders/terrain"
 
 ### Textures ###
 texture_default:

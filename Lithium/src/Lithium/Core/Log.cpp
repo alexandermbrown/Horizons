@@ -1,7 +1,8 @@
 #include "lipch.h"
 #include "Log.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include "Lithium/Core/Memory.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace Li
 {

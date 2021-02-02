@@ -1,4 +1,3 @@
-#type vertex
 #version 420 core
 
 layout(location = 0) in vec3 POSITION;
@@ -15,17 +14,4 @@ void main()
 {
 	v_Color = COLOR;
 	gl_Position = u_ViewProj * vec4(POSITION, 1.0);
-}
-
-
-
-#type fragment
-#version 420 core
-layout(location = 0) out vec4 color;
-
-in vec4 v_Color;
-
-void main()
-{
-	color = v_Color;
 }

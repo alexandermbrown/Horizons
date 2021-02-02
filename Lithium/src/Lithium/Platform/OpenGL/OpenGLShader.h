@@ -5,16 +5,12 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 
-namespace Li 
+namespace Li
 {
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& filepath);
-		OpenGLShader(const std::string& name, const std::string& source);
-
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
-
+		OpenGLShader(const std::string& name, const OpenGLShaderInput& input);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
@@ -35,9 +31,7 @@ namespace Li
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 
 	private:
-		std::string ReadFile(const std::string& filepath);
-		std::unordered_map<unsigned int, std::string> PreProcess(const std::string& source);
-		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
+		void Compile(const std::unordered_map<unsigned int, const char*>& shader_sources);
 
 		uint32_t m_RendererID;
 		std::string m_Name;

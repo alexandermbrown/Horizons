@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Memory.h"
 #include <cstdint>
 #include <string>
 

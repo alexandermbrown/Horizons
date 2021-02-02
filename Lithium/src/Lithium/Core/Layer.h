@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
 #include "Lithium/Utility/Time.h"
 #include "SDL.h"
 

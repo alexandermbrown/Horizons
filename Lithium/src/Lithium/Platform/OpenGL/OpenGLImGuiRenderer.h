@@ -1,7 +1,5 @@
 #pragma once
 #ifndef LI_DIST
-#include "Lithium/Core/Core.h"
-
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
 namespace Li

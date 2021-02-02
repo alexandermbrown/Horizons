@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Renderer/Texture.h"
 #include "Lithium/Renderer/VertexArray.h"
 
@@ -31,7 +31,6 @@ namespace Li
 		hb_font_t* GetHBFont(int pointSize);
 
 	private:
-
 		std::string m_Name;
 		FontProperties m_Properties;
 		Ref<Texture2D> m_Texture;

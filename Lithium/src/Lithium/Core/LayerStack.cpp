@@ -1,6 +1,8 @@
 #include "lipch.h"
 #include "LayerStack.h"
 
+#include "Lithium/Core/Assert.h"
+
 namespace Li
 {
 	LayerStack::LayerStack()

@@ -29,7 +29,7 @@ Horizons::Horizons(Li::RendererAPI renderer_api)
 	LoadConfig();
 
 	m_ScriptContext.InitApp("data/scripts/Init.lua");
-
+	
 #ifdef HZ_CONSOLE_ENABLED
 	PushOverlay(Li::MakeUnique<ConsoleLayer>());
 
@@ -114,7 +114,7 @@ Li::Unique<Li::Application> Li::CreateApplication()
 	}
 	catch (const std::runtime_error& error)
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error!", error.what(), NULL);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", error.what(), NULL);
 		abort();
 	}
 }

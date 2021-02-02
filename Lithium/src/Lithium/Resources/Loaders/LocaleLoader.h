@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Localization/Localization.h"
 
 #include "flatbuffers/flatbuffers.h"

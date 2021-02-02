@@ -2,6 +2,7 @@
 
 #include "Texture.h"
 #include "RendererEnums.h"
+#include "Lithium/Core/Memory.h"
 
 #include "glm/glm.hpp"
 
@@ -22,5 +23,4 @@ namespace Li
 
 		static Ref<Framebuffer> Create(int width, int height);
 	};
-
 }

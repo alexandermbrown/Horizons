@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "ResourceManager.h"
 
+#include "Loaders/ShaderLoader.h"
 #include "Loaders/TextureAtlasLoader.h"
 #include "Loaders/FontLoader.h"
 #include "Loaders/LocaleLoader.h"
@@ -11,43 +12,35 @@ namespace Li
 {
 	Unique<ResourceManager::ResourceData> ResourceManager::s_Data = MakeUnique<ResourceData>();
 
-	void ResourceManager::Load(const std::string& labFilePath)
+	void ResourceManager::Load(const std::string& lab_file_path)
 	{
-		Log::CoreInfo("Loading asset base {}...", labFilePath);
-		std::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
+		Log::CoreInfo("Loading asset base {}...", lab_file_path);
+		std::ifstream in_file(lab_file_path, std::ios::in | std::ios::binary);
 
-		if (!inFile.good()) {
-			Log::CoreError("Error opening lithium asset base {}", labFilePath);
-			return;
-		}
+		if (!in_file.good())
+			throw std::runtime_error("Error opening asset base " + lab_file_path);
 
-		inFile.seekg(0, std::ios::end);
-		long filesize = (long)inFile.tellg();
-		inFile.seekg(0, std::ios::beg);
+		in_file.seekg(0, std::ios::end);
+		long filesize = (long)in_file.tellg();
+		in_file.seekg(0, std::ios::beg);
 		uint8_t* buffer = new uint8_t[filesize];
-		inFile.read((char*)buffer, filesize);
-		inFile.close();
+		in_file.read((char*)buffer, filesize);
+		in_file.close();
 
 		const Assets::AssetBundle* asset_bundle = flatbuffers::GetRoot<Assets::AssetBundle>(buffer);
 		if (!asset_bundle->Verify(flatbuffers::Verifier(buffer, filesize))) 
-		{
-			Log::CoreError("Invalid lithium asset base {}", labFilePath);
-			return;
-		}
+			throw std::runtime_error("Corrupt asset base " + lab_file_path + ". Verify or reinstall game files.");
 
 		for (const Assets::Texture2D* texture : *asset_bundle->textures())
 		{
 			const auto* data = texture->data();
-			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
+			s_Data->Textures[texture->name()->c_str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
 				(WrapType)texture->wrap_s(), (WrapType)texture->wrap_t(), (FilterType)texture->min_filter(), (FilterType)texture->mag_filter());
 		}
 
 		for (const Assets::Shader* shader : *asset_bundle->shaders())
 		{
-			const auto* hlsl_vs = shader->hlsl_vs();
-			const auto* hlsl_ps = shader->hlsl_ps();
-			std::string name = shader->name()->str();
-			s_Data->Shaders[name] = Shader::Create(name, shader->glsl()->str(), hlsl_vs->data(), hlsl_vs->size(), hlsl_ps->data(), hlsl_ps->size());
+			s_Data->Shaders[shader->name()->c_str()] = Loaders::LoadShader(shader);
 		}
 
 		for (const Assets::TextureAtlas* atlas : *asset_bundle->atlases())
@@ -57,13 +50,13 @@ namespace Li
 
 		for (const Assets::Font* font : *asset_bundle->fonts())
 		{
-			s_Data->Fonts[font->name()->str()] = Loaders::LoadFont(font);
+			s_Data->Fonts[font->name()->c_str()] = Loaders::LoadFont(font);
 		}
 
 		for (const Assets::Audio* audio : *asset_bundle->audio())
 		{
 			const auto* data = audio->data();
-			s_Data->Audio[audio->name()->str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
+			s_Data->Audio[audio->name()->c_str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
 		}
 
 		for (const Assets::Locale* locale : *asset_bundle->locales())
@@ -74,29 +67,24 @@ namespace Li
 		delete[] buffer;
 	}
 
-	void ResourceManager::BeginStaggeredLoad(const std::string& labFilePath)
+	void ResourceManager::BeginStaggeredLoad(const std::string& lab_file_path)
 	{
-		Log::CoreInfo("Loading asset base {} staggered...", labFilePath);
-		std::ifstream inFile(labFilePath, std::ios::in | std::ios::binary);
+		Log::CoreInfo("Loading asset base {} staggered...", lab_file_path);
+		std::ifstream in_file(lab_file_path, std::ios::in | std::ios::binary);
 
-		if (!inFile.good()) {
-			Log::CoreError("Error opening lithium asset base {}", labFilePath);
-			return;
-		}
+		if (!in_file.good())
+			throw std::runtime_error("Error opening asset base " + lab_file_path);
 
-		inFile.seekg(0, std::ios::end);
-		long filesize = (long)inFile.tellg();
-		inFile.seekg(0, std::ios::beg);
+		in_file.seekg(0, std::ios::end);
+		long filesize = (long)in_file.tellg();
+		in_file.seekg(0, std::ios::beg);
 		s_Data->LoadData.Buffer = new uint8_t[filesize];
-		inFile.read((char*)s_Data->LoadData.Buffer, filesize);
-		inFile.close();
+		in_file.read((char*)s_Data->LoadData.Buffer, filesize);
+		in_file.close();
 
 		s_Data->LoadData.Bundle = flatbuffers::GetRoot<Assets::AssetBundle>(s_Data->LoadData.Buffer);
 		if (!s_Data->LoadData.Bundle->Verify(flatbuffers::Verifier(s_Data->LoadData.Buffer, filesize)))
-		{
-			Log::CoreError("Invalid lithium asset base {}", labFilePath);
-			return;
-		}
+			throw std::runtime_error("Corrupt asset base " + lab_file_path + ". Verify or reinstall game files.");
 		
 		s_Data->LoadData.TextureIt = s_Data->LoadData.Bundle->textures()->begin();
 		s_Data->LoadData.ShaderIt = s_Data->LoadData.Bundle->shaders()->begin();
@@ -114,7 +102,7 @@ namespace Li
 		{
 			const Assets::Texture2D* texture = *s_Data->LoadData.TextureIt;
 			const auto* data = texture->data();
-			s_Data->Textures[texture->name()->str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
+			s_Data->Textures[texture->name()->c_str()] = Texture2D::Create((size_t)data->size(), data->data(), 4,
 				(WrapType)texture->wrap_s(), (WrapType)texture->wrap_t(), (FilterType)texture->min_filter(), (FilterType)texture->mag_filter());
 
 			s_Data->LoadData.TextureIt++;
@@ -122,11 +110,8 @@ namespace Li
 		else if(s_Data->LoadData.ShaderIt != s_Data->LoadData.Bundle->shaders()->end())
 		{
 			const Assets::Shader* shader = *s_Data->LoadData.ShaderIt;
-			const auto* hlsl_vs = shader->hlsl_vs();
-			const auto* hlsl_ps = shader->hlsl_ps();
-			std::string name = shader->name()->str();
-			s_Data->Shaders[name] = Shader::Create(name, shader->glsl()->str(), hlsl_vs->data(), hlsl_vs->size(), hlsl_ps->data(), hlsl_ps->size());
-
+			s_Data->Shaders[shader->name()->c_str()] = Loaders::LoadShader(shader);
+			std::string jeff(shader->name()->string_view());
 			s_Data->LoadData.ShaderIt++;
 		}
 		else if (s_Data->LoadData.TextureAtlasIt != s_Data->LoadData.Bundle->atlases()->end())
@@ -139,7 +124,7 @@ namespace Li
 		else if (s_Data->LoadData.FontIt != s_Data->LoadData.Bundle->fonts()->end())
 		{
 			const Assets::Font* font = *s_Data->LoadData.FontIt;
-			s_Data->Fonts[font->name()->str()] = Loaders::LoadFont(font);
+			s_Data->Fonts[font->name()->c_str()] = Loaders::LoadFont(font);
 
 			s_Data->LoadData.FontIt++;
 		}
@@ -147,7 +132,7 @@ namespace Li
 		{
 			const Assets::Audio* audio = *s_Data->LoadData.AudioIt;
 			const auto* data = audio->data();
-			s_Data->Audio[audio->name()->str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
+			s_Data->Audio[audio->name()->c_str()] = AudioBuffer::FromOggMemory(data->data(), (uint32_t)data->size());
 
 			s_Data->LoadData.AudioIt++;
 		}
@@ -191,5 +176,5 @@ namespace Li
 		Log::CoreInfo("    # Audio           | {}", s_Data->Audio.size());
 		Log::CoreInfo("    # Locales         | {}", Localization::GetLocaleCount());
 		Log::CoreInfo("--------------------------------");
-	}
+	}													  
 }

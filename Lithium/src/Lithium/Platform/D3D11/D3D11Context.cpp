@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "D3D11Context.h"
 
+#include "Lithium/Core/Assert.h"
 #include "D3D11Core.h"
 #include "glm/gtc/type_ptr.hpp"
 

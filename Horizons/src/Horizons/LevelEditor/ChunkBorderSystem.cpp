@@ -44,5 +44,4 @@ void ChunkBorderSystem::SubmitBorders(entt::registry& registry, glm::vec2 camera
 		Li::Renderer::SubmitLine(color, { bottom_left.x, y, 0.0f }, { top_right.x, y, 0.0f });
 	}
 }
-
 #endif

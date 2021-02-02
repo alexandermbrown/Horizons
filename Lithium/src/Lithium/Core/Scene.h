@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
-
 namespace Li
 {
 	class Scene

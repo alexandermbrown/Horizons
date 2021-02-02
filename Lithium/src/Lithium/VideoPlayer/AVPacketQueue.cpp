@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "AVPacketQueue.h"
 
+#include "Lithium/Core/Assert.h"
 extern "C"
 {
 #include "libavformat/avformat.h"

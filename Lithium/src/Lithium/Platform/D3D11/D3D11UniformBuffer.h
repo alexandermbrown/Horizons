@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/UniformBuffer.h"
+#include "Lithium/Core/Assert.h"
 
 #include <d3d11.h>
 #include <wrl/client.h>

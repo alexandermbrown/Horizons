@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
 class GameScene : public Li::Scene

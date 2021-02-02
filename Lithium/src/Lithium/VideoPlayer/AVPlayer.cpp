@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "AVPlayer.h"
 
+#include "Lithium/Core/Assert.h"
 extern "C"
 {
 #include "libavcodec/avcodec.h"

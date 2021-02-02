@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "LineBatchRenderer.h"
 
+#include "Lithium/Core/Assert.h"
 #include "Lithium/Core/Application.h"
 #include "Lithium/Resources/ResourceManager.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Core/Log.h"
 #include "Lithium/Renderer/RendererEnums.h"
 
@@ -120,11 +120,9 @@ namespace Li
 	class VertexBuffer
 	{
 	public:
-
 		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() const = 0;
-
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 		virtual void SetSubData(float* data, uint32_t size, uint32_t offset, bool discard) = 0;
@@ -139,13 +137,10 @@ namespace Li
 		virtual ~IndexBuffer() = default;
 
 		virtual void Bind() const = 0;
-
 		virtual uint32_t GetCount() const = 0;
-
 		virtual void SetSubData(uint32_t* data, uint32_t size, uint32_t offset, bool discard) = 0;
 
 		static Ref<IndexBuffer> Create(uint32_t size, BufferUsage usage);
 		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count, BufferUsage usage = BufferUsage::StaticDraw);
 	};
-
 }

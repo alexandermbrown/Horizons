@@ -1,7 +1,6 @@
 #pragma once
 
 #ifndef LI_DIST
-#include "Horizons/Core/Core.h"
 #include "Horizons/Console/Command.h"
 
 #include "Lithium.h"

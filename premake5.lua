@@ -241,7 +241,9 @@ project "Horizons"
 	filter "configurations:Debug"
 		defines {
 			"LI_DEBUG",
-			"HZ_DEBUG"
+			"HZ_DEBUG",
+			"HZ_PHYSICS_DEBUG_DRAW",
+			"HZ_CONSOLE_ENABLED"
 		}
 		runtime "Debug"
 		symbols "on"
@@ -250,7 +252,8 @@ project "Horizons"
 	filter "configurations:Release"
 		defines {
 			"LI_RELEASE",
-			"HZ_RELEASE"
+			"HZ_RELEASE",
+			"HZ_CONSOLE_ENABLED"
 		}
 		runtime "Release"
 		optimize "on"

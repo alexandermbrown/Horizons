@@ -2,6 +2,7 @@
 #include "Buffer.h"
 
 #include "Lithium/Core/Application.h"
+#include "Lithium/Core/Assert.h"
 
 #ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLBuffer.h"

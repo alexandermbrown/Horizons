@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Core/Window.h"
 #include "Lithium/Core/LayerStack.h"
 #include "Lithium/Core/Input.h"

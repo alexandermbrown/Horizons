@@ -19,3 +19,4 @@
 
 #include "Lithium/Core/Core.h"
 #include "Lithium/Core/Log.h"
+#include "Lithium/Core/Assert.h"

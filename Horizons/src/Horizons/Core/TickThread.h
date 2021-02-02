@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
 #include "Horizons/Config/ConfigStore.h"
 #include "Horizons/Gameplay/Sync/Sync.h"
 #include "Horizons/Gameplay/Sync/SyncTransform.h"

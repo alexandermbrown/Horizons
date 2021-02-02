@@ -1,8 +1,7 @@
 
 shader_splash:
   type: shader
-  glsl: "./res/shaders/Texture.glsl"
-  hlsl: "./res/shaders/Texture.hlsl"
+  path: "./res/shaders/texture"
 
 texture_horizons_splash:
   type: texture2d

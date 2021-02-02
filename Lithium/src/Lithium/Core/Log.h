@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
-
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 

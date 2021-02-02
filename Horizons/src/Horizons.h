@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
 #include "Horizons/Core/AppState.h"
 #include "Horizons/Config/ConfigStore.h"
 #include "Horizons/Config/ConfigLoader.h"

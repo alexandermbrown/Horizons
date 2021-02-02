@@ -452,15 +452,24 @@ struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ShaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_GLSL = 6,
-    VT_HLSL_VS = 8,
-    VT_HLSL_PS = 10
+    VT_GLSL_VERT = 6,
+    VT_GLSL_FRAG = 8,
+    VT_GLSL_COMP = 10,
+    VT_HLSL_VS = 12,
+    VT_HLSL_PS = 14,
+    VT_HLSL_CS = 16
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
-  const flatbuffers::String *glsl() const {
-    return GetPointer<const flatbuffers::String *>(VT_GLSL);
+  const flatbuffers::String *glsl_vert() const {
+    return GetPointer<const flatbuffers::String *>(VT_GLSL_VERT);
+  }
+  const flatbuffers::String *glsl_frag() const {
+    return GetPointer<const flatbuffers::String *>(VT_GLSL_FRAG);
+  }
+  const flatbuffers::String *glsl_comp() const {
+    return GetPointer<const flatbuffers::String *>(VT_GLSL_COMP);
   }
   const flatbuffers::Vector<uint8_t> *hlsl_vs() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_HLSL_VS);
@@ -468,16 +477,25 @@ struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<uint8_t> *hlsl_ps() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_HLSL_PS);
   }
+  const flatbuffers::Vector<uint8_t> *hlsl_cs() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_HLSL_CS);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
-           VerifyOffset(verifier, VT_GLSL) &&
-           verifier.VerifyString(glsl()) &&
+           VerifyOffset(verifier, VT_GLSL_VERT) &&
+           verifier.VerifyString(glsl_vert()) &&
+           VerifyOffset(verifier, VT_GLSL_FRAG) &&
+           verifier.VerifyString(glsl_frag()) &&
+           VerifyOffset(verifier, VT_GLSL_COMP) &&
+           verifier.VerifyString(glsl_comp()) &&
            VerifyOffset(verifier, VT_HLSL_VS) &&
            verifier.VerifyVector(hlsl_vs()) &&
            VerifyOffset(verifier, VT_HLSL_PS) &&
            verifier.VerifyVector(hlsl_ps()) &&
+           VerifyOffset(verifier, VT_HLSL_CS) &&
+           verifier.VerifyVector(hlsl_cs()) &&
            verifier.EndTable();
   }
 };
@@ -489,14 +507,23 @@ struct ShaderBuilder {
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(Shader::VT_NAME, name);
   }
-  void add_glsl(flatbuffers::Offset<flatbuffers::String> glsl) {
-    fbb_.AddOffset(Shader::VT_GLSL, glsl);
+  void add_glsl_vert(flatbuffers::Offset<flatbuffers::String> glsl_vert) {
+    fbb_.AddOffset(Shader::VT_GLSL_VERT, glsl_vert);
+  }
+  void add_glsl_frag(flatbuffers::Offset<flatbuffers::String> glsl_frag) {
+    fbb_.AddOffset(Shader::VT_GLSL_FRAG, glsl_frag);
+  }
+  void add_glsl_comp(flatbuffers::Offset<flatbuffers::String> glsl_comp) {
+    fbb_.AddOffset(Shader::VT_GLSL_COMP, glsl_comp);
   }
   void add_hlsl_vs(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_vs) {
     fbb_.AddOffset(Shader::VT_HLSL_VS, hlsl_vs);
   }
   void add_hlsl_ps(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_ps) {
     fbb_.AddOffset(Shader::VT_HLSL_PS, hlsl_ps);
+  }
+  void add_hlsl_cs(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_cs) {
+    fbb_.AddOffset(Shader::VT_HLSL_CS, hlsl_cs);
   }
   explicit ShaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -513,13 +540,19 @@ struct ShaderBuilder {
 inline flatbuffers::Offset<Shader> CreateShader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> name = 0,
-    flatbuffers::Offset<flatbuffers::String> glsl = 0,
+    flatbuffers::Offset<flatbuffers::String> glsl_vert = 0,
+    flatbuffers::Offset<flatbuffers::String> glsl_frag = 0,
+    flatbuffers::Offset<flatbuffers::String> glsl_comp = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_vs = 0,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_ps = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_ps = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_cs = 0) {
   ShaderBuilder builder_(_fbb);
+  builder_.add_hlsl_cs(hlsl_cs);
   builder_.add_hlsl_ps(hlsl_ps);
   builder_.add_hlsl_vs(hlsl_vs);
-  builder_.add_glsl(glsl);
+  builder_.add_glsl_comp(glsl_comp);
+  builder_.add_glsl_frag(glsl_frag);
+  builder_.add_glsl_vert(glsl_vert);
   builder_.add_name(name);
   return builder_.Finish();
 }
@@ -527,19 +560,28 @@ inline flatbuffers::Offset<Shader> CreateShader(
 inline flatbuffers::Offset<Shader> CreateShaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    const char *glsl = nullptr,
+    const char *glsl_vert = nullptr,
+    const char *glsl_frag = nullptr,
+    const char *glsl_comp = nullptr,
     const std::vector<uint8_t> *hlsl_vs = nullptr,
-    const std::vector<uint8_t> *hlsl_ps = nullptr) {
+    const std::vector<uint8_t> *hlsl_ps = nullptr,
+    const std::vector<uint8_t> *hlsl_cs = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto glsl__ = glsl ? _fbb.CreateString(glsl) : 0;
+  auto glsl_vert__ = glsl_vert ? _fbb.CreateString(glsl_vert) : 0;
+  auto glsl_frag__ = glsl_frag ? _fbb.CreateString(glsl_frag) : 0;
+  auto glsl_comp__ = glsl_comp ? _fbb.CreateString(glsl_comp) : 0;
   auto hlsl_vs__ = hlsl_vs ? _fbb.CreateVector<uint8_t>(*hlsl_vs) : 0;
   auto hlsl_ps__ = hlsl_ps ? _fbb.CreateVector<uint8_t>(*hlsl_ps) : 0;
+  auto hlsl_cs__ = hlsl_cs ? _fbb.CreateVector<uint8_t>(*hlsl_cs) : 0;
   return Assets::CreateShader(
       _fbb,
       name__,
-      glsl__,
+      glsl_vert__,
+      glsl_frag__,
+      glsl_comp__,
       hlsl_vs__,
-      hlsl_ps__);
+      hlsl_ps__,
+      hlsl_cs__);
 }
 
 struct AtlasEntry FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

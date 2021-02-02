@@ -1,8 +1,9 @@
 #include "lipch.h"
 #include "D3D11Window.h"
 
-#include "stb_image.h"
+#include "Lithium/Core/Assert.h"
 
+#include "stb_image.h"
 #include "SDL_syswm.h"
 
 namespace Li

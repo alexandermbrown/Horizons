@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Assert.h"
 
 #ifdef LI_ENABLE_ASSERTS
 #	define ALCall(x) { ALClearError();\

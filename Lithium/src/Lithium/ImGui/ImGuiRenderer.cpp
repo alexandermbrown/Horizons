@@ -2,16 +2,17 @@
 #ifndef LI_DIST
 #include "Lithium/ImGui/ImGuiRenderer.h"
 
-#include "examples/imgui_impl_sdl.h"
+#include "Lithium/Core/Assert.h"
 #include "Lithium/Core/Application.h"
 
 #ifdef LI_INCLUDE_OPENGL
 #include "Lithium/Platform/OpenGL/OpenGLImGuiRenderer.h"
 #endif
-
 #ifdef LI_INCLUDE_D3D11
 #include "Lithium/Platform/D3D11/D3D11ImGuiRenderer.h"
 #endif
+
+#include "examples/imgui_impl_sdl.h"
 
 namespace Li 
 {
@@ -81,7 +82,7 @@ namespace Li
 
 	void ImGuiRenderer::InitImGuiStyle()
 	{
-//		source: https://github.com/ocornut/imgui/issues/707#issuecomment-468798935
+		// source: https://github.com/ocornut/imgui/issues/707#issuecomment-468798935
 		ImGuiStyle* style = &ImGui::GetStyle();
 		ImVec4* colors = style->Colors;
 

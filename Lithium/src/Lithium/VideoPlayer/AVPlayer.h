@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Renderer/Texture.h"
 #include "Lithium/Utility/Time.h"
 #include "AudioQueue.h"

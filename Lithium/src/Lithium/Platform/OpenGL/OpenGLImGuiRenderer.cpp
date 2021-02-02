@@ -18,7 +18,7 @@ namespace Li
 		ImGui_ImplSDL2_InitForOpenGL(app.GetWindow().GetWindow(), static_cast<OpenGLContext*>(app.GetWindow().GetContext())->GetGLContext());
 
 		// TODO: set version dynamically for maximum compatibility.
-		ImGui_ImplOpenGL3_Init("#version 410");
+		ImGui_ImplOpenGL3_Init("#version 420");
 	}
 
 	OpenGLImGuiRenderer::~OpenGLImGuiRenderer()

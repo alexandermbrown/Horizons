@@ -1,13 +1,11 @@
 #pragma once
 
-#include "box2d/box2d.h"
-#include "Horizons/Core/Core.h"
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "DebugDrawSystem.h"
 #endif
 
 #include "Lithium.h"
+#include "box2d/box2d.h"
 
 namespace cp
 {

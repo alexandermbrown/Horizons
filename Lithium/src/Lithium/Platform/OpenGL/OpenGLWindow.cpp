@@ -1,6 +1,7 @@
 #include "lipch.h"
 #include "OpenGLWindow.h"
 
+#include "Lithium/Core/Assert.h"
 #include "Lithium/Core/Application.h"
 
 #include "stb_image.h"

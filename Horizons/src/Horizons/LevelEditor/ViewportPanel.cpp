@@ -25,6 +25,7 @@ ViewportPanel::ViewportPanel(EditorSettings* settings)
 
 ViewportPanel::~ViewportPanel()
 {
+	m_ViewportFB->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	EditorCameraSystem::Shutdown(m_Registry);
 	if (m_TerrainOpen)
 	{

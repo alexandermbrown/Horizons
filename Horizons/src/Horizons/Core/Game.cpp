@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Game.h"
 
-#include "Horizons/Core/Core.h"
 #include "Horizons/Core/Constants.h"
 #include "Horizons/Gameplay/Physics/PhysicsSystem.h"
 #include "Horizons/Gameplay/Player/PlayerSystem.h"

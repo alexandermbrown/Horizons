@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Renderer/OrthographicCamera.h"
 #include "Lithium/Renderer/Texture.h"
 #include "Lithium/Renderer/VertexArray.h"
@@ -11,7 +11,7 @@
 #include "Lithium/Renderer/RenderStage.h"
 #include "Lithium/Renderer/Font.h"
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 namespace Li
 {

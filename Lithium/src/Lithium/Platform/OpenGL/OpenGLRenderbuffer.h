@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
 #include "Lithium/Renderer/RendererEnums.h"
 
 namespace Li
@@ -8,7 +7,6 @@ namespace Li
 	class OpenGLRenderbuffer
 	{
 	public:
-
 		OpenGLRenderbuffer(uint32_t width, uint32_t height);
 		virtual ~OpenGLRenderbuffer();
 

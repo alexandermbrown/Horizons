@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "Horizons/Rendering/DebugPhysicsDrawShared.h"
 
@@ -56,5 +54,4 @@ public:
 private:
 	DebugDrawCommandQueue* m_CommandQueue;
 };
-
 #endif

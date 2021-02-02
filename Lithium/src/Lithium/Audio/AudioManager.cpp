@@ -1,6 +1,8 @@
 #include "lipch.h"
 #include "AudioManager.h"
 
+#include "Lithium/Core/Memory.h"
+
 #define AL_LIBTYPE_STATIC
 #include "AL/alc.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Assert.h"
+#include "Lithium/Core/Memory.h"
 #include "Lithium/Renderer/Texture.h"
 #include "Lithium/Renderer/Shader.h"
 #include "Lithium/Renderer/TextureAtlas.h"

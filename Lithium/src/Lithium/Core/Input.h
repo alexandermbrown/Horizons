@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
-
 #include "glm/glm.hpp"
 #include "SDL.h"
 

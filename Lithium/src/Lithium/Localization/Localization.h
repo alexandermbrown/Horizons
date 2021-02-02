@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Memory.h"
 
 #include <unordered_map>
 #include <string>
@@ -10,7 +10,6 @@ namespace Li
 	class Locale
 	{
 	public:
-
 		Locale(const std::string& code);
 		virtual ~Locale() = default;
 
@@ -32,7 +31,6 @@ namespace Li
 		}
 
 	private:
-
 		std::string m_Code;
 		std::unordered_map<std::string, std::wstring> m_Strings;
 	};
@@ -40,7 +38,6 @@ namespace Li
 	class Localization
 	{
 	public:
-
 		static void Init();
 
 		static inline void AddLocale(Ref<Locale> locale)

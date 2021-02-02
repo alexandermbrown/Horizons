@@ -11,13 +11,13 @@
 
 namespace Li
 {
-	Ref<Shader> Shader::Create(const std::string& name, const std::string& glsl, const uint8_t* vs_bytecode, uint32_t vs_size, const uint8_t* ps_bytecode, uint32_t ps_size)
+	Ref<Shader> Shader::Create(const std::string& name, const OpenGLShaderInput& gl_input, const uint8_t* vs_bytecode, uint32_t vs_size, const uint8_t* ps_bytecode, uint32_t ps_size)
 	{
 		switch (Application::Get().GetAPI())
 		{
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
-			return MakeRef<OpenGLShader>(name, glsl);
+			return MakeRef<OpenGLShader>(name, gl_input);
 #endif
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:

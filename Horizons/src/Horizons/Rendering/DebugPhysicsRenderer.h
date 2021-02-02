@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
-
 #ifdef HZ_PHYSICS_DEBUG_DRAW
 #include "DebugPhysicsDrawShared.h"
 #include "Lithium.h"
@@ -19,5 +17,4 @@ private:
 	std::deque<DebugDrawCommand> m_FeedQueue;
 	std::deque<DebugDrawCommand> m_CurrentQueue;
 };
-
 #endif

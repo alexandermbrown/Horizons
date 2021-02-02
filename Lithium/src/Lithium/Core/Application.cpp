@@ -1,7 +1,7 @@
 #include "lipch.h"
 #include "Application.h"
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Assert.h"
 #include "Lithium/Core/Log.h"
 #include "Lithium/Renderer/Renderer.h"
 #include "Lithium/Resources/ResourceManager.h"
@@ -46,7 +46,6 @@ namespace Li
 			"SDL compiled and linked to two different versions!"
 		);
 #endif
-
 		m_EventCallbackFn = LI_BIND_FN(Application::OnEvent);
 
 		m_Window = Window::Create(props);

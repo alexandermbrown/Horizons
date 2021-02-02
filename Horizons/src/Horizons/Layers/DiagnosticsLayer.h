@@ -1,6 +1,5 @@
 #pragma once
 #ifndef LI_DIST
-#include "Horizons/Core/Core.h"
 #include "Lithium.h"
 
 class DiagnosticsLayer : public Li::Layer

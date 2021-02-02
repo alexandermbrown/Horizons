@@ -2,6 +2,7 @@
 #include "D3D11VertexArray.h"
 
 #include "Lithium/Core/Application.h"
+#include "Lithium/Core/Assert.h"
 #include "D3D11Core.h"
 #include "D3D11Context.h"
 #include "D3D11Shader.h"

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Horizons/Core/Core.h"
 #include "Horizons/Core/TickThread.h"
 
 #ifdef HZ_PHYSICS_DEBUG_DRAW

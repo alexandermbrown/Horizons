@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithium/Core/Core.h"
+#include "Lithium/Core/Assert.h"
 #include "Lithium/Renderer/UniformBuffer.h"
 
 #include <unordered_map>

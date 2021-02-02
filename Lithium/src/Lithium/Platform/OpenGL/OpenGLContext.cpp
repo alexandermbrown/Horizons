@@ -1,11 +1,15 @@
 #include "lipch.h"
 #include "OpenGLContext.h"
 
+#include "Lithium/Core/Assert.h"
 #include "ConvertOpenGL.h"
 #include "OpenGLCore.h"
 
 #include "SDL.h"
 #include "glad/glad.h"
+
+#include <stdexcept>
+#include <sstream>
 
 namespace Li
 {
@@ -16,7 +20,7 @@ namespace Li
 		unsigned severity,
 		int length,
 		const char* message,
-		const void* userParam)
+		const void* user_param)
 	{
 		switch (severity)
 		{
@@ -29,27 +33,40 @@ namespace Li
 		LI_CORE_ASSERT(false, "Unknown severity level!");
 	}
 
-	OpenGLContext::OpenGLContext(SDL_Window* windowHandle, int width, int height)
-		: m_WindowHandle(windowHandle), m_Width(width), m_Height(height)
+	OpenGLContext::OpenGLContext(SDL_Window* window_handle, int width, int height)
+		: m_WindowHandle(window_handle), m_Width(width), m_Height(height)
 	{
-		m_Context = SDL_GL_CreateContext(windowHandle);
+		m_Context = SDL_GL_CreateContext(window_handle);
 
 		SDL_GL_MakeCurrent(m_WindowHandle, m_Context);
-		LI_CORE_VERIFY(gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to load OpenGL loader!");
+		if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+			throw std::runtime_error("Failed to load OpenGL functions.");
 
 		Log::CoreInfo("OpenGL Info:");
 		GLCall(Log::CoreInfo("    Vendor: {0}", glGetString(GL_VENDOR)));
 		GLCall(Log::CoreInfo("    Renderer: {0}", glGetString(GL_RENDERER)));
 		GLCall(Log::CoreInfo("    Version: OpenGL {0}", glGetString(GL_VERSION)));
+		
+		// Verify OpenGL version.
+		int version_major;
+		int version_minor;
+		GLCall(glGetIntegerv(GL_MAJOR_VERSION, &version_major));
+		GLCall(glGetIntegerv(GL_MINOR_VERSION, &version_minor));
 
-#ifdef LI_ENABLE_ASSERTS
-		int versionMajor;
-		int versionMinor;
-		GLCall(glGetIntegerv(GL_MAJOR_VERSION, &versionMajor));
-		GLCall(glGetIntegerv(GL_MINOR_VERSION, &versionMinor));
-
-		LI_CORE_ASSERT(versionMajor > 4 || (versionMajor == 4 && versionMinor >= 2), "Lithium requires at least OpenGL version 4.2!");
+#ifdef LI_DEBUG
+		constexpr int RequiredMajor = 4;
+		constexpr int RequiredMinor = 3;
+#else
+		constexpr int RequiredMajor = 4;
+		constexpr int RequiredMinor = 2;
 #endif
+		bool good_version = version_major > RequiredMajor || (version_major == RequiredMajor && version_minor >= RequiredMinor);
+		if (!good_version)
+		{
+			std::stringstream stream;
+			stream << "OpenGL version " << RequiredMajor << "." << RequiredMinor << " is required.";
+			throw std::runtime_error(stream.str());
+		}
 		
 #ifdef LI_DEBUG
 		GLCall(glEnable(GL_DEBUG_OUTPUT));

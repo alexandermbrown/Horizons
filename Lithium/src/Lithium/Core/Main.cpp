@@ -2,8 +2,7 @@
 
 #define SDL_MAIN_HANDLED
 #include "Lithium/Core/Application.h"
-#include "Lithium/Core/Core.h"
-#include "Lithium/Core/Log.h"
+#include "Lithium/Core/Memory.h"
 
 extern Li::Unique<Li::Application> Li::CreateApplication();
 
