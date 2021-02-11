@@ -55,8 +55,8 @@ namespace Li
 		vertex_buffer->Bind();
 		glBindVertexArray(m_RendererID);
 
-		const auto& layout = vertex_buffer->GetLayout();
-		for (const auto& element : layout)
+		const Li::BufferLayout& layout = vertex_buffer->GetLayout();
+		for (const Li::BufferElement& element : layout)
 		{
 			if (element.Type == ShaderDataType::Mat4)
 			{
