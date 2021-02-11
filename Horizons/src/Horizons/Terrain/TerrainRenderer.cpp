@@ -41,8 +41,8 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 		}
 	}
 
-	Li::Ref<Li::VertexBuffer> positionBuffer = Li::VertexBuffer::Create((float*)vertices, sizeof(vertices), Li::BufferUsage::StaticDraw);
-	positionBuffer->SetLayout({
+	Li::Ref<Li::VertexBuffer> position_vb = Li::VertexBuffer::Create((float*)vertices, sizeof(vertices), Li::BufferUsage::StaticDraw);
+	position_vb->SetLayout({
 		{ Li::ShaderDataType::Float2, "POSITION", 0 },
 		{ Li::ShaderDataType::Float2, "TEXCOORD", 1 }
 	});
@@ -63,11 +63,11 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 			indices[index + 5] = indices[index + 2];
 		}
 	}
-	Li::Ref<Li::IndexBuffer> indexBuffer = Li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, Li::BufferUsage::StaticDraw);
+	Li::Ref<Li::IndexBuffer> index_buffer = Li::IndexBuffer::Create(indices, ChunkHeight * ChunkWidth * 6, Li::BufferUsage::StaticDraw);
 
 	for (int i = 0; i < RenderWidth * RenderWidth; i++)
 	{
-		auto& chunk = m_RenderChunks[i];
+		RenderChunk& chunk = m_RenderChunks[i];
 		chunk.VertexArray = Li::VertexArray::Create();
 
 		chunk.AlphaVB = Li::VertexBuffer::Create(sizeof(TerrainStore::AlphaValuesArray), Li::BufferUsage::DynamicDraw);
@@ -75,9 +75,9 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 			{ Li::ShaderDataType::Float3, "ALPHAVALUES", 2 }
 		});
 
-		chunk.VertexArray->AddVertexBuffer(positionBuffer);
+		chunk.VertexArray->AddVertexBuffer(position_vb);
 		chunk.VertexArray->AddVertexBuffer(chunk.AlphaVB);
-		chunk.VertexArray->SetIndexBuffer(indexBuffer);
+		chunk.VertexArray->SetIndexBuffer(index_buffer);
 		chunk.VertexArray->Finalize(m_TerrainShader);
 	}
 
@@ -95,7 +95,11 @@ TerrainRenderer::TerrainRenderer(TerrainStore* store, int render_width)
 
 TerrainRenderer::~TerrainRenderer()
 {
-	delete[] m_RenderChunks;
+	if (m_RenderChunks)
+	{
+		delete[] m_RenderChunks;
+		m_RenderChunks = nullptr;
+	}
 }
 
 bool TerrainRenderer::LoadTerrain(const std::string& path, glm::ivec2 center)
