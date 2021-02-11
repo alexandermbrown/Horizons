@@ -10,7 +10,7 @@ void LoadAssetBase(const std::string& xml_path, const std::string& lab_path, boo
 
 int main(int argc, char* argv[])
 {
-	std::cout << "AssetBase v0.3.0\n";
+	std::cout << "AssetBase v0.3.1\n";
 
 	std::ifstream resfiles("./resfiles.txt");
 	if (!resfiles.is_open())
@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
 	while (resfiles >> xml_path >> lab_path)
 	{
 		try {
+			std::filesystem::path output_path = lab_path;
+			std::filesystem::create_directories(output_path.parent_path());
 			LoadAssetBase(xml_path, lab_path + "-debug", true);
 			LoadAssetBase(xml_path, lab_path, false);
 		}
@@ -52,7 +54,7 @@ void LoadAssetBase(const std::string& xml_path, const std::string& lab_path, boo
 	std::cout << std::string(32, '-') << "\nLoading " << xml_path << (debug_mode ? " in debug mode" : " in release mode") << "...\n";
 	AssetBase::AssetSerial serial(xml_path, debug_mode);
 
-	std::ofstream out_file(std::string(lab_path), std::ios::out | std::ios::trunc | std::ios::binary);
+	std::ofstream out_file(lab_path, std::ios::out | std::ios::trunc | std::ios::binary);
 
 	std::cout << "\nWriting " << serial.GetBufferSize() << " bytes to file " << lab_path << "...\n";
 	out_file << serial;

@@ -3,6 +3,7 @@
 
 #include "OptionalField.h"
 
+#include "ShaderConductor/ShaderConductor.hpp"
 #include <d3dcompiler.h>
 #include <wrl/client.h>
 
@@ -11,74 +12,155 @@
 #include <sstream>
 
 namespace fs = std::filesystem;
+namespace fb = flatbuffers;
+namespace SC = ShaderConductor;
 using namespace Microsoft::WRL;
 
 namespace AssetBase
 {
 	struct ShaderStore
 	{
-		flatbuffers::Offset<flatbuffers::String> GL_Vert;
-		flatbuffers::Offset<flatbuffers::String> GL_Frag;
-		flatbuffers::Offset<flatbuffers::String> GL_Comp;
+		fb::Offset<fb::String> GL_Vert;
+		fb::Offset<fb::String> GL_Frag;
+		fb::Offset<fb::String> GL_Comp;
 
-		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> D3D_VS;
-		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> D3D_PS;
-		flatbuffers::Offset<flatbuffers::Vector<uint8_t>> D3D_CS;
+		fb::Offset<fb::Vector<uint8_t>> D3D_VS;
+		fb::Offset<fb::Vector<uint8_t>> D3D_PS;
+		fb::Offset<fb::Vector<uint8_t>> D3D_CS;
 	};
 
-	static void LoadGLShader(flatbuffers::FlatBufferBuilder& builder,
-		const fs::path& shader_path, flatbuffers::Offset<flatbuffers::String>& dest);
+	static void CompileHLSL(fb::FlatBufferBuilder& builder, ShaderStore& store,
+		const fs::path& entry_path, bool debug_mode);
+	
+	static std::string GetStageCharacters(const std::string& filename);
 
-	static void LoadD3DShader(flatbuffers::FlatBufferBuilder& builder, ShaderStore& store,
-		const fs::path& entry_path, UINT flags);
+	fb::Offset<fb::Vector<uint8_t>> CompileD3D11(fb::FlatBufferBuilder& builder, const fs::path& entry_path,
+		const std::string& entrypoint, const std::string& target, bool debug_mode);
 
-	flatbuffers::Offset<Assets::Shader> SerializeShader(flatbuffers::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node shader, bool debug_mode)
+	static fb::Offset<fb::Vector<fb::Offset<Assets::ShaderSampler>>>
+		LoadSamplers(fb::FlatBufferBuilder& builder, const YAML::Node& shader);
+
+	fb::Offset<Assets::Shader> SerializeShader(fb::FlatBufferBuilder& builder, const std::filesystem::path& base_path, const std::string& name, YAML::Node shader, bool debug_mode)
 	{
 		ShaderStore store;
 		fs::path shader_path{ GetOptionalString(shader, "path") };
 
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-		if (debug_mode)
-			flags |= D3DCOMPILE_DEBUG;
-		else
-			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-
+		// SHADER SOURCES //
 		for (const fs::directory_entry& entry : fs::directory_iterator(shader_path))
 		{
 			const fs::path& entry_path = entry.path();
 			if (!fs::is_regular_file(entry_path))
 				continue;
 
-			fs::path extension = entry_path.extension();
-			if (extension == ".vert")
-				LoadGLShader(builder, entry_path, store.GL_Vert);
-			else if (extension == ".frag")
-				LoadGLShader(builder, entry_path, store.GL_Frag);
-			else if (extension == ".comp")
-				LoadGLShader(builder, entry_path, store.GL_Comp);
-			else if (extension == ".hlsl")
-				LoadD3DShader(builder, store, entry_path, flags);
+			if (entry_path.extension() == ".hlsl")
+				CompileHLSL(builder, store, entry_path, debug_mode);
 		}
-		
+
+		auto samplers_offset = LoadSamplers(builder, shader);
+
 		return Assets::CreateShader(builder, builder.CreateString(name),
 			store.GL_Vert, store.GL_Frag, store.GL_Comp,
-			store.D3D_VS, store.D3D_PS, store.D3D_CS);
+			store.D3D_VS, store.D3D_PS, store.D3D_CS, samplers_offset);
 	}
 
-	static void LoadGLShader(flatbuffers::FlatBufferBuilder& builder,
-		const fs::path& shader_path, flatbuffers::Offset<flatbuffers::String>& dest)
+	static void CompileHLSL(fb::FlatBufferBuilder& builder, ShaderStore& store, const fs::path& entry_path, bool debug_mode)
 	{
-		std::ifstream shader_file(shader_path);
-		if (!shader_file.is_open())
-			throw std::runtime_error("Error opening glsl shader source file " + shader_path.string());
-		std::string glsl_source{ std::istreambuf_iterator<char>(shader_file), std::istreambuf_iterator<char>() };
-		dest = builder.CreateString(glsl_source);
-	}
+		constexpr int TargetCount = 1;
+		constexpr int GlslIndex = 0;
+		//constexpr int SpirvIndex = 1;
 
-	static void LoadD3DShader(flatbuffers::FlatBufferBuilder& builder, ShaderStore& store, const fs::path& entry_path, UINT flags)
-	{
+		std::ifstream shader_file(entry_path);
+		std::string hlsl_source{ std::istreambuf_iterator<char>(shader_file), std::istreambuf_iterator<char>() };
+
+		SC::Compiler::TargetDesc targets[TargetCount];
+		SC::Compiler::ResultDesc results[TargetCount];
+
+		SC::Compiler::SourceDesc source;
+		std::string path = entry_path.u8string();
+		source.source = hlsl_source.c_str();
+		source.fileName = path.c_str();
+		source.defines = nullptr;
+		source.numDefines = 0;
+
+		SC::Compiler::Options options;
+		options.enableDebugInfo = debug_mode;
+		options.disableOptimizations = !debug_mode;
+		options.optimizationLevel = debug_mode ? 0 : 3;
+		options.shaderModel.major_ver = 5;
+		options.shaderModel.minor_ver = 0;
+		options.packMatricesInRowMajor = false;
+
+		SC::Compiler::TargetDesc& target_glsl = targets[GlslIndex];
+		target_glsl.language = SC::ShadingLanguage::Glsl;
+		target_glsl.version = "430";
+		target_glsl.asModule = false;
+
+		//SC::Compiler::TargetDesc& target_spirv = targets[SpirvIndex];
+		//target_spirv.language = SC::ShadingLanguage::SpirV;
+		//target_spirv.version = "1.3";
+		//target_spirv.asModule = false;
+
 		std::string filename = entry_path.filename().string();
+		std::string stage_chars = GetStageCharacters(filename);
+		for (char stage_char : stage_chars)
+		{
+			std::string entrypoint = "?s_main";
+			entrypoint[0] = stage_char;
+			source.entryPoint = entrypoint.c_str();
 
+			std::string target = "?s_5_0";
+			target[0] = stage_char;
+
+			fb::Offset<fb::Vector<uint8_t>>* dxil_offset = nullptr;
+			fb::Offset<fb::String>* glsl_offset = nullptr;
+			switch (stage_char)
+			{
+			case 'v':
+				dxil_offset = &store.D3D_VS;
+				glsl_offset = &store.GL_Vert;
+				source.stage = SC::ShaderStage::VertexShader;
+				break;
+			case 'p':
+				dxil_offset = &store.D3D_PS;
+				glsl_offset = &store.GL_Frag;
+				source.stage = SC::ShaderStage::PixelShader;
+				break;
+			case 'c':
+				dxil_offset = &store.D3D_CS;
+				glsl_offset = &store.GL_Comp;
+				source.stage = SC::ShaderStage::ComputeShader;
+				break;
+			default:
+				throw std::runtime_error(std::string("Unknown shader type character ") + stage_char);
+			}
+
+			if (dxil_offset->o)
+				throw std::runtime_error(filename + ": invalid HLSL shader filename: character '" + stage_char + "' appears more than once.");
+
+			*dxil_offset = CompileD3D11(builder, entry_path, entrypoint, target, debug_mode);
+
+			// SHADER CONDUCTOR //
+			SC::Compiler::Compile(source, options, targets, TargetCount, results);
+
+			for (int i = 0; i < TargetCount; i++)
+			{
+				if (results[i].hasError)
+				{
+					std::string error_msg((const char*)results[i].errorWarningMsg.Data(), results[i].errorWarningMsg.Size());
+					throw std::runtime_error(error_msg);
+				}
+			}
+
+			// GLSL Source code.
+			const SC::Compiler::ResultDesc& glsl_result = results[GlslIndex];
+			*glsl_offset = builder.CreateString((const char*)glsl_result.target.Data(), glsl_result.target.Size());
+
+			// TODO: SPIR-V Bytecode.
+		}
+	}
+
+	std::string GetStageCharacters(const std::string& filename)
+	{
 		size_t underscore_pos = filename.rfind('_');
 		if (underscore_pos == std::string::npos)
 			throw std::runtime_error(filename + ": invalid HLSL shader filename: missing '_'");
@@ -90,45 +172,74 @@ namespace AssetBase
 		if (dot_pos - underscore_pos <= 2)
 			throw std::runtime_error(filename + ": invalid HLSL shader filename: incorrect positioning of '_' and '.'");
 
-		std::string type = filename.substr(underscore_pos + 1, dot_pos - underscore_pos - 2);
+		return filename.substr(underscore_pos + 1, dot_pos - underscore_pos - 2);
+	}
 
-		for (char shader_char : type)
+	fb::Offset<fb::Vector<uint8_t>> CompileD3D11(fb::FlatBufferBuilder& builder, const fs::path& entry_path,
+		const std::string& entrypoint, const std::string& target, bool debug_mode)
+	{
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+		if (debug_mode)
+			flags |= D3DCOMPILE_DEBUG;
+		else
+			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+
+		ComPtr<ID3D10Blob> dxil_shader;
+		ComPtr<ID3D10Blob> error_message;
+		HRESULT result = D3DCompileFromFile(entry_path.c_str(), NULL, NULL, entrypoint.c_str(), target.c_str(), flags, 0, &dxil_shader, &error_message);
+
+		if (FAILED(result))
+			throw std::runtime_error(std::string{ (const char*)error_message->GetBufferPointer(), error_message->GetBufferSize() });
+
+		uint8_t* dxil_vector_data = nullptr;
+		fb::Offset<fb::Vector<uint8_t>> dxil_offset = builder.CreateUninitializedVector(dxil_shader->GetBufferSize(), &dxil_vector_data);
+		memcpy(dxil_vector_data, dxil_shader->GetBufferPointer(), dxil_shader->GetBufferSize());
+
+		return dxil_offset;
+	}
+
+	fb::Offset<fb::Vector<fb::Offset<Assets::ShaderSampler>>>
+		LoadSamplers(fb::FlatBufferBuilder& builder, const YAML::Node& shader)
+	{
+		std::vector<fb::Offset<Assets::ShaderSampler>> sampler_offsets;
+		YAML::Node samplers = shader["samplers"];
+		for (const std::pair<YAML::Node, YAML::Node>& sampler : samplers)
 		{
-			flatbuffers::Offset<flatbuffers::Vector<uint8_t>>* shader_offset = nullptr;
-			switch (shader_char)
+			int binding = sampler.first.as<int>();
+			if (binding < 0 || binding > UINT8_MAX)
 			{
-			case 'v':
-				shader_offset = &store.D3D_VS;
-				break;
-			case 'p':
-				shader_offset = &store.D3D_PS;
-				break;
-			case 'c':
-				shader_offset = &store.D3D_CS;
-				break;
-			default:
-				throw std::runtime_error(std::string("Unknown shader type character ") + shader_char);
+				throw std::runtime_error((std::stringstream() <<
+					"Sampler binding " << binding << " is out of bounds for uint8").str());
+			}
+			if (!sampler.second.IsSequence())
+			{
+				throw std::runtime_error((std::stringstream() <<
+					"Sampler with binding " << binding << " is not a sequence").str());
 			}
 
-			if (shader_offset->o)
-				throw std::runtime_error(filename + ": invalid HLSL shader filename: character '" + shader_char + "' appears more than once.");
+			constexpr int NumSamplerStrings = 2;
+			if (sampler.second.size() != NumSamplerStrings)
+			{
+				throw std::runtime_error((std::stringstream() <<
+					"Sampler with binding " << binding << " does not have 2 entries").str());
+			}
 
-			ComPtr<ID3D10Blob> compiled_shader;
-			ComPtr<ID3D10Blob> error_message;
+			std::string combined = "SPIRV_Cross_Combined";
+			for (int i = 0; i < NumSamplerStrings; i++)
+			{
+				YAML::Node name = sampler.second[i];
+				if (!name.IsScalar())
+				{
+					std::stringstream ss;
+					ss << "Sampler with binding " << binding << " is not a string";
+					throw std::runtime_error(ss.str());
+				}
+				combined += name.Scalar();
+			}
 
-			std::string entrypoint = "?s_main";
-			std::string target = "?s_5_0";
-			entrypoint[0] = shader_char;
-			target[0] = shader_char;
-
-			HRESULT result = D3DCompileFromFile(entry_path.c_str(), NULL, NULL, entrypoint.c_str(), target.c_str(), flags, 0, &compiled_shader, &error_message);
-
-			if (FAILED(result))
-				throw std::runtime_error(std::string{ (const char*)error_message->GetBufferPointer(), error_message->GetBufferSize() });
-
-			uint8_t* vector_data = nullptr;
-			*shader_offset = builder.CreateUninitializedVector(compiled_shader->GetBufferSize(), &vector_data);
-			memcpy(vector_data, compiled_shader->GetBufferPointer(), compiled_shader->GetBufferSize());
+			fb::Offset<fb::String> combined_offset = builder.CreateString(combined);
+			sampler_offsets.push_back(Assets::CreateShaderSampler(builder, binding, combined_offset));
 		}
+		return builder.CreateVector(sampler_offsets);
 	}
 }

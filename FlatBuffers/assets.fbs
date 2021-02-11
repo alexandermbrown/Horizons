@@ -37,6 +37,11 @@ table Texture2D {
 	data:[ubyte];
 }
 
+table ShaderSampler {
+	binding:ubyte;
+	name:string;
+}
+
 table Shader {
 	name:string;
 	glsl_vert:string;
@@ -45,6 +50,7 @@ table Shader {
 	hlsl_vs:[ubyte];
 	hlsl_ps:[ubyte];
 	hlsl_cs:[ubyte];
+	samplers:[ShaderSampler];
 }
 
 table AtlasEntry {

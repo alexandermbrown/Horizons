@@ -35,6 +35,7 @@ IncludeDir["freetype"] = "AssetBase/vendor/freetype/include"
 IncludeDir["msdfgen"] = "AssetBase/vendor/msdfgen"
 IncludeDir["flatbuffers"] = "AssetBase/vendor/flatbuffers/include"
 IncludeDir["yamlcpp"] = "AssetBase/vendor/yaml-cpp/include"
+IncludeDir["ShaderConductor"] = "AssetBase/vendor/ShaderConductor/include"
 IncludeDir["lab_serial"] = "FlatBuffers/include"
 
 IncludeDir["entt"] = "Horizons/vendor/entt/include"
@@ -296,14 +297,19 @@ project "AssetBase"
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.flatbuffers}",
 		"%{IncludeDir.lab_serial}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.yamlcpp}",
+		"%{IncludeDir.ShaderConductor}"
 	}
 
 	links {
 		"msdfgen",
 		"zlib",
-		"yaml-cpp"
+		"yaml-cpp",
+		"ShaderConductor",
+		-- "SPIRV-Tools",
+		-- "SPIRV-Tools-opt"
 	}
+	libdirs "AssetBase/vendor/ShaderConductor/lib/win64"
 
 	filter "system:windows"
 		systemversion "latest"
@@ -313,6 +319,23 @@ project "AssetBase"
 			"dxgi.lib",
 			"d3dcompiler.lib"
 		}
+
+	--filter { "system:windows", "configurations:Debug" }
+		--libdirs "AssetBase/vendor/ShaderConductor/lib/win64-debug"
+		-- links {
+		-- 	"spirv-cross-cored",
+		-- 	"spirv-cross-glsld",
+		-- 	"spirv-cross-hlsld",
+		-- 	"spirv-cross-msld"
+		-- }
+	
+	--filter { "system:windows", "configurations:Release or Dist" }
+		-- links {
+		-- 	"spirv-cross-core",
+		-- 	"spirv-cross-glsl",
+		-- 	"spirv-cross-hlsl",
+		-- 	"spirv-cross-msl"
+		-- }
 
 	filter "configurations:Debug"
 		defines "LI_DEBUG"

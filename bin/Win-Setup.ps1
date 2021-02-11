@@ -12,8 +12,8 @@ try {
 	Get-Command "7z" -ErrorAction Stop | Out-Null
 }
 catch {
-	Write-Host "[Win-Init.ps1] 7z.exe not found. Install 7-Zip and add it to PATH." -ForegroundColor Red
-	Write-Host "[Win-Init.ps1] Script failed. Press any key to finish...";
+	Write-Host "[Win-Setup.ps1] 7z.exe not found. Install 7-Zip and add it to PATH." -ForegroundColor Red
+	Write-Host "[Win-Setup.ps1] Script failed. Press any key to finish...";
 	$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown");
 	EXIT
 }
@@ -24,17 +24,17 @@ New-Item -ItemType "Directory" -Force -Path "$libav_build_path\Release-windows-x
 
 # Download libav binaries if not found.
 if (-Not (Test-Path -Path $libav_archive_path)) {
-	Write-Host "[Win-Init.ps1] Downloading $libav_url..." -ForegroundColor DarkGreen
+	Write-Host "[Win-Setup.ps1] Downloading $libav_url..." -ForegroundColor DarkGreen
 	$client = New-Object System.Net.WebClient
 	# $client.DownloadFile($libav_url, $libav_archive_path)
 	$client.DownloadFile($libav_url, "$PSScriptRoot\..\$libav_archive_path")
-	Write-Host "[Win-Init.ps1] Saved to $libav_archive_path" -ForegroundColor DarkGreen
+	Write-Host "[Win-Setup.ps1] Saved to $libav_archive_path" -ForegroundColor DarkGreen
 }
 else {
-	Write-Host "[Win-Init.ps1] $libav_archive_name.7z already exists, skipping download." -ForegroundColor DarkGreen
+	Write-Host "[Win-Setup.ps1] $libav_archive_name.7z already exists, skipping download." -ForegroundColor DarkGreen
 }
 
-Write-Host "[Win-Init.ps1] Extracting $libav_archive_path..." -ForegroundColor DarkGreen
+Write-Host "[Win-Setup.ps1] Extracting $libav_archive_path..." -ForegroundColor DarkGreen
 Remove-Item "$libav_build_path\Debug-windows-x86_64\*.lib" -ErrorAction Ignore | Out-Null
 Remove-Item "$libav_build_path\Debug-windows-x86_64\*.pdb" -ErrorAction Ignore | Out-Null
 Remove-Item "$libav_build_path\Release-windows-x86_64\*.lib" -ErrorAction Ignore | Out-Null
@@ -47,23 +47,31 @@ Remove-Item "$libav_build_path\Release-windows-x86_64\*.pdb" -ErrorAction Ignore
 New-Item -ItemType "Directory" -Force -Path "build\Debug-windows-x86_64\Horizons"
 New-Item -ItemType "Directory" -Force -Path "build\Release-windows-x86_64\Horizons"
 New-Item -ItemType "Directory" -Force -Path "build\Dist-windows-x86_64\Horizons"
+New-Item -ItemType "Directory" -Force -Path "build\Debug-windows-x86_64\AssetBase"
+New-Item -ItemType "Directory" -Force -Path "build\Release-windows-x86_64\AssetBase"
+New-Item -ItemType "Directory" -Force -Path "build\Dist-windows-x86_64\AssetBase"
 
 # Copy PDBs
-Write-Host "[Win-Init.ps1] Copying PDB files..." -ForegroundColor DarkGreen
+Write-Host "[Win-Setup.ps1] Copying PDB files..." -ForegroundColor DarkGreen
 Copy-Item "$libav_build_path\Debug-windows-x86_64\*.pdb" -Destination "build\Debug-windows-x86_64\Horizons\"
 Copy-Item "$libav_build_path\Release-windows-x86_64\*.pdb" -Destination "build\Release-windows-x86_64\Horizons\"
 Copy-Item "$libav_build_path\Release-windows-x86_64\*.pdb" -Destination "build\Dist-windows-x86_64\Horizons\"
 
 # Copy DLLs
+Write-Host "[Win-Setup.ps1] Copying DLL files..." -ForegroundColor DarkGreen
 $sdl_dll_path = "Lithium\vendor\SDL2\lib\win64\SDL2.dll"
-Write-Host "[Win-Init.ps1] Copying DLL files..." -ForegroundColor DarkGreen
 Copy-Item $sdl_dll_path -Destination "build\Debug-windows-x86_64\Horizons\"
 Copy-Item $sdl_dll_path -Destination "build\Release-windows-x86_64\Horizons\"
 Copy-Item $sdl_dll_path -Destination "build\Dist-windows-x86_64\Horizons\"
 
-Write-Host "[Win-Init.ps1] Generating projects..." -ForegroundColor DarkGreen
+$shader_conductor_dll_path = "AssetBase\vendor\ShaderConductor\lib\win64\*.dll"
+Copy-Item $shader_conductor_dll_path -Destination "build\Debug-windows-x86_64\AssetBase"
+Copy-Item $shader_conductor_dll_path -Destination "build\Release-windows-x86_64\AssetBase"
+Copy-Item $shader_conductor_dll_path -Destination "build\Dist-windows-x86_64\AssetBase"
+
+Write-Host "[Win-Setup.ps1] Generating projects..." -ForegroundColor DarkGreen
 bin/Win-GenProjects.ps1 -noprompt
 Pop-Location
 
-Write-Host "[Win-Init.ps1] Press any key to finish...";
+Write-Host "[Win-Setup.ps1] Press any key to finish...";
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown");

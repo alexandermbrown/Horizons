@@ -3,10 +3,20 @@
 shader_batched:
   type: shader
   path: "./res/shaders/batched"
+  samplers:
+    0: ["u_Texture0", "u_Sampler0"]
+    1: ["u_Texture1", "u_Sampler1"]
+    2: ["u_Texture2", "u_Sampler2"]
+    3: ["u_Texture3", "u_Sampler3"]
+    4: ["u_Texture4", "u_Sampler4"]
+    5: ["u_Texture5", "u_Sampler5"]
+    6: ["u_Texture6", "u_Sampler6"]
+    7: ["u_Texture7", "u_Sampler7"]
 
 shader_label:
   type: shader
   path: "./res/shaders/label"
+  samplers: { 0: ["u_Texture", "u_Sampler"] }
 
 shader_line:
   type: shader
@@ -15,6 +25,11 @@ shader_line:
 shader_terrain:
   type: shader
   path: "./res/shaders/terrain"
+  samplers: 
+    0: ["u_Texture", "u_TextureSampler"]
+    1: ["u_Noise1", "u_Noise1Sampler"]
+    2: ["u_Noise2", "u_Noise2Sampler"]
+    3: ["u_Noise3", "u_Noise3Sampler"]
 
 ### Textures ###
 texture_default:

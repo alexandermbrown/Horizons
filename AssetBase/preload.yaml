@@ -2,6 +2,7 @@
 shader_splash:
   type: shader
   path: "./res/shaders/texture"
+  samplers: { 0: ["u_Texture", "u_Sampler"] }
 
 texture_horizons_splash:
   type: texture2d

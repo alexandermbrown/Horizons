@@ -20,6 +20,9 @@ struct AssetBundleBuilder;
 struct Texture2D;
 struct Texture2DBuilder;
 
+struct ShaderSampler;
+struct ShaderSamplerBuilder;
+
 struct Shader;
 struct ShaderBuilder;
 
@@ -448,6 +451,70 @@ inline flatbuffers::Offset<Texture2D> CreateTexture2DDirect(
       data__);
 }
 
+struct ShaderSampler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ShaderSamplerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BINDING = 4,
+    VT_NAME = 6
+  };
+  uint8_t binding() const {
+    return GetField<uint8_t>(VT_BINDING, 0);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_BINDING) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ShaderSamplerBuilder {
+  typedef ShaderSampler Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_binding(uint8_t binding) {
+    fbb_.AddElement<uint8_t>(ShaderSampler::VT_BINDING, binding, 0);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(ShaderSampler::VT_NAME, name);
+  }
+  explicit ShaderSamplerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ShaderSamplerBuilder &operator=(const ShaderSamplerBuilder &);
+  flatbuffers::Offset<ShaderSampler> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ShaderSampler>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ShaderSampler> CreateShaderSampler(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t binding = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0) {
+  ShaderSamplerBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_binding(binding);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<ShaderSampler> CreateShaderSamplerDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t binding = 0,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return Assets::CreateShaderSampler(
+      _fbb,
+      binding,
+      name__);
+}
+
 struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ShaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -457,7 +524,8 @@ struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GLSL_COMP = 10,
     VT_HLSL_VS = 12,
     VT_HLSL_PS = 14,
-    VT_HLSL_CS = 16
+    VT_HLSL_CS = 16,
+    VT_SAMPLERS = 18
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
@@ -480,6 +548,9 @@ struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<uint8_t> *hlsl_cs() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_HLSL_CS);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<Assets::ShaderSampler>> *samplers() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Assets::ShaderSampler>> *>(VT_SAMPLERS);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
@@ -496,6 +567,9 @@ struct Shader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(hlsl_ps()) &&
            VerifyOffset(verifier, VT_HLSL_CS) &&
            verifier.VerifyVector(hlsl_cs()) &&
+           VerifyOffset(verifier, VT_SAMPLERS) &&
+           verifier.VerifyVector(samplers()) &&
+           verifier.VerifyVectorOfTables(samplers()) &&
            verifier.EndTable();
   }
 };
@@ -525,6 +599,9 @@ struct ShaderBuilder {
   void add_hlsl_cs(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_cs) {
     fbb_.AddOffset(Shader::VT_HLSL_CS, hlsl_cs);
   }
+  void add_samplers(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::ShaderSampler>>> samplers) {
+    fbb_.AddOffset(Shader::VT_SAMPLERS, samplers);
+  }
   explicit ShaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -545,8 +622,10 @@ inline flatbuffers::Offset<Shader> CreateShader(
     flatbuffers::Offset<flatbuffers::String> glsl_comp = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_vs = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_ps = 0,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_cs = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> hlsl_cs = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Assets::ShaderSampler>>> samplers = 0) {
   ShaderBuilder builder_(_fbb);
+  builder_.add_samplers(samplers);
   builder_.add_hlsl_cs(hlsl_cs);
   builder_.add_hlsl_ps(hlsl_ps);
   builder_.add_hlsl_vs(hlsl_vs);
@@ -565,7 +644,8 @@ inline flatbuffers::Offset<Shader> CreateShaderDirect(
     const char *glsl_comp = nullptr,
     const std::vector<uint8_t> *hlsl_vs = nullptr,
     const std::vector<uint8_t> *hlsl_ps = nullptr,
-    const std::vector<uint8_t> *hlsl_cs = nullptr) {
+    const std::vector<uint8_t> *hlsl_cs = nullptr,
+    const std::vector<flatbuffers::Offset<Assets::ShaderSampler>> *samplers = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto glsl_vert__ = glsl_vert ? _fbb.CreateString(glsl_vert) : 0;
   auto glsl_frag__ = glsl_frag ? _fbb.CreateString(glsl_frag) : 0;
@@ -573,6 +653,7 @@ inline flatbuffers::Offset<Shader> CreateShaderDirect(
   auto hlsl_vs__ = hlsl_vs ? _fbb.CreateVector<uint8_t>(*hlsl_vs) : 0;
   auto hlsl_ps__ = hlsl_ps ? _fbb.CreateVector<uint8_t>(*hlsl_ps) : 0;
   auto hlsl_cs__ = hlsl_cs ? _fbb.CreateVector<uint8_t>(*hlsl_cs) : 0;
+  auto samplers__ = samplers ? _fbb.CreateVector<flatbuffers::Offset<Assets::ShaderSampler>>(*samplers) : 0;
   return Assets::CreateShader(
       _fbb,
       name__,
@@ -581,7 +662,8 @@ inline flatbuffers::Offset<Shader> CreateShaderDirect(
       glsl_comp__,
       hlsl_vs__,
       hlsl_ps__,
-      hlsl_cs__);
+      hlsl_cs__,
+      samplers__);
 }
 
 struct AtlasEntry FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

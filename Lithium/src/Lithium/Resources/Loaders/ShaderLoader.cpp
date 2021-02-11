@@ -32,8 +32,13 @@ namespace Li::Loaders
 			input.VertexSrc = FillGLShaderInput(shader->glsl_vert());
 			input.FragmentSrc = FillGLShaderInput(shader->glsl_frag());
 			input.ComputeSrc = FillGLShaderInput(shader->glsl_comp());
-			
-			return Li::MakeRef<OpenGLShader>(name, input);
+
+			Ref<OpenGLShader> shader_ref = MakeRef<OpenGLShader>(name, input);
+			shader_ref->Bind();
+			for (const Assets::ShaderSampler* sampler : *shader->samplers())
+				shader_ref->SetTexture(sampler->name()->str(), sampler->binding());
+
+			return shader_ref;
 		}
 #endif
 #ifdef LI_INCLUDE_D3D11

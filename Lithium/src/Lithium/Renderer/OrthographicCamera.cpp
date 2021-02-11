@@ -4,10 +4,10 @@
 #include "Lithium/Core/Application.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Li 
+namespace Li
 {
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
-		: m_ViewMatrix(1.0f)
+		: m_ViewMatrix(1.0f), m_Position{ 0.0f, 0.0f, 0.0f }
 	{
 		SetProjection(left, right, bottom, top);
 	}
@@ -17,7 +17,7 @@ namespace Li
 		switch (Application::Get().GetAPI())
 		{
 		case RendererAPI::OpenGL:
-			m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 100.0f);
+			m_ProjectionMatrix = glm::orthoRH_NO(left, right, bottom, top, -100.0f, 100.0f);
 			break;
 		case RendererAPI::D3D11:
 			m_ProjectionMatrix = glm::orthoRH_ZO(left, right, bottom, top, -100.0f, 100.0f);
