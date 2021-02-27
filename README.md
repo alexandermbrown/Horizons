@@ -3,7 +3,9 @@ This repository contains a game and game engine prototype developed by Alex Brow
 
 ## Overview
 `Lithium/` - A game engine written in C++.
+
 `AssetBase/` - A basic asset compiler/packer for `Lithium`.
+
 `Horizons/` - A game prototype which uses the `Lithium` engine.
 
 ### Lithium
