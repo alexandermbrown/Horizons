@@ -19,7 +19,7 @@ Lithium was originally based off an early state of the [Hazel Engine](https://gi
 ### AssetBase
 AssetBase is the asset compiler / formatter / packer for `Lithium`. It uses [Google FlatBuffers](https://google.github.io/flatbuffers/) to serialise and pack the assets into files. It features:
 - [msdf](https://github.com/Chlumsky/msdfgen) font generation
-- [ShaderConductor](https://github.com/microsoft/ShaderConductor) to translate HLSL to GLSL ([code](AssetBase/src/AssetBase/ShaderSegment.cpp))
+- [ShaderConductor](https://github.com/microsoft/ShaderConductor) to translate HLSL to GLSL ([code](AssetBase/src/AssetBase/Resources/ShaderSegment.cpp))
 
 ### Horizons
 Horizons is a prototype game built with Lithium. It features:
