@@ -31,6 +31,10 @@ shader_terrain:
     2: ["u_Noise2", "u_Noise2Sampler"]
     3: ["u_Noise3", "u_Noise3Sampler"]
 
+# shader_emitter_emit:
+#   type: shader
+#   path: "./res/shaders/emitter_emit"
+
 ### Textures ###
 texture_default:
   type: texture2d

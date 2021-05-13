@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace AssetBase::Convert
+namespace Convert
 {
 	float StringToFloat(const std::string& string, const std::string& field)
 	{

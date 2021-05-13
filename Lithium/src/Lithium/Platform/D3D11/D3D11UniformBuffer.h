@@ -14,38 +14,18 @@ namespace Li
 	class D3D11UniformBuffer : public UniformBuffer
 	{
 	public:
-		D3D11UniformBuffer(const std::string& name, uint32_t bindingSlot, ShaderType shaderType, const UniformBufferLayout& layout);
-		virtual ~D3D11UniformBuffer();
+		D3D11UniformBuffer(uint32_t slot, uint32_t size);
+		virtual ~D3D11UniformBuffer() = default;
 
-		virtual void SetInt(const std::string& name, int value) override;
-		virtual void SetFloat(const std::string& name, float value) override;
-		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
-		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
-		virtual void SetMat4(const std::string& name, const glm::mat4& value) override;
-
-		virtual void UploadData() override;
+		virtual void Bind(ShaderType type) const override;
 		virtual void BindToSlot() const override {};
-		virtual void Bind() const override;
-
-		virtual inline const std::string& GetName() const override { return m_Name; }
-		virtual ShaderType GetShaderType() const override { return m_Type; }
 		virtual inline uint32_t GetSlot() const override { return m_Slot; }
+		virtual void SetData(const void* data) override;
 
 	private:
-		std::string m_Name;
-		ShaderType m_Type;
-
-#ifdef LI_ENABLE_ASSERTS
-		bool m_Changed = false;
-#endif
-
-		uint8_t* m_GlslData;
-		uint32_t m_DataSize;
-
-		std::unordered_map<std::string, UniformBufferElement> m_Elements;
-
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 		uint32_t m_Slot;
+		uint32_t m_Size;
 
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_ContextHandle;
 	};

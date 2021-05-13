@@ -1,3 +1,4 @@
+#include "ViewProjCB.h"
 
 struct VERTEX_IN
 {
@@ -13,11 +14,6 @@ struct PS_IN
 	float2 texcoord : TEXCOORD;
 	float4 color : COLOR;
 	int texindex : TEXINDEX;
-};
-
-cbuffer ViewProjectionMatrix : register(b0)
-{
-	float4x4 u_ViewProj;
 };
 
 PS_IN vs_main(VERTEX_IN input)

@@ -5,7 +5,6 @@
 #include "ConvertOpenGL.h"
 #include "OpenGLCore.h"
 
-#include "SDL.h"
 #include "glad/glad.h"
 
 #include <stdexcept>
@@ -34,7 +33,7 @@ namespace Li
 	}
 
 	OpenGLContext::OpenGLContext(SDL_Window* window_handle, int width, int height)
-		: m_WindowHandle(window_handle), m_Width(width), m_Height(height)
+		: m_WindowHandle(window_handle), m_Width(width), m_Height(height), m_DrawMode(DrawMode::Triangles)
 	{
 		m_Context = SDL_GL_CreateContext(window_handle);
 
@@ -114,6 +113,16 @@ namespace Li
 	{
 		glDrawElementsInstanced(ConvertOpenGL::DrawMode(m_DrawMode),
 			indexCount, GL_UNSIGNED_INT, nullptr, instanceCount);
+	}
+
+	void OpenGLContext::DispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y, uint32_t num_groups_z)
+	{
+		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+	}
+
+	void OpenGLContext::ShaderStorageBarrier()
+	{
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
 
 	void OpenGLContext::ResizeView(int width, int height)

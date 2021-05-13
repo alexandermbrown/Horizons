@@ -1,3 +1,4 @@
+#include "ViewProjCB.h"
 
 struct VS_IN
 {
@@ -9,11 +10,6 @@ struct PS_IN
 {
 	float4 position : SV_POSITION;
 	float4 color : COLOR;
-};
-
-cbuffer ViewProjectionMatrix : register(b0)
-{
-	float4x4 u_ViewProj;
 };
 
 PS_IN vs_main(VS_IN input)

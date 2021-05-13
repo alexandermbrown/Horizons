@@ -13,7 +13,7 @@ namespace Li
 	class LineBatchRenderer
 	{
 	public:
-		LineBatchRenderer(const Ref<UniformBuffer>& viewProjBuffer);
+		LineBatchRenderer(const Ref<UniformBuffer>& view_proj_buffer);
 		virtual ~LineBatchRenderer() = default;
 
 		void BeginScene();

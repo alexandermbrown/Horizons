@@ -9,10 +9,20 @@
 
 namespace Li
 {
+	struct DXILInput
+	{
+		const uint8_t* VSData{ nullptr };
+		const uint8_t* PSData{ nullptr };
+		const uint8_t* CSData{ nullptr };
+		uint32_t VSSize{ 0 };
+		uint32_t PSSize{ 0 };
+		uint32_t CSSize{ 0 };
+	};
+
 	class D3D11Shader : public Shader
 	{
 	public:
-		D3D11Shader(const std::string& name, const uint8_t* vs_bytecode, uint32_t vs_size, const uint8_t* ps_bytecode, uint32_t ps_size);
+		D3D11Shader(const std::string& name, const DXILInput& input);
 		virtual ~D3D11Shader() = default;
 
 		virtual void Bind() const override;
@@ -29,6 +39,7 @@ namespace Li
 
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
+		Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_ComputeShader;
 
 		std::vector<uint8_t> m_VSBufferData;
 

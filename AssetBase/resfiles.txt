@@ -1,2 +1,0 @@
-preload.yaml output/preload.lab
-resources.yaml output/resources.lab

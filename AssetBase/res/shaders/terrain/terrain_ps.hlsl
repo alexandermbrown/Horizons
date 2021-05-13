@@ -1,19 +1,10 @@
+#include "AtlasBoundsCB.h"
 
 struct PS_IN
 {
 	float4 position : SV_POSITION;
 	float2 texcoord : TEXCOORD;
 	float3 alphavalues : ALPHAVALUES;
-};
-
-cbuffer AtlasBounds : register(b3)
-{
-	float4 u_AtlasBounds0;
-	float4 u_AtlasBounds1;
-	float4 u_AtlasBounds2;
-	float4 u_AtlasBounds3;
-	float3 u_NoiseWeights;
-	float3 u_BlendWidths;
 };
 
 Texture2D u_Texture : register( t0 );

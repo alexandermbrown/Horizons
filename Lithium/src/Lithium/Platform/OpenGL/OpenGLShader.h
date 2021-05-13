@@ -7,20 +7,29 @@
 
 namespace Li
 {
+	struct GLSLInput
+	{
+		const char* VertexSrc{ nullptr };
+		const char* TessControlSrc{ nullptr };
+		const char* TessEvalSrc{ nullptr };
+		const char* GeometrySrc{ nullptr };
+		const char* FragmentSrc{ nullptr };
+		const char* ComputeSrc{ nullptr };
+	};
+
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& name, const OpenGLShaderInput& input);
+		OpenGLShader(const std::string& name, const GLSLInput& input);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;
-
+		virtual const std::string& GetName() const override { return m_Name; }
 		virtual void SetTexture(const std::string& name, int slot) override
 		{
 			UploadUniformInt(name, slot);
 		}
 
-		virtual const std::string& GetName() const override { return m_Name; }
 
 		void UploadUniformInt(const std::string& name, int value);
 		void UploadUniformFloat(const std::string& name, float value);

@@ -1,3 +1,5 @@
+#include "ViewProjCB.h"
+#include "TransformCB.h"
 
 struct VS_IN_STATIC
 {
@@ -15,16 +17,6 @@ struct PS_IN
 	float4 position : SV_POSITION;
 	float2 texcoord : TEXCOORD;
 	float3 alphavalues : ALPHAVALUES;
-};
-
-cbuffer ViewProjectionMatrix : register(b0)
-{
-	float4x4 u_ViewProj;
-};
-
-cbuffer TransformMatrix : register(b1)
-{
-	float4x4 u_Transform;
 };
 
 PS_IN vs_main(VS_IN_STATIC s_input, VS_IN_DYNAMIC d_input)

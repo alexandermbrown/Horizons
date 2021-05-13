@@ -22,6 +22,9 @@
 #include "Lithium/Renderer/Font.h"
 #include "Lithium/Renderer/Framebuffer.h"
 #include "Lithium/Renderer/RendererAPI.h"
+#include "Lithium/Renderer/ShaderInterop/ShaderInterop.h"
+#include "Lithium/Renderer/ShaderInterop/ViewProjCB.h"
+#include "Lithium/Renderer/ShaderInterop/TransformCB.h"
 
 #include "Lithium/Audio/AudioManager.h"
 #include "Lithium/Audio/AudioBuffer.h"

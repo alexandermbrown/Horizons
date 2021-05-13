@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-const std::string& AssetBase::GetOptionalString(YAML::Node node, const char* field)
+const std::string& GetOptionalString(YAML::Node node, const char* field)
 {
 	YAML::Node path_node = node[field];
 	if (path_node && path_node.IsScalar())

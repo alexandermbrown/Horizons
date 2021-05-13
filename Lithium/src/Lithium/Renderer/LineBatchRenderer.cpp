@@ -7,8 +7,8 @@
 
 namespace Li
 {
-	LineBatchRenderer::LineBatchRenderer(const Ref<UniformBuffer>& viewProjBuffer)
-		: m_VertexCount(0), m_ViewProjUB(viewProjBuffer), m_VertexArray(VertexArray::Create())
+	LineBatchRenderer::LineBatchRenderer(const Ref<UniformBuffer>& view_proj_buffer)
+		: m_VertexCount(0), m_ViewProjUB(view_proj_buffer), m_VertexArray(VertexArray::Create())
 	{
 		// Max must be an even number because each line has two points.
 		static_assert(MaxBatchVertices % 2 == 0);
@@ -20,7 +20,7 @@ namespace Li
 		m_VertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "POSITION", 0 },
 			{ ShaderDataType::Float4, "COLOR", 1 }
-			});
+		});
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 		m_VertexArray->Finalize(m_Shader);
 	}
@@ -51,7 +51,7 @@ namespace Li
 		{
 			m_Shader->Bind();
 			m_VertexBuffer->SetSubData((float*)m_VertexData.data(), sizeof(LineVertex) * m_VertexCount, 0, true);
-			m_ViewProjUB->Bind();
+			m_ViewProjUB->Bind(ShaderType::Vertex);
 
 			m_VertexArray->Bind();
 			Application::Get().GetWindow().GetContext()->SetDrawMode(Li::DrawMode::Lines);

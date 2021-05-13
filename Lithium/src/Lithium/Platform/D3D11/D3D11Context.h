@@ -17,9 +17,11 @@ namespace Li
 
 		virtual void BindDefaultRenderTarget() override;
 		virtual void Clear() override;
-		virtual void DrawArrays(uint32_t vertexCount) override;
-		virtual void DrawIndexed(uint32_t indexCount) override;
-		virtual void DrawIndexedInstanced(uint32_t indexCount, uint32_t instanceCount) override;
+		virtual void DrawArrays(uint32_t vertex_count) override;
+		virtual void DrawIndexed(uint32_t index_count) override;
+		virtual void DrawIndexedInstanced(uint32_t index_count, uint32_t instance_count) override;
+		virtual void DispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y, uint32_t num_groups_z) override;
+		virtual void ShaderStorageBarrier() override {};
 		virtual void ResizeView(int width, int height) override;
 		virtual void SetClearColor(const glm::vec4& color) override { m_ClearColor = color; }
 		virtual void SetDepthTest(bool enabled) override;

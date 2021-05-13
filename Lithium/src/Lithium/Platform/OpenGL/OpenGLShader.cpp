@@ -10,7 +10,7 @@
 
 namespace Li 
 {
-	OpenGLShader::OpenGLShader(const std::string& name, const OpenGLShaderInput& input)
+	OpenGLShader::OpenGLShader(const std::string& name, const GLSLInput& input)
 		: m_Name(name), m_RendererID(0)
 	{
 		std::unordered_map<GLenum, const char*> sources;

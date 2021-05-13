@@ -1,0 +1,8 @@
+
+includes:
+  - "../Lithium/src/Lithium/Renderer/ShaderInterop"
+  - "../Horizons/src/Horizons/Rendering/ShaderInterop"
+
+packs:
+  - ["preload.yaml", "output/preload.lab"]
+  - ["resources.yaml", "output/resources.lab"]

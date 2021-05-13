@@ -4,7 +4,12 @@
 #include "Lithium/Core/Application.h"
 #include "Lithium/Resources/ResourceManager.h"
 
+#include "ShaderInterop/ViewProjCB.h"
+#include "ShaderInterop/TransformCB.h"
+#include "ShaderInterop/FontCB.h"
+
 #include "glm/gtc/matrix_transform.hpp"
+
 
 namespace Li
 {
@@ -17,20 +22,13 @@ namespace Li
 		Application::Get().GetWindow().GetContext()->SetDepthTest(false);
 		Application::Get().GetWindow().GetContext()->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
-		s_Data->ViewProjUB = UniformBuffer::Create("ViewProjectionMatrices", 0, ShaderType::Vertex, {
-			{ "u_ViewProj", ShaderDataType::Mat4 },
-		});
+		s_Data->ViewProjUB = UniformBuffer::Create(LI_CB_GETBINDSLOT(ViewProjCB), sizeof(ViewProjCB));
 		s_Data->ViewProjUB->BindToSlot();
 
-		s_Data->TransformMatrixUB = UniformBuffer::Create("TransformMatrix", 1, ShaderType::Vertex, {
-			{ "u_Transform", ShaderDataType::Mat4 },
-		});
+		s_Data->TransformMatrixUB = UniformBuffer::Create(LI_CB_GETBINDSLOT(TransformCB), sizeof(TransformCB));
 		s_Data->TransformMatrixUB->BindToSlot();
 
-		s_Data->FontUB = UniformBuffer::Create("Font", 2, ShaderType::Fragment, {
-			{ "u_Color", ShaderDataType::Float4 },
-			{ "u_DistanceFactor", ShaderDataType::Float }
-		});
+		s_Data->FontUB = UniformBuffer::Create(LI_CB_GETBINDSLOT(FontCB), sizeof(FontCB));
 		s_Data->FontUB->BindToSlot();
 		
 		s_Data->Camera = nullptr;
@@ -105,8 +103,9 @@ namespace Li
 	{
 		s_Data->Camera = camera;
 
-		s_Data->ViewProjUB->SetMat4("u_ViewProj", camera->GetViewProjectionMatrix());
-		s_Data->ViewProjUB->UploadData();
+		ViewProjCB view_proj;
+		view_proj.u_ViewProj = camera->GetViewProjectionMatrix();
+		s_Data->ViewProjUB->SetData(&view_proj);
 
 		s_Data->SceneRenderer->BeginScene();
 		s_Data->SceneLineRenderer->BeginScene();
@@ -120,8 +119,9 @@ namespace Li
 
 	void Renderer::BeginUI()
 	{
-		s_Data->ViewProjUB->SetMat4("u_ViewProj", s_Data->UICamera->GetViewProjectionMatrix());
-		s_Data->ViewProjUB->UploadData();
+		ViewProjCB view_proj;
+		view_proj.u_ViewProj = s_Data->UICamera->GetViewProjectionMatrix();
+		s_Data->ViewProjUB->SetData(&view_proj);
 
 		s_Data->UIRenderer->BeginScene();
 	}
@@ -225,16 +225,18 @@ namespace Li
 	{
 		s_Data->TextureShader->Bind();
 
-		s_Data->TransformMatrixUB->SetMat4("u_Transform", transform);
-		s_Data->TransformMatrixUB->UploadData();
+		TransformCB transform_cb;
+		transform_cb.u_Transform = transform;
+		s_Data->TransformMatrixUB->SetData(&transform_cb);
 
-		s_Data->ViewProjUB->SetMat4("u_ViewProj", view_projection);
-		s_Data->ViewProjUB->UploadData();
+		ViewProjCB view_proj;
+		view_proj.u_ViewProj = view_projection;
+		s_Data->ViewProjUB->SetData(&view_proj);
 
 		s_Data->TextureShader->SetTexture("u_Texture", 0);
 
-		s_Data->ViewProjUB->Bind();
-		s_Data->TransformMatrixUB->Bind();
+		s_Data->ViewProjUB->Bind(ShaderType::Vertex);
+		s_Data->TransformMatrixUB->Bind(ShaderType::Vertex);
 		texture->Bind();
 		s_Data->QuadVA->Bind();
 		Application::Get().GetWindow().GetContext()->SetDrawMode(DrawMode::Triangles);
@@ -246,18 +248,20 @@ namespace Li
 		const Ref<VertexArray>& vertexArray = label->GetVertexArray();
 		s_Data->FontShader->Bind();
 
-		s_Data->TransformMatrixUB->SetMat4("u_Transform", transform);
-		s_Data->TransformMatrixUB->UploadData();
+		TransformCB transform_cb;
+		transform_cb.u_Transform = transform;
+		s_Data->TransformMatrixUB->SetData(&transform_cb);
 
-		s_Data->FontUB->SetFloat4("u_Color", color);
-		s_Data->FontUB->SetFloat("u_DistanceFactor", label->GetDistanceFactor());
-		s_Data->FontUB->UploadData();
+		FontCB font_cb;
+		font_cb.u_Color = color;
+		font_cb.u_DistanceFactor = label->GetDistanceFactor();
+		s_Data->FontUB->SetData(&font_cb);
 
 		s_Data->FontShader->SetTexture("u_Texture", 0);
 
-		s_Data->ViewProjUB->Bind();
-		s_Data->TransformMatrixUB->Bind();
-		s_Data->FontUB->Bind();
+		s_Data->ViewProjUB->Bind(ShaderType::Vertex);
+		s_Data->TransformMatrixUB->Bind(ShaderType::Vertex);
+		s_Data->FontUB->Bind(ShaderType::Fragment);
 		label->GetFont()->GetTexture()->Bind();
 		vertexArray->Bind();
 		Application::Get().GetWindow().GetContext()->SetDrawMode(DrawMode::Triangles);

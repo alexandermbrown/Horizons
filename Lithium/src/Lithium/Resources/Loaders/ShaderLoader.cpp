@@ -12,11 +12,20 @@
 
 namespace Li::Loaders
 {
-	static inline const char* FillGLShaderInput(const flatbuffers::String* source)
+	static inline const char* FillGLSLInput(const flatbuffers::String* source)
 	{
 		if (source)
 			return source->c_str();
 		return nullptr;
+	}
+
+	static inline void FillDXILInput(const uint8_t** data, uint32_t* size, const flatbuffers::Vector<uint8_t>* dxil)
+	{
+		if (dxil)
+		{
+			*data = dxil->data();
+			*size = dxil->size();
+		}
 	}
 
 	Ref<Shader> LoadShader(const Assets::Shader* shader)
@@ -28,10 +37,10 @@ namespace Li::Loaders
 #ifdef LI_INCLUDE_OPENGL
 		case RendererAPI::OpenGL:
 		{
-			OpenGLShaderInput input;
-			input.VertexSrc = FillGLShaderInput(shader->glsl_vert());
-			input.FragmentSrc = FillGLShaderInput(shader->glsl_frag());
-			input.ComputeSrc = FillGLShaderInput(shader->glsl_comp());
+			GLSLInput input;
+			input.VertexSrc = FillGLSLInput(shader->glsl_vert());
+			input.FragmentSrc = FillGLSLInput(shader->glsl_frag());
+			input.ComputeSrc = FillGLSLInput(shader->glsl_comp());
 
 			Ref<OpenGLShader> shader_ref = MakeRef<OpenGLShader>(name, input);
 			shader_ref->Bind();
@@ -44,10 +53,12 @@ namespace Li::Loaders
 #ifdef LI_INCLUDE_D3D11
 		case RendererAPI::D3D11:
 		{
-			const flatbuffers::Vector<uint8_t>* hlsl_vs = shader->hlsl_vs();
-			const flatbuffers::Vector<uint8_t>* hlsl_ps = shader->hlsl_ps();
-			//const flatbuffers::Vector<uint8_t>* hlsl_cs = shader->hlsl_cs();
-			return MakeRef<D3D11Shader>(name, hlsl_vs->data(), hlsl_vs->size(), hlsl_ps->data(), hlsl_ps->size());
+			DXILInput input;
+			FillDXILInput(&input.VSData, &input.VSSize, shader->hlsl_vs());
+			FillDXILInput(&input.PSData, &input.PSSize, shader->hlsl_ps());
+			FillDXILInput(&input.CSData, &input.CSSize, shader->hlsl_cs());
+
+			return MakeRef<D3D11Shader>(name, input);
 		}
 #endif
 		}

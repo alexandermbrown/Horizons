@@ -149,6 +149,11 @@ namespace Li
 		m_DeviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
 	}
 
+	void D3D11Context::DispatchCompute(uint32_t num_groups_x, uint32_t num_groups_y, uint32_t num_groups_z)
+	{
+		m_DeviceContext->Dispatch(num_groups_x, num_groups_y, num_groups_z);
+	}
+
 	void D3D11Context::SetDepthTest(bool enabled)
 	{
 	}

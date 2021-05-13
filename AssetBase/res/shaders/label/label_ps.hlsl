@@ -1,14 +1,9 @@
+#include "FontCB.h"
 
 struct PS_IN
 {
 	float4 position : SV_POSITION;
 	float2 texcoord : TEXCOORD;
-};
-
-cbuffer Font : register(b2)
-{
-	float4 u_Color;
-	float u_DistanceFactor;
 };
 
 Texture2D u_Texture : register( t0 );
